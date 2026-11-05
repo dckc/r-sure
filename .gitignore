@@ -7,6 +7,7 @@ deployments/*.json
 deployments/.suite-results.lock
 !deployments/.gitkeep
 !deployments/catalogue.json
+!deployments/suite-results.json
 .pytest_cache/
 .DS_Store
 

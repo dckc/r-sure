@@ -24,10 +24,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: spec/lean
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make venv
       - run: make formal-check
 
   parse:
     runs-on: ubuntu-latest
+    env:
+      RCHAIN_RUST_DIR: ${{ github.workspace }}/RNodeRust
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
