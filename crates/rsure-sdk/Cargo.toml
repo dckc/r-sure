@@ -1,17 +1,27 @@
 [package]
 name = "rsure-sdk"
-description = "Connected r-sure client: reads, writes, funding and r-gen terms"
+description = "Connected r-sure client: reads, writes, funding and admin"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 repository.workspace = true
 
+[features]
+default = ["native"]
+native = ["rcash-sdk/native", "rcash-chain/native"]
+wasm = ["rcash-sdk/wasm", "rcash-chain/wasm"]
+
 [dependencies]
 rsure-core.workspace = true
+rcash-core.workspace = true
+rcash-chain.workspace = true
+rcash-sdk.workspace = true
+rchain-crypto.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+getrandom.workspace = true
 
 [lints]
 workspace = true

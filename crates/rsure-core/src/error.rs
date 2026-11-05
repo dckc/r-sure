@@ -24,4 +24,6 @@ pub enum CoreError {
     Evidence,
     #[error("unknown status: {0}")]
     UnknownStatus(String),
+    #[error("manifest is invalid: {0}")]
+    Manifest(String),
 }

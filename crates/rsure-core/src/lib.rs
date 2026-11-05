@@ -2,18 +2,22 @@
 
 #![forbid(unsafe_code)]
 
+pub mod component;
 pub mod error;
 pub mod evidence;
 pub mod ids;
+pub mod manifest;
 pub mod math;
 pub mod primitives;
 pub mod render;
 pub mod status;
 pub mod terms;
 
+pub use component::ComponentKey;
 pub use error::CoreError;
 pub use evidence::{EvidenceKind, EvidenceRef};
 pub use ids::{BrokerId, ClaimId, LineId, PolicyId, RiskId, SlipId, SyndicateId};
+pub use manifest::Manifest;
 pub use math::{line_shares, payable, premium_split, split_bps};
 pub use primitives::{Amount, BasisPoints, Height, Nonce, OwnerId};
 pub use status::{ClaimStatus, CoverStatus, LineStatus, PolicyStatus, SlipStatus, SyndicateStatus};
