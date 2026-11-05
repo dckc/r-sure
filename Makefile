@@ -244,7 +244,7 @@ client-test:
 	cargo test --workspace
 
 client-wasm:
-	cargo check --workspace --target wasm32-unknown-unknown
+	cargo check -p rsure-wasm --target wasm32-unknown-unknown
 
 client-wasm-smoke: web-install
 	npm --prefix web run test:wasm
