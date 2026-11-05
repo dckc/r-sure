@@ -45,7 +45,16 @@ def resolve(path_text: str) -> Path:
     path = Path(path_text)
     if path.is_absolute():
         return path
-    return ROOT / path
+    direct = ROOT / path
+    if direct.exists():
+        return direct
+    # Locally the node is a sibling checkout; CI checks it out inside the workspace.
+    parts = path.parts
+    if len(parts) >= 2 and parts[0] == ".." and parts[1] == "RNodeRust":
+        inside = ROOT.joinpath("RNodeRust", *parts[2:])
+        if inside.exists():
+            return inside
+    return direct
 
 
 def ids_of(items: list[dict]) -> set[str]:

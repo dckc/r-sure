@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rchain-community/rchain-rust
+          ref: e2d073dcd02f1e560ccb84749937138a1e184b0b
+          path: RNodeRust
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -46,6 +51,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
       - run: make venv
       - run: make build
       - run: tools/parse_check.sh contracts/build/*.rho
