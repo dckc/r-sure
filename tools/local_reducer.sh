@@ -34,9 +34,10 @@ rchain-models = { path = "$RCHAIN_RUST_DIR/models" }
 rchain-rholang = { path = "$RCHAIN_RUST_DIR/rholang" }
 rchain-rspace = { path = "$RCHAIN_RUST_DIR/rspace" }
 rchain-shared = { path = "$RCHAIN_RUST_DIR/shared" }
+serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread"] }
 EOF
 
 cd "$CRATE"
 CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$ROOT/.devnet/local-reducer-target}" \
-  cargo run --release --quiet -- "$ROOT/contracts/build"
+  cargo run --release --quiet -- "$ROOT/contracts/build" "$ROOT/spec/vectors/core.json"

@@ -296,6 +296,132 @@ fn build_dir() -> Result<PathBuf, Error> {
     Ok(dir)
 }
 
+fn vectors_path() -> PathBuf {
+    std::env::args()
+        .nth(2)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| Path::new("spec/vectors/core.json").to_path_buf())
+}
+
+fn ints(text: &str) -> Vec<i64> {
+    text.split(',')
+        .filter_map(|part| part.trim().parse().ok())
+        .collect()
+}
+
+fn sum_amounts(reply: &str) -> i64 {
+    reply
+        .split("\"amount\" : ")
+        .skip(1)
+        .filter_map(|rest| {
+            rest.chars()
+                .take_while(|ch| ch.is_ascii_digit())
+                .collect::<String>()
+                .parse::<i64>()
+                .ok()
+        })
+        .sum()
+}
+
+async fn check_model_vectors(
+    reducer: &mut Reducer,
+    root: &str,
+    path: &Path,
+) -> Result<usize, Error> {
+    let document: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+    let vectors = document["vectors"]
+        .as_object()
+        .ok_or_else(|| std::io::Error::other(format!("{}: no vectors", path.display())))?;
+    let mut checked = 0;
+    for (name, vector) in vectors {
+        let Some(rest) = name.strip_prefix("math.") else {
+            continue;
+        };
+        let input = vector["input"].as_str().unwrap_or("");
+        let output = vector["output"].as_str().unwrap_or("");
+        let reply = if rest.starts_with("share.") {
+            let values = ints(input);
+            reducer
+                .component_call(
+                    root,
+                    "component:suremath",
+                    "share",
+                    &format!(", {}, {}", values[0], values[1]),
+                )
+                .await?
+        } else if rest == "split.conserve" {
+            let values = ints(input);
+            reducer
+                .component_call(
+                    root,
+                    "component:suremath",
+                    "premiumSplit",
+                    &format!(", {}, {}, {}", values[0], values[1], values[2]),
+                )
+                .await?
+        } else if rest.starts_with("payable.") {
+            let values = ints(input);
+            reducer
+                .component_call(
+                    root,
+                    "component:suremath",
+                    "payable",
+                    &format!(
+                        ", {}, {}, {}, {}",
+                        values[0], values[1], values[2], values[3]
+                    ),
+                )
+                .await?
+        } else if rest.starts_with("alloc.") {
+            let (net, shares) = input
+                .split_once(',')
+                .ok_or_else(|| std::io::Error::other(format!("{name}: input {input}")))?;
+            let bps = shares
+                .trim()
+                .trim_start_matches('[')
+                .trim_end_matches(']')
+                .split(',')
+                .map(|part| format!("{{\"shareBps\": {}}}", part.trim()))
+                .collect::<Vec<_>>()
+                .join(", ");
+            reducer
+                .component_call(
+                    root,
+                    "component:suremath",
+                    "lineShares",
+                    &format!(", {}, [{}]", net.trim(), bps),
+                )
+                .await?
+        } else {
+            return Err(std::io::Error::other(format!("{name}: unknown math vector")).into());
+        };
+
+        let reply = reply.trim();
+        let matched = if rest.starts_with("share.") {
+            let values = ints(input);
+            let part: i64 = output.parse()?;
+            reply == format!("(true, {part}, {})", values[0] - part)
+        } else if rest.starts_with("alloc.") {
+            let expected: i64 = output.parse()?;
+            sum_amounts(reply) == expected
+        } else {
+            let expected = output
+                .split(',')
+                .map(str::trim)
+                .collect::<Vec<_>>()
+                .join(", ");
+            reply == format!("(true, {expected})")
+        };
+        if !matched {
+            return Err(
+                std::io::Error::other(format!("{name}: expected {output}, got {reply}")).into(),
+            );
+        }
+        checked += 1;
+    }
+    Ok(checked)
+}
+
 async fn run() -> Result<(), Error> {
     let build = build_dir()?;
     let mut reducer = Reducer::new().await?;
@@ -386,6 +512,9 @@ async fn run() -> Result<(), Error> {
         return Err(std::io::Error::other(format!("suremath share: {share}")).into());
     }
     println!("local-reducer: suremath share(1000, 250) -> {share}");
+
+    let vectors = check_model_vectors(&mut reducer, &root, &vectors_path()).await?;
+    println!("local-reducer: {vectors} model vectors match SureMath");
 
     let address = reducer
         .deploy(

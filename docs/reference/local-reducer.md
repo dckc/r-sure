@@ -7,7 +7,7 @@
 No devnet, Docker or network is involved. The gate installs `contracts/build/*.rho` in the
 install order, then drives:
 
-1. `SureRoot.resolve` and `SureMath.share`;
+1. `SureRoot.resolve` and every `math.*` model vector through `SureMath`;
 2. syndicate create, capital contribution and broker registration;
 3. risk submit and slip open;
 4. subscribe, accept, fund the premium and bind;
@@ -35,6 +35,10 @@ resolves, then submits `resumeAll` and checks that the write path is open again.
   checked before the devnet campaign sees them.
 - Signature and pause scope: the 2-of-3 payload is signed and verified by the deployed
   `AdminGuard`; pause blocks writes, leaves reads available and resumes cleanly.
+- Model/contract drift: the 10 `math.*` vectors emitted by the Lean model
+  (`spec/vectors/core.json`) are executed against the deployed `SureMath` and compared.
+  The sharing, split, payable and allocation arithmetic the model proves and the contract
+  runs must agree.
 
 It caught the funding term's missing `wdCh` binder class of defect before any deploy, and
 it is the first place a malformed install term or a deadlocked arm fails without bringing
@@ -57,6 +61,7 @@ The output ends with:
 ```text
 local-reducer: resolve component:clock -> (true, `rho:id:…`, 1)
 local-reducer: suremath share(1000, 250) -> (true, 25, 975)
+local-reducer: 10 model vectors match SureMath
 local-reducer: bound slp:… -> (true, `rho:id:…`)
 local-reducer: claim … settled and closed
 local-reducer: refused bind is one-shot -> closed

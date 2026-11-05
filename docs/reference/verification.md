@@ -71,9 +71,9 @@ same gate in `make normalize-check`; the client terms are checked separately bec
 are assembled at runtime.
 
 `make local-reducer` goes one step further: it installs all 17 built terms in the node's
-own in-memory runtime, drives a syndicate, broker, risk, slip, bind, claim and settlement,
-runs 22 refusal vectors and a signed pause/resume, and fails on a reduction error, a wrong
-refusal or an unexpected state. It needs an RNodeRust
+own in-memory runtime, executes the 10 `math.*` model vectors against `SureMath`, drives a
+syndicate, broker, risk, slip, bind, claim and settlement, runs 22 refusal vectors and a
+signed pause/resume, and fails on a reduction error, a wrong refusal or an unexpected state. It needs an RNodeRust
 checkout and `protoc`; see [Local reducer](local-reducer.md) for its fixtures and limits.
 
 The suite inventory is in `harness/run_suites.py`. A suite that has not been run must report
