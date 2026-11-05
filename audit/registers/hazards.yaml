@@ -1,0 +1,49 @@
+hazards:
+  - id: HZ-001
+    node: N05
+    guide_word: more
+    parameter: syndicate capacity
+    deviation: two slips reserve more than free capacity
+    causes: [concurrent quotes, stale capacity read]
+    consequences: [overcommitment, unpaid claim]
+    severity: high
+    likelihood: low
+    risk: high
+    controls: [single syndicate cell, committed/written counters, bindLine re-check]
+    findings: []
+    tests: []
+    disposition: mitigate
+    owner: contracts
+    evidence: [spec/invariants.md]
+  - id: HZ-002
+    node: N12
+    guide_word: other
+    parameter: claim settlement
+    deviation: the same claim is paid twice
+    causes: [replayed settle, line retry, policy retry]
+    consequences: [double payout, capital loss]
+    severity: critical
+    likelihood: low
+    risk: critical
+    controls: [claim status, line paidFor, policy claimPaid, policy token]
+    findings: []
+    tests: []
+    disposition: mitigate
+    owner: contracts
+    evidence: [spec/invariants.md]
+  - id: HZ-003
+    node: N14
+    guide_word: as_well_as
+    parameter: r-gen evidence
+    deviation: a forged credential or case is accepted
+    causes: [adapter disabled, no strict credentials, wrong adjudicator]
+    consequences: [wrong decision, payout]
+    severity: high
+    likelihood: medium
+    risk: high
+    controls: [RgenAdapter verify, strictCredentials, OracleCase credential proof]
+    findings: []
+    tests: []
+    disposition: mitigate
+    owner: contracts
+    evidence: [docs/reference/rgen-integration.md]

@@ -1,0 +1,1016 @@
+// Syndicates: capacity, members, quotes, lines and the per-line settlement capabilities.
+// The claims purse is contract-owned; members contribute capital into it and claims are
+// paid from it. A quote reserves capacity and creates a one-shot LineGrant that captures
+// the slip's private token; openLine consumes the grant and creates a Line.
+// Placeholders: __ROOT_URI__.
+new
+  SyndicateBook, syndicateBookState,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  dops(`rho:rchain:deployerId:ops`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  authOwner, authIsOwner, resolveComponent, syndicateResolve,
+  bookAddClasses, bookByClass, classAllowed, profileOk,
+  nowHeight, makePurse, lineFactoryCreate, lineIdFor, syndicateMake,
+  lineCreditCap, lineSettleCap, lineReleaseCap
+in {
+  // @@INLINE:lib/Resolve.rho@@
+  // @@INLINE:lib/Auth.rho@@
+
+  contract syndicateResolve(@key, ret) = {
+    resolveComponent!(key, *ret)
+  } |
+
+  contract nowHeight(ret) = {
+    new cCh in {
+      syndicateResolve!("component:clock", *cCh) |
+      for (@r <- cCh) {
+        match r {
+          (true, Clock) => { @Clock!("now", *ret) }
+          _ => { ret!((false, "clock unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract bookAddClasses(@classes, @i, @byClass, @id, ret) = {
+    if (i >= classes.length()) {
+      ret!(byClass)
+    } else {
+      match classes.nth(i) {
+        k => {
+          match byClass.get(k) {
+            Nil => { bookAddClasses!(classes, i + 1, byClass.set(k, [id]), id, *ret) }
+            ids => { bookAddClasses!(classes, i + 1, byClass.set(k, ids ++ [id]), id, *ret) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract bookByClass(@byClass, @class, ret) = {
+    match byClass.get(class) {
+      Nil => { ret!([]) }
+      ids => { ret!(ids) }
+    }
+  } |
+
+  contract classAllowed(@classes, @class, @i, ret) = {
+    if (i >= classes.length()) { ret!(false) }
+    else {
+      if (classes.nth(i) == class) { ret!(true) }
+      else { classAllowed!(classes, i + 1, class, *ret) }
+    }
+  } |
+
+  contract profileOk(@profile, ret) = {
+    match (profile.get("name"), profile.get("assetId"), profile.get("riskAppetite")) {
+      (name, assetId, classes) => {
+        if (name == Nil || assetId == Nil || classes == Nil) {
+          ret!((false, "profile"))
+        } else {
+          if (name.length() == 0 || name.length() > 64) { ret!((false, "name")) }
+          else {
+            if (assetId.length() == 0 || assetId.length() > 32) { ret!((false, "asset")) }
+            else {
+              if (classes.length() == 0 || classes.length() > 16) {
+                ret!((false, "classes"))
+              } else { ret!((true, Nil)) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract makePurse(@assetId, ret) = {
+    new pCh, iCh, puCh in {
+      syndicateResolve!("component:payments", *pCh) |
+      for (@p <- pCh) {
+        match p {
+          (true, Payments) => {
+            @Payments!("issuer", assetId, *iCh) |
+            for (@i <- iCh) {
+              match i {
+                (true, brand, issuer) => {
+                  @issuer!("makeEmptyPurse", *puCh) |
+                  for (@pu <- puCh) {
+                    match pu {
+                      (true, purse) => { ret!((true, purse, brand, issuer)) }
+                      _ => { ret!(pu) }
+                    }
+                  }
+                }
+                _ => { ret!(i) }
+              }
+            }
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract lineIdFor(@policyId, @syndicateId, ret) = {
+    ret!("lin:" ++ policyId ++ ":" ++ syndicateId)
+  } |
+
+  // ---------- book ----------
+
+  contract SyndicateBook(@"create", dId, @profile, ret) = {
+    new aCh, pkCh, prCh, purseCh, dupCh in {
+      authOwner!(*dId, *aCh) |
+      dops!("pubKeyBytes", *dId, *pkCh) |
+      profileOk!(profile, *prCh) |
+      for (@(true, ownerId) <- aCh; @pubKey <- pkCh; @ok <- prCh) {
+        match ok {
+          (false, reason) => { ret!((false, reason)) }
+          (true, Nil) => {
+            for (@b <<- syndicateBookState) {
+              match b.get("byOwner").get(ownerId) {
+                Nil => { dupCh!(Nil) }
+                existing => { dupCh!((false, "duplicate owner")) }
+              }
+            } |
+            for (@dup <- dupCh) {
+            match dup {
+              Nil => {
+            makePurse!(profile.get("assetId"), *purseCh) |
+            for (@purseR <- purseCh) {
+              match purseR {
+                (true, purse, brand, issuer) => {
+                  syndicateMake!(ownerId, pubKey, profile, *purse, brand, *issuer, *ret)
+                }
+                _ => { ret!(purseR) }
+              }
+            }
+              }
+              _ => { ret!(dup) }
+            }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SyndicateBook(@"syndicateOf", @ownerId, ret) = {
+    for (@b <<- syndicateBookState) {
+      match b.get("byOwner").get(ownerId) {
+        Nil => { ret!((false, "unknown syndicate")) }
+        id => {
+          match b.get("syndicates").get(id) {
+            Nil => { ret!((false, "unknown syndicate")) }
+            uri => { ret!((true, id, uri)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SyndicateBook(@"syndicates", ret) = {
+    for (@b <<- syndicateBookState) { ret!((true, b.get("syndicates"))) }
+  } |
+
+  contract SyndicateBook(@"byClass", @class, ret) = {
+    for (@b <<- syndicateBookState) {
+      new cCh in {
+        bookByClass!(b.get("byClass"), class, *cCh) |
+        for (@ids <- cCh) { ret!((true, ids)) }
+      }
+    }
+  } |
+
+  contract SyndicateBook(@"count", ret) = {
+    for (@b <<- syndicateBookState) { ret!((true, b.get("count"))) }
+  } |
+
+  contract SyndicateBook(@"verify", @uri, ret) = {
+    for (@b <<- syndicateBookState) {
+      new found in {
+        found!(false) |
+        for (@f <- found) { ret!((true, f)) }
+      }
+    }
+  } |
+
+  // ---------- per-line capabilities ----------
+
+  contract lineCreditCap(policyToken, purse, brand, issuer, stateCell, lineId, ret) = {
+    new LineCredit in {
+      contract LineCredit(@"credit", @lineToken, payment, ret2) = {
+        if (*lineToken != *policyToken) {
+          ret2!((false, "not holder"))
+        } else {
+          new aCh in {
+            @issuer!("getAmountOf", payment, *aCh) |
+            for (@r <- aCh) {
+              match r {
+                (true, amount) => {
+                  new dCh in {
+                    @purse!("deposit", payment, *dCh) |
+                    for (@d <- dCh) {
+                      match d {
+                        (true, _) => {
+                          for (@s <- stateCell) {
+                            stateCell!(s.set("premiums", s.get("premiums") + amount)
+                                        .set("nonce", s.get("nonce") + 1)) |
+                            ret2!((true, amount))
+                          }
+                        }
+                        _ => { 1/0 }
+                      }
+                    }
+                  }
+                }
+                _ => { ret2!(r) }
+              }
+            }
+          }
+        }
+      } |
+      ret!(*LineCredit)
+    }
+  } |
+
+  contract lineSettleCap(policyToken, purse, brand, issuer, stateCell,
+                         lineId, exposure, ret) = {
+    new LineSettle in {
+      contract LineSettle(@"pay", @lineToken, @claimId, @amount, @targetOwner, ret2) = {
+        if (*lineToken != *policyToken) {
+          ret2!((false, "not holder"))
+        } else {
+          for (@s <- stateCell) {
+            match s.get("lines").get(lineId) {
+              Nil => { stateCell!(s) | ret2!((false, "unknown line")) }
+              l => {
+                match l.get("paidFor").get(claimId) {
+                  _ => {
+                    if (l.get("paidFor").get(claimId) != Nil) {
+                      stateCell!(s) | ret2!((false, "already paid"))
+                    } else {
+                      if (amount < 1 || amount > exposure - l.get("paid")) {
+                        stateCell!(s) | ret2!((false, "amount"))
+                      } else {
+                        new balCh in {
+                          @purse!("getCurrentAmount", *balCh) |
+                          for (@bal <- balCh) {
+                                if (bal < amount) {
+                                  stateCell!(s) | ret2!((false, "insufficient"))
+                                } else {
+                                  new fCh in {
+                                    syndicateResolve!("component:payments", *fCh) |
+                                    for (@p <- fCh) {
+                                      match p {
+                                        (true, Payments) => {
+                                          new facetCh in {
+                                            @Payments!("depositFacet", targetOwner,
+                                                       s.get("assetId"), *facetCh) |
+                                            for (@fr <- facetCh) {
+                                              match fr {
+                                                (true, facet) => {
+                                                  stateCell!(s.set("capital",
+                                                      s.get("capital") - amount)
+                                                    .set("written",
+                                                      s.get("written") - amount)
+                                                    .set("claimsPaid",
+                                                      s.get("claimsPaid") + amount)
+                                                    .set("lines", s.get("lines").set(lineId,
+                                                      l.set("paid", l.get("paid") + amount)
+                                                       .set("paidFor",
+                                                         l.get("paidFor").set(claimId, amount))))
+                                                    .set("nonce", s.get("nonce") + 1)) |
+                                                  new wCh in {
+                                                    @purse!("withdraw", (brand, amount),
+                                                            *wCh) |
+                                                    for (@w <- wCh) {
+                                                      match w {
+                                                        (true, payment) => {
+                                                          new depCh in {
+                                                            @facet!("deposit", payment,
+                                                                    *depCh) |
+                                                            for (@dd <- depCh) {
+                                                              match dd {
+                                                                (true, _) => {
+                                                                  ret2!((true, amount))
+                                                                }
+                                                                _ => { 1/0 }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                        _ => { 1/0 }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                                _ => { ret2!(fr) }
+                                              }
+                                            }
+                                          }
+                                        }
+                                        _ => { ret2!((false, "payments unavailable")) }
+                                      }
+                                    }
+                                  }
+                                }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+      ret!(*LineSettle)
+    }
+  } |
+
+  contract lineReleaseCap(policyToken, stateCell, lineId, exposure, ret) = {
+    new LineRelease in {
+      contract LineRelease(@"release", @lineToken, ret2) = {
+        if (*lineToken != *policyToken) {
+          ret2!((false, "not holder"))
+        } else {
+          for (@s <- stateCell) {
+            match s.get("lines").get(lineId) {
+              Nil => { stateCell!(s) | ret2!((false, "unknown line")) }
+              l => {
+                if (l.get("status") == "released") {
+                  stateCell!(s) | ret2!((true, "already released"))
+                } else {
+                  stateCell!(s.set("written",
+                      s.get("written") - (exposure - l.get("paid")))
+                    .set("lines", s.get("lines").set(lineId,
+                      l.set("status", "released")))
+                    .set("nonce", s.get("nonce") + 1)) |
+                  ret2!((true, Nil))
+                }
+              }
+            }
+          }
+        }
+      } |
+      ret!(*LineRelease)
+    }
+  } |
+
+
+  contract syndicateMake(@ownerId, @pubKey, @profile, purse, brand, issuer, ret) = {
+                    syndicateState!({
+                      "id": "",
+                      "uri": "",
+                      "ownerId": ownerId,
+                      "managerId": ownerId,
+                      "managerPubKey": pubKey,
+                      "name": profile.get("name"),
+                      "assetId": profile.get("assetId"),
+                      "treasuryId": ownerId,
+                      "capital": 0,
+                      "committed": 0,
+                      "written": 0,
+                      "premiums": 0,
+                      "claimsPaid": 0,
+                      "members": {},
+                      "quotes": {},
+                      "lines": {},
+                      "riskAppetite": profile.get("riskAppetite"),
+                      "status": "active",
+                      "nonce": 0
+                    }) |
+
+                    contract Syndicate(@"info", ret2) = {
+                      for (@s <<- syndicateState) { ret2!((true, s)) }
+                    } |
+
+                    contract Syndicate(@"capacity", ret2) = {
+                      for (@s <<- syndicateState) {
+                        ret2!((true, {"capital": s.get("capital"),
+                                      "committed": s.get("committed"),
+                                      "written": s.get("written"),
+                                      "free": s.get("capital") - s.get("committed")
+                                              - s.get("written")}))
+                      }
+                    } |
+
+                    contract Syndicate(@"quotes", ret2) = {
+                      for (@s <<- syndicateState) { ret2!((true, s.get("quotes"))) }
+                    } |
+
+                    contract Syndicate(@"quote", @grantId, ret2) = {
+                      for (@s <<- syndicateState) {
+                        match s.get("quotes").get(grantId) {
+                          Nil => { ret2!((false, "unknown quote")) }
+                          q => { ret2!((true, q)) }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"lines", ret2) = {
+                      for (@s <<- syndicateState) { ret2!((true, s.get("lines"))) }
+                    } |
+
+                    contract Syndicate(@"line", @lineId, ret2) = {
+                      for (@s <<- syndicateState) {
+                        match s.get("lines").get(lineId) {
+                          Nil => { ret2!((false, "unknown line")) }
+                          l => { ret2!((true, l)) }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"members", ret2) = {
+                      for (@s <<- syndicateState) { ret2!((true, s.get("members"))) }
+                    } |
+
+                    contract Syndicate(@"member", @memberId, ret2) = {
+                      for (@s <<- syndicateState) {
+                        match s.get("members").get(memberId) {
+                          Nil => { ret2!((false, "unknown member")) }
+                          m => { ret2!((true, m)) }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"setManager", dId2, @newManagerId, ret2) = {
+                      new a2Ch in {
+                        authOwner!(*dId2, *a2Ch) |
+                        for (@(true, who) <- a2Ch) {
+                          for (@s <- syndicateState) {
+                            if (who != s.get("ownerId")) {
+                              syndicateState!(s) | ret2!((false, "not owner"))
+                            } else {
+                              if (newManagerId.length() == 0) {
+                                syndicateState!(s) | ret2!((false, "manager"))
+                              } else {
+                                syndicateState!(s.set("managerId", newManagerId)
+                                                 .set("nonce", s.get("nonce") + 1)) |
+                                ret2!((true, Nil))
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"contribute", dId2, payment, ret2) = {
+                      new a2Ch, iCh in {
+                        authOwner!(*dId2, *a2Ch) |
+                        @issuer!("getAmountOf", payment, *iCh) |
+                        for (@(true, who) <- a2Ch; @amt <- iCh) {
+                          match amt {
+                            (true, amount) => {
+                              if (amount < 1) { ret2!((false, "amount")) }
+                              else {
+                                new dCh in {
+                                  @purse!("deposit", payment, *dCh) |
+                                  for (@d <- dCh) {
+                                    match d {
+                                      (true, _) => {
+                                        for (@s <- syndicateState) {
+                                          match s.get("members").get(who) {
+                                            Nil => {
+                                              syndicateState!(s.set("capital",
+                                                  s.get("capital") + amount)
+                                                .set("members",
+                                                  s.get("members").set(who,
+                                                    {"contributed": amount, "withdrawn": 0}))
+                                                .set("nonce", s.get("nonce") + 1)) |
+                                              ret2!((true, Nil))
+                                            }
+                                            m => {
+                                              syndicateState!(s.set("capital",
+                                                  s.get("capital") + amount)
+                                                .set("members",
+                                                  s.get("members").set(who,
+                                                    m.set("contributed",
+                                                      m.get("contributed") + amount)))
+                                                .set("nonce", s.get("nonce") + 1)) |
+                                              ret2!((true, Nil))
+                                            }
+                                          }
+                                        }
+                                      }
+                                      _ => { 1/0 }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            _ => { ret2!(amt) }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"withdrawCapital", dId2, @amount, ret2) = {
+                      new a2Ch in {
+                        authOwner!(*dId2, *a2Ch) |
+                        for (@(true, who) <- a2Ch) {
+                          for (@s <- syndicateState) {
+                            match s.get("members").get(who) {
+                              Nil => { syndicateState!(s) | ret2!((false, "not member")) }
+                              m => {
+                                match m.get("contributed") - m.get("withdrawn") {
+                                  available => {
+                                    if (amount < 1 || amount > available) {
+                                      syndicateState!(s) | ret2!((false, "amount"))
+                                    } else {
+                                      if (amount > s.get("capital") - s.get("committed")
+                                                   - s.get("written")) {
+                                        syndicateState!(s) | ret2!((false, "capacity"))
+                                      } else {
+                                        new fCh in {
+                                          syndicateResolve!("component:payments", *fCh) |
+                                          for (@p <- fCh) {
+                                            match p {
+                                              (true, Payments) => {
+                                                new facetCh in {
+                                                  @Payments!("depositFacet", who,
+                                                             s.get("assetId"), *facetCh) |
+                                                  for (@fr <- facetCh) {
+                                                    match fr {
+                                                      (true, facet) => {
+                                                        syndicateState!(s.set("capital",
+                                                            s.get("capital") - amount)
+                                                          .set("members",
+                                                            s.get("members").set(who,
+                                                              m.set("withdrawn",
+                                                                m.get("withdrawn") + amount)))
+                                                          .set("nonce", s.get("nonce") + 1)) |
+                                                        new wCh in {
+                                                          @purse!("withdraw",
+                                                                  (brand, amount), *wCh) |
+                                                          for (@w <- wCh) {
+                                                            match w {
+                                                              (true, payment) => {
+                                                                new depCh in {
+                                                                  @facet!("deposit", payment,
+                                                                          *depCh) |
+                                                                  for (@dd <- depCh) {
+                                                                    match dd {
+                                                                      (true, _) => {
+                                                                        ret2!((true, Nil))
+                                                                      }
+                                                                      _ => { 1/0 }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                              _ => { 1/0 }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                      _ => { ret2!(fr) }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                              _ => { ret2!((false, "payments unavailable")) }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"quote", dId2, @class, @slipId, @shareBps,
+                                      @exposure, @expiryHeight, slipToken, ret2) = {
+                      new a2Ch, hCh in {
+                        authOwner!(*dId2, *a2Ch) |
+                        nowHeight!(*hCh) |
+                        for (@(true, who) <- a2Ch; @(true, now) <- hCh) {
+                          for (@s <- syndicateState) {
+                            if (who != s.get("managerId")) {
+                              syndicateState!(s) | ret2!((false, "not manager"))
+                            } else {
+                              if (s.get("status") != "active") {
+                                syndicateState!(s) | ret2!((false, "not active"))
+                              } else {
+                                new okCh in {
+                                  classAllowed!(s.get("riskAppetite"), class, 0, *okCh) |
+                                  for (@ok <- okCh) {
+                                    if (not ok) {
+                                      syndicateState!(s) | ret2!((false, "class"))
+                                    } else {
+                                      if (shareBps < 1 || shareBps > 10000
+                                          || exposure < 1 || expiryHeight <= now) {
+                                        syndicateState!(s) | ret2!((false, "quote"))
+                                      } else {
+                                        if (exposure > s.get("capital") - s.get("committed")
+                                                      - s.get("written")) {
+                                          syndicateState!(s) | ret2!((false, "capacity"))
+                                        } else {
+                                          match "grt:" ++ s.get("id") ++ ":"
+                                                ++ s.get("nonce").toString() {
+                                            grantId => {
+                                              syndicateState!(s.set("committed",
+                                                  s.get("committed") + exposure)
+                                                .set("quotes",
+                                                  s.get("quotes").set(grantId, {
+                                                    "grantId": grantId,
+                                                    "slipId": slipId,
+                                                    "class": class,
+                                                    "shareBps": shareBps,
+                                                    "exposure": exposure,
+                                                    "expiryHeight": expiryHeight,
+                                                    "status": "open",
+                                                    "grantUri": ""
+                                                  }))
+                                                .set("nonce", s.get("nonce") + 1)) |
+                                              new LineGrant, grantState, guCh in {
+                                                grantState!({
+                                                  "grantId": grantId,
+                                                  "syndicateId": s.get("id"),
+                                                  "slipId": slipId,
+                                                  "class": class,
+                                                  "shareBps": shareBps,
+                                                  "exposure": exposure,
+                                                  "expiryHeight": expiryHeight,
+                                                  "status": "open"
+                                                }) |
+                                                contract LineGrant(@"get", ret3) = {
+                                                  for (@g <<- grantState) {
+                                                    ret3!((true, g))
+                                                  }
+                                                } |
+                                                contract LineGrant(@"consume", @slipId2,
+                                                    @shareBps2, @exposure2,
+                                                    lineToken, ret3) = {
+                                                  for (@g <- grantState) {
+                                                    if (g.get("status") != "open") {
+                                                      grantState!(g) |
+                                                      ret3!((false, "closed"))
+                                                    } else {
+                                                      if (*lineToken != *slipToken) {
+                                                        grantState!(g) |
+                                                        ret3!((false, "not holder"))
+                                                      } else {
+                                                        if (slipId2 != g.get("slipId")
+                                                            || shareBps2 != g.get("shareBps")
+                                                            || exposure2 != g.get("exposure")) {
+                                                          grantState!(g) |
+                                                          ret3!((false, "quote"))
+                                                        } else {
+                                                          grantState!(g.set("status", "consumed")) |
+                                                          ret3!((true, g))
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                } |
+                                                contract LineGrant(@"revoke", ret3) = {
+                                                  for (@g <- grantState) {
+                                                    if (g.get("status") != "open") {
+                                                      grantState!(g) |
+                                                      ret3!((false, "closed"))
+                                                    } else {
+                                                      grantState!(g.set("status", "revoked")) |
+                                                      ret3!((true, Nil))
+                                                    }
+                                                  }
+                                                } |
+                                                contract LineGrant(@"expire", ret3) = {
+                                                  new h2Ch in {
+                                                    nowHeight!(*h2Ch) |
+                                                    for (@(true, now2) <- h2Ch) {
+                                                      for (@g <- grantState) {
+                                                        if (g.get("status") != "open") {
+                                                          grantState!(g) |
+                                                          ret3!((false, "closed"))
+                                                        } else {
+                                                          if (now2 <= g.get("expiryHeight")) {
+                                                            grantState!(g) |
+                                                            ret3!((false, "not expired"))
+                                                          } else {
+                                                            grantState!(g.set("status",
+                                                                              "expired")) |
+                                                            ret3!((true, Nil))
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                } |
+                                                rs!(bundle+{*LineGrant}, *guCh) |
+                                                for (@grantUri <- guCh) {
+                                                  for (@s2 <- syndicateState) {
+                                                    match s2.get("quotes").get(grantId) {
+                                                      Nil => {
+                                                        syndicateState!(s2) |
+                                                        ret2!((false, "quote lost"))
+                                                      }
+                                                      q => {
+                                                        syndicateState!(s2.set("quotes",
+                                                          s2.get("quotes").set(grantId,
+                                                            q.set("grantUri", grantUri)))) |
+                                                        ret2!((true, grantId, grantUri))
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"revokeQuote", dId2, @grantId, ret2) = {
+                      new a2Ch in {
+                        authOwner!(*dId2, *a2Ch) |
+                        for (@(true, who) <- a2Ch) {
+                          for (@s <- syndicateState) {
+                            if (who != s.get("managerId")) {
+                              syndicateState!(s) | ret2!((false, "not manager"))
+                            } else {
+                              match s.get("quotes").get(grantId) {
+                                Nil => { syndicateState!(s) | ret2!((false, "unknown quote")) }
+                                q => {
+                                  if (q.get("status") != "open") {
+                                    syndicateState!(s) | ret2!((false, "closed"))
+                                  } else {
+                                    syndicateState!(s.set("committed",
+                                        s.get("committed") - q.get("exposure"))
+                                      .set("quotes", s.get("quotes").set(grantId,
+                                        q.set("status", "revoked")))
+                                      .set("nonce", s.get("nonce") + 1)) |
+                                    ret2!((true, Nil))
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"expireQuote", @grantId, ret2) = {
+                      new hCh in {
+                        nowHeight!(*hCh) |
+                        for (@h <- hCh) {
+                          match h {
+                            (true, now) => {
+                              for (@s <- syndicateState) {
+                                match s.get("quotes").get(grantId) {
+                                  Nil => {
+                                    syndicateState!(s) |
+                                    ret2!((false, "unknown quote"))
+                                  }
+                                  q => {
+                                    if (q.get("status") != "open") {
+                                      syndicateState!(s) |
+                                      ret2!((false, "closed"))
+                                    } else {
+                                      if (now <= q.get("expiryHeight")) {
+                                        syndicateState!(s) |
+                                        ret2!((false, "not expired"))
+                                      } else {
+                                        syndicateState!(s.set("committed",
+                                            s.get("committed") - q.get("exposure"))
+                                          .set("quotes", s.get("quotes").set(grantId,
+                                            q.set("status", "expired")))
+                                          .set("nonce", s.get("nonce") + 1)) |
+                                        ret2!((true, Nil))
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            _ => { ret2!(h) }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"openLine", @grantId, @grantUri, @policyId,
+                                      @slipId, slipToken, policyToken, ret2) = {
+                      for (@s <- syndicateState) {
+                        match s.get("quotes").get(grantId) {
+                          Nil => { syndicateState!(s) | ret2!((false, "unknown quote")) }
+                          q => {
+                            if (q.get("status") != "open") {
+                              syndicateState!(s) | ret2!((false, "closed"))
+                            } else {
+                              new lfCh in {
+                                syndicateResolve!("component:line-factory", *lfCh) |
+                                for (@lf <- lfCh) {
+                                  match lf {
+                                    (true, LineFactory) => {
+                                      new lCh in {
+                                        lineIdFor!(policyId, s.get("id"), *lCh) |
+                                        for (@lineId <- lCh) {
+                                          match s.get("lines").get(lineId) {
+                                            Nil => {
+                                              new gCh in {
+                                                rl!(grantUri, *gCh) |
+                                                for (LineGrant <- gCh) {
+                                                  new consCh in {
+                                                    @LineGrant!("consume", slipId,
+                                                      q.get("shareBps"), q.get("exposure"),
+                                                      *slipToken, *consCh) |
+                                                    for (@cons <- consCh) {
+                                                      match cons {
+                                                        (true, _) => {
+                                                          new creditCh, settleCh, releaseCh in {
+                                                            lineCreditCap!(
+                                                              policyToken, *purse, brand,
+                                                              *issuer, *syndicateState, lineId,
+                                                              *creditCh) |
+                                                            lineSettleCap!(
+                                                              policyToken, *purse, brand,
+                                                              *issuer, *syndicateState,
+                                                              lineId, q.get("exposure"),
+                                                              *settleCh) |
+                                                            lineReleaseCap!(
+                                                              policyToken, *syndicateState,
+                                                              lineId, q.get("exposure"),
+                                                              *releaseCh) |
+                                                            for (@creditCap <- creditCh;
+                                                                 @settleCap <- settleCh;
+                                                                 @releaseCap <- releaseCh) {
+                                                            new lfRet in {
+                                                              @LineFactory!("create",
+                                                                {"lineId": lineId,
+                                                                 "policy": policyId,
+                                                                 "syndicate": s.get("id"),
+                                                                 "shareBps": q.get("shareBps"),
+                                                                 "exposure": q.get("exposure")},
+                                                                *creditCap, *settleCap,
+                                                                *releaseCap, *policyToken,
+                                                                *lfRet) |
+                                                              for (@lfr <- lfRet) {
+                                                                match lfr {
+                                                                  (true, lineUri) => {
+                                                                    for (@s2 <- syndicateState) {
+                                                                      match s2.get("quotes").get(grantId) {
+                                                                        Nil => {
+                                                                          syndicateState!(s2) |
+                                                                          ret2!((false, "quote lost"))
+                                                                        }
+                                                                        q2 => {
+                                                                          syndicateState!(
+                                                                            s2.set("committed",
+                                                                              s2.get("committed") - q2.get("exposure"))
+                                                                              .set("written",
+                                                                                s2.get("written") + q2.get("exposure"))
+                                                                              .set("quotes",
+                                                                                s2.get("quotes").set(grantId,
+                                                                                  q2.set("status", "consumed")))
+                                                                              .set("lines",
+                                                                                s2.get("lines").set(lineId, {
+                                                                                  "uri": lineUri,
+                                                                                  "policyId": policyId,
+                                                                                  "shareBps": q2.get("shareBps"),
+                                                                                  "exposure": q2.get("exposure"),
+                                                                                  "paid": 0,
+                                                                                  "paidFor": {},
+                                                                                  "status": "bound"
+                                                                                }))
+                                                                              .set("nonce",
+                                                                                s2.get("nonce") + 1)) |
+                                                                          ret2!((true, lineId, lineUri))
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                  _ => { 1/0 }
+                                                                }
+                                                              }
+                                                            }
+                                                            }
+                                                          }
+                                                        }
+                                                        _ => {
+                                                          syndicateState!(s) |
+                                                          ret2!(cons)
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                            _ => { syndicateState!(s) | ret2!((false, "duplicate line")) }
+                                          }
+                                        }
+                                      }
+                                    }
+                                    _ => { syndicateState!(s) | ret2!((false, "line factory")) }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"suspend", dId2, ret2) = {
+                      new a2Ch in {
+                        authOwner!(*dId2, *a2Ch) |
+                        for (@(true, who) <- a2Ch) {
+                          for (@s <- syndicateState) {
+                            if (who != s.get("ownerId")) {
+                              syndicateState!(s) | ret2!((false, "not owner"))
+                            } else {
+                              syndicateState!(s.set("status", "suspended")
+                                               .set("nonce", s.get("nonce") + 1)) |
+                              ret2!((true, Nil))
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    contract Syndicate(@"resume", dId2, ret2) = {
+                      new a2Ch in {
+                        authOwner!(*dId2, *a2Ch) |
+                        for (@(true, who) <- a2Ch) {
+                          for (@s <- syndicateState) {
+                            if (who != s.get("ownerId")) {
+                              syndicateState!(s) | ret2!((false, "not owner"))
+                            } else {
+                              syndicateState!(s.set("status", "active")
+                                               .set("nonce", s.get("nonce") + 1)) |
+                              ret2!((true, Nil))
+                            }
+                          }
+                        }
+                      }
+                    } |
+
+                    rs!(bundle+{*Syndicate}, *uriCh) |
+                    for (@uri <- uriCh) {
+                      for (@s2 <- syndicateState) {
+                        syndicateState!(s2.set("uri", uri)) |
+                        for (@b <- syndicateBookState) {
+                          match b.get("byOwner").get(ownerId) {
+                            Nil => {
+                              match "syn:" ++ ownerId ++ ":" ++ b.get("count").toString() {
+                                id2 => {
+                                  new cCh in {
+                                    bookAddClasses!(s2.get("riskAppetite"), 0,
+                                                    b.get("byClass"), id2, *cCh) |
+                                    for (@byClass <- cCh) {
+                                      syndicateBookState!(b.set("syndicates",
+                                          b.get("syndicates").set(id2, uri))
+                                        .set("byOwner", b.get("byOwner").set(ownerId, id2))
+                                        .set("byClass", byClass)
+                                        .set("count", b.get("count") + 1)) |
+                                      for (@s3 <- syndicateState) {
+                                        syndicateState!(s3.set("id", id2)) |
+                                        ret!((true, id2, uri))
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            existing => { ret!((false, "duplicate owner", existing)) }
+                          }
+                        }
+                      }
+                    }
+                  } |
+
+  syndicateBookState!({
+    "syndicates": {},
+    "byOwner": {},
+    "byClass": {},
+    "count": 0,
+    "nonce": 0
+  }) |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*SyndicateBook}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:syndicate-book", uri, 1, "syndicate",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

@@ -1,0 +1,738 @@
+// Slip: a placing slip. The broker opens it, the insured accepts and funds the premium,
+// syndicate managers subscribe through a LineGrant, and bind opens the lines, creates the
+// policy and distributes the premium. Capacity is reserved by the syndicate quote.
+// Placeholders: __ROOT_URI__.
+new
+  SlipFactory,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  slipResolve, nowHeight, slipMake, slipShareSum, slipHasShare, slipLeadSecond,
+  slipOpenLines, slipExpireQuotes, mapKeys, slipReqOk, authOwner, slipStatus
+in {
+// Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
+
+contract authOwner(dId, ret) = {
+  new dops(`rho:rchain:deployerId:ops`), rev(`rho:rev:address`), pkCh, addrCh in {
+    dops!("pubKeyBytes", *dId, *pkCh) |
+    for (@pk <- pkCh) {
+      rev!("fromPublicKey", pk, *addrCh) |
+      for (@addr <- addrCh) { ret!((true, addr)) }
+    }
+  }
+} |
+
+contract authIsOwner(dId, @ownerId, ret) = {
+  new c in {
+    authOwner!(*dId, *c) |
+    for (@r <- c) {
+      match r {
+        (true, addr) => {
+          if (addr == ownerId) { ret!((true, Nil)) }
+          else { ret!((false, "not owner")) }
+        }
+        _ => { ret!((false, "not owner")) }
+      }
+    }
+  }
+} |
+
+  contract slipResolve(@key, ret) = {
+    new rCh, Root, kCh in {
+      rl!(`__ROOT_URI__`, *rCh) |
+      for (Root <- rCh) {
+        Root!("resolve", key, 1, *kCh) |
+        for (@r <- kCh) {
+          match r {
+            (true, uri, _) => {
+              new cCh in {
+                rl!(uri, *cCh) |
+                for (C <- cCh) { ret!((true, *C)) }
+              }
+            }
+            _ => { ret!((false, "unavailable", key)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract nowHeight(ret) = {
+    new cCh in {
+      slipResolve!("component:clock", *cCh) |
+      for (@r <- cCh) {
+        match r {
+          (true, Clock) => { @Clock!("now", *ret) }
+          _ => { ret!((false, "clock unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract mapKeys(@m, ret) = {
+    ret!(m.keys())
+  } |
+
+  contract slipStatus(@sum, ret) = {
+    if (sum == 10000) { ret!("subscribed") }
+    else { ret!("open") }
+  } |
+
+  contract slipShareSum(@keys, @i, @shares, @acc, ret) = {
+    if (i >= keys.length()) { ret!(acc) }
+    else {
+      match keys.nth(i) {
+        k => {
+          match shares.get(k) {
+            Nil => { slipShareSum!(keys, i + 1, shares, acc, *ret) }
+            s => { slipShareSum!(keys, i + 1, shares, acc + s.get("shareBps"), *ret) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract slipHasShare(@shares, @id, ret) = {
+    match shares.get(id) {
+      Nil => { ret!(false) }
+      _ => { ret!(true) }
+    }
+  } |
+
+  contract slipLeadSecond(@shares, @keys, @i, @lead, @second, @secondBps, ret) = {
+    if (i >= keys.length()) { ret!((lead, second)) }
+    else {
+      match keys.nth(i) {
+        k => {
+          match shares.get(k) {
+            Nil => { slipLeadSecond!(shares, keys, i + 1, lead, second, secondBps, *ret) }
+            s => {
+              if (lead == Nil) {
+                slipLeadSecond!(shares, keys, i + 1, k, second, secondBps, *ret)
+              } else {
+                if (k != lead && s.get("shareBps") > secondBps) {
+                  slipLeadSecond!(shares, keys, i + 1, lead, k, s.get("shareBps"), *ret)
+                } else {
+                  slipLeadSecond!(shares, keys, i + 1, lead, second, secondBps, *ret)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenLines(@keys, @i, @shares, @policyId, @slipId, slipToken, policyToken, @acc, ret) = {
+    if (i >= keys.length()) { ret!((true, acc)) }
+    else {
+      match keys.nth(i) {
+        k => {
+          match shares.get(k) {
+            Nil => { slipOpenLines!(keys, i + 1, shares, policyId, slipId,
+                                    *slipToken, *policyToken, acc, *ret) }
+            s => {
+              new synCh in {
+                rl!(s.get("syndicate"), *synCh) |
+                for (Syndicate <- synCh) {
+                  new olCh in {
+                    @Syndicate!("openLine", s.get("grantId"), s.get("grantUri"),
+                                policyId, slipId, *slipToken, *policyToken, *olCh) |
+                    for (@ol <- olCh) {
+                      match ol {
+                        (true, lineId, lineUri) => {
+                          slipOpenLines!(keys, i + 1, shares, policyId, slipId,
+                                         *slipToken, *policyToken,
+                                         acc ++ [{"syndicate": k,
+                                                  "shareBps": s.get("shareBps"),
+                                                  "lineId": lineId,
+                                                  "uri": lineUri,
+                                                  "manager": s.get("manager")}], *ret)
+                        }
+                        _ => { 1/0 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract slipExpireQuotes(@keys, @i, @shares, ret) = {
+    if (i >= keys.length()) { ret!((true, Nil)) }
+    else {
+      match keys.nth(i) {
+        k => {
+          match shares.get(k) {
+            Nil => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
+            s => {
+              new synCh in {
+                rl!(s.get("syndicate"), *synCh) |
+                for (Syndicate <- synCh) {
+                  new eCh in {
+                    @Syndicate!("expireQuote", s.get("grantId"), *eCh) |
+                    for (@e <- eCh) {
+                      match e {
+                        (true, _) => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
+                        (false, "not expired") => {
+                          slipExpireQuotes!(keys, i + 1, shares, *ret)
+                        }
+                        (false, "closed") => {
+                          slipExpireQuotes!(keys, i + 1, shares, *ret)
+                        }
+                        _ => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract slipReqOk(@req, ret) = {
+    match (req.get("riskId"), req.get("riskUri"), req.get("insured"),
+           req.get("terms"), req.get("expiryHeight")) {
+      (riskId, riskUri, insured, terms, expiry) => {
+        if (riskId == Nil || riskUri == Nil || insured == Nil
+            || terms == Nil || expiry == Nil) {
+          ret!((false, "fields"))
+        } else { ret!((true, Nil)) }
+      }
+    }
+  } |
+
+  contract slipMake(@ownerId, @brokerId, @sid, @req, purse, brand, issuer,
+                    slipToken, policyToken, claimToken, ret) = {
+    new Slip, slipState, uriCh in {
+      slipState!({
+        "id": sid,
+        "uri": "",
+        "riskId": req.get("riskId"),
+        "riskUri": req.get("riskUri"),
+        "insured": req.get("insured"),
+        "broker": brokerId,
+        "brokerOwner": ownerId,
+        "class": req.get("class"),
+        "assetId": req.get("terms").get("assetId"),
+        "terms": req.get("terms"),
+        "termsHash": req.get("termsHash"),
+        "premiumTotal": req.get("terms").get("premiumTotal"),
+        "funded": 0,
+        "shares": {},
+        "lead": Nil,
+        "second": Nil,
+        "insuredAccepted": false,
+        "expiryHeight": req.get("expiryHeight"),
+        "status": "open",
+        "policyUri": Nil,
+        "nonce": 0
+      }) |
+
+      contract Slip(@"info", ret2) = {
+        for (@s <<- slipState) { ret2!((true, s)) }
+      } |
+
+      contract Slip(@"subscriptions", ret2) = {
+        for (@s <<- slipState) { ret2!((true, s.get("shares"))) }
+      } |
+
+      contract Slip(@"subscription", @id, ret2) = {
+        for (@s <<- slipState) {
+          match s.get("shares").get(id) {
+            Nil => { ret2!((false, "unknown subscription")) }
+            sub => { ret2!((true, sub)) }
+          }
+        }
+      } |
+
+      contract Slip(@"premium", ret2) = {
+        for (@s <<- slipState) {
+          ret2!((true, {"total": s.get("premiumTotal"),
+                        "funded": s.get("funded")}))
+        }
+      } |
+
+      contract Slip(@"policy", ret2) = {
+        for (@s <<- slipState) { ret2!((true, s.get("policyUri"))) }
+      } |
+
+      contract Slip(@"accept", dId, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- slipState) {
+              if (who != s.get("insured")) {
+                slipState!(s) | ret2!((false, "not insured"))
+              } else {
+                if (s.get("status") != "open" && s.get("status") != "subscribed") {
+                  slipState!(s) | ret2!((false, "closed"))
+                } else {
+                  slipState!(s.set("insuredAccepted", true)
+                              .set("nonce", s.get("nonce") + 1)) |
+                  ret2!((true, Nil))
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Slip(@"subscribe", dId, @syndicateUri, @shareBps, ret2) = {
+        for (@s <- slipState) {
+          if (s.get("status") != "open" && s.get("status") != "subscribed") {
+            slipState!(s) | ret2!((false, "closed"))
+          } else {
+            if (shareBps < 1 || shareBps > 10000) {
+              slipState!(s) | ret2!((false, "share"))
+            } else {
+              new synCh in {
+                rl!(syndicateUri, *synCh) |
+                for (Syndicate <- synCh) {
+                  new iCh in {
+                    @Syndicate!("info", *iCh) |
+                    for (@ir <- iCh) {
+                      match ir {
+                        (true, syn) => {
+                          new hasCh in {
+                            slipHasShare!(s.get("shares"), syn.get("id"), *hasCh) |
+                            for (@has <- hasCh) {
+                              if (has) {
+                                slipState!(s) | ret2!((false, "duplicate syndicate"))
+                              } else {
+                                match s.get("terms").get("aggregateLimit") * shareBps / 10000 + 8 {
+                                  exposureCap => {
+                                    new qCh in {
+                                      @Syndicate!("quote", *dId, s.get("class"),
+                                                  s.get("id"), shareBps, exposureCap,
+                                                  s.get("expiryHeight"), *slipToken, *qCh) |
+                                      for (@q <- qCh) {
+                                        match q {
+                                          (true, grantId, grantUri) => {
+                                            for (@s2 <- slipState) {
+                                              match s2.get("shares").get(syn.get("id")) {
+                                                Nil => {
+                                                  match s2.get("shares").set(syn.get("id"), {
+                                                    "syndicate": syndicateUri,
+                                                    "grantId": grantId,
+                                                    "grantUri": grantUri,
+                                                    "shareBps": shareBps,
+                                                    "exposure": exposureCap,
+                                                    "manager": syn.get("managerId")
+                                                  }) {
+                                                    shares2 => {
+                                                      new sumCh in {
+                                                        mapKeys!(shares2, *sumCh) |
+                                                        for (@keys <- sumCh) {
+                                                          new ssCh in {
+                                                            slipShareSum!(keys, 0, shares2, 0, *ssCh) |
+                                                            for (@sum <- ssCh) {
+                                                              new lsCh in {
+                                                                slipLeadSecond!(shares2, keys, 0, Nil, Nil, 0, *lsCh) |
+                                                                for (@ls <- lsCh) {
+                                                                  match ls {
+                                                                    (lead, second) => {
+                                                                      new stCh in {
+                                                                        slipStatus!(sum, *stCh) |
+                                                                        for (@st <- stCh) {
+                                                                          slipState!(s2.set("shares", shares2)
+                                                                            .set("lead", lead)
+                                                                            .set("second", second)
+                                                                            .set("status", st)
+                                                                            .set("nonce", s2.get("nonce") + 1)) |
+                                                                          ret2!((true, grantId, grantUri))
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                                _ => {
+                                                  slipState!(s2) |
+                                                  ret2!((false, "duplicate syndicate"))
+                                                }
+                                              }
+                                            }
+                                          }
+                                          _ => { slipState!(s) | ret2!(q) }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                        _ => { slipState!(s) | ret2!(ir) }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Slip(@"fundPremium", dId, payment, ret2) = {
+        new aCh, iCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, _) <- aCh) {
+            for (@s <- slipState) {
+              new iCh2 in {
+                slipResolve!("component:payments", *iCh2) |
+                for (@p <- iCh2) {
+                  match p {
+                    (true, Payments) => {
+                      new issCh in {
+                        @Payments!("issuer", s.get("assetId"), *issCh) |
+                        for (@i <- issCh) {
+                          match i {
+                            (true, brand2, issuer2) => {
+                              new aCh2 in {
+                                @issuer2!("getAmountOf", payment, *aCh2) |
+                                for (@a <- aCh2) {
+                                  match a {
+                                    (true, amount) => {
+                                      if (amount != s.get("premiumTotal")) {
+                                        slipState!(s) | ret2!((false, "amount"))
+                                      } else {
+                                        new dCh in {
+                                          @purse!("deposit", payment, *dCh) |
+                                          for (@d <- dCh) {
+                                            match d {
+                                              (true, _) => {
+                                                slipState!(s.set("funded", amount)
+                                                            .set("nonce", s.get("nonce") + 1)) |
+                                                ret2!((true, amount))
+                                              }
+                                              _ => { 1/0 }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                    _ => { ret2!(a) }
+                                  }
+                                }
+                              }
+                            }
+                            _ => { ret2!(i) }
+                          }
+                        }
+                      }
+                    }
+                    _ => { ret2!((false, "payments unavailable")) }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Slip(@"bind", ret2) = {
+        for (@s <- slipState) {
+          if (s.get("insuredAccepted") != true) {
+            slipState!(s) | ret2!((false, "not accepted"))
+          } else {
+            if (s.get("funded") != s.get("premiumTotal")) {
+              slipState!(s) | ret2!((false, "not funded"))
+            } else {
+              new kCh, linesCh in {
+                mapKeys!(s.get("shares"), *kCh) |
+                for (@keys <- kCh) {
+                  new ssCh in {
+                    slipShareSum!(keys, 0, s.get("shares"), 0, *ssCh) |
+                    for (@sum <- ssCh) {
+                      if (sum != 10000) {
+                        slipState!(s) | ret2!((false, "not fully subscribed"))
+                      } else {
+                        match "pol:" ++ s.get("id") {
+                          policyId => {
+                            slipOpenLines!(keys, 0, s.get("shares"), policyId,
+                                           s.get("id"), *slipToken, *policyToken,
+                                           [], *linesCh) |
+                            for (@linesR <- linesCh) {
+                              match linesR {
+                                (true, lines) => {
+                                  new piCh in {
+                                    slipResolve!("component:policy-factory", *piCh) |
+                                    for (@pi <- piCh) {
+                                      match pi {
+                                        (true, PolicyFactory) => {
+                                          new pCh in {
+                                            @PolicyFactory!("create",
+                                              {"policyId": policyId,
+                                               "slipId": s.get("id"),
+                                               "slipUri": s.get("uri"),
+                                               "riskId": s.get("riskId"),
+                                               "insured": s.get("insured"),
+                                               "broker": s.get("broker"),
+                                               "brokerOwner": s.get("brokerOwner"),
+                                               "class": s.get("class"),
+                                               "assetId": s.get("assetId"),
+                                               "terms": s.get("terms"),
+                                               "termsHash": s.get("termsHash"),
+                                               "premiumTotal": s.get("premiumTotal"),
+                                               "lines": lines},
+                                              *purse, brand, *policyToken, *claimToken, *pCh) |
+                                            for (@pr <- pCh) {
+                                              match pr {
+                                                (true, policyUri) => {
+                                                  new polCh in {
+                                                    rl!(policyUri, *polCh) |
+                                                    for (Policy <- polCh) {
+                                                      new distCh in {
+                                                        @Policy!("distribute", *policyToken,
+                                                                 *distCh) |
+                                                        for (@d <- distCh) {
+                                                          match d {
+                                                            (true, _) => {
+                                                              for (@s2 <- slipState) {
+                                                                slipState!(s2.set("status", "bound")
+                                                                             .set("policyUri", policyUri)
+                                                                             .set("nonce", s2.get("nonce") + 1)) |
+                                                                ret2!((true, policyUri))
+                                                              }
+                                                            }
+                                                            _ => { 1/0 }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                                _ => { 1/0 }
+                                              }
+                                            }
+                                          }
+                                        }
+                                        _ => { slipState!(s) | ret2!((false, "policy factory")) }
+                                      }
+                                    }
+                                  }
+                                }
+                                _ => { 1/0 }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Slip(@"expire", ret2) = {
+        new hCh in {
+          nowHeight!(*hCh) |
+          for (@h <- hCh) {
+            match h {
+              (true, now) => {
+                for (@s <- slipState) {
+                  if (s.get("status") == "bound" || s.get("status") == "expired") {
+                    slipState!(s) | ret2!((false, "closed"))
+                  } else {
+                    if (now <= s.get("expiryHeight")) {
+                      slipState!(s) | ret2!((false, "not expired"))
+                    } else {
+                      new keysCh in {
+                        mapKeys!(s.get("shares"), *keysCh) |
+                        for (@keys <- keysCh) {
+                          new eqCh in {
+                            slipExpireQuotes!(keys, 0, s.get("shares"), *eqCh) |
+                            for (@eq <- eqCh) {
+                              slipState!(s.set("status", "expired")
+                                          .set("nonce", s.get("nonce") + 1)) |
+                              ret2!((true, Nil))
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              _ => { ret2!(h) }
+            }
+          }
+        }
+      } |
+
+      rs!(bundle+{*Slip}, *uriCh) |
+      for (@uri <- uriCh) {
+        for (@s2 <- slipState) {
+          slipState!(s2.set("uri", uri)) |
+          new doneCh in {
+            slipResolve!("component:broker-book", *doneCh) |
+            for (@bb <- doneCh) {
+              match bb {
+                (true, BrokerBook) => {
+                  new addCh in {
+                    @BrokerBook!("brokerOf", ownerId, *addCh) |
+                    for (@bo <- addCh) {
+                      match bo {
+                        (true, bId, bUri) => {
+                          new bCh in {
+                            rl!(bUri, *bCh) |
+                            for (Broker <- bCh) {
+                              new aCh in {
+                                @Broker!("addSlip", *deployerId, s2.get("id"), uri, *aCh) |
+                                for (@a <- aCh) {
+                                  ret!((true, s2.get("id"), uri))
+                                }
+                              }
+                            }
+                          }
+                        }
+                        _ => { ret!((true, s2.get("id"), uri)) }
+                      }
+                    }
+                  }
+                }
+                _ => { ret!((true, s2.get("id"), uri)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SlipFactory(@"open", dId, @req, ret) = {
+    new aCh, okCh, bCh, prCh in {
+      slipResolve!("component:broker-book", *bCh) |
+      slipReqOk!(req, *okCh) |
+      for (@bb <- bCh; @ok <- okCh) {
+        match (bb, ok) {
+          ((true, BrokerBook), (true, Nil)) => {
+            new boCh in {
+              @BrokerBook!("brokerOf", *dId, *boCh) |
+              for (@bo <- boCh) {
+                match bo {
+                  (true, brokerId, brokerUri) => {
+                    new termCh in {
+                      slipResolve!("component:terms", *termCh) |
+                      for (@t <- termCh) {
+                        match t {
+                          (true, CoverTerms) => {
+                            new vCh in {
+                              @CoverTerms!("validate", req.get("terms"), *vCh) |
+                              for (@v <- vCh) {
+                                match v {
+                                  (true, Nil) => {
+                                    new hCh in {
+                                      @CoverTerms!("hash", req.get("terms"), *hCh) |
+                                      for (@h <- hCh) {
+                                        match h {
+                                          (true, termsHash) => {
+                                            new pCh in {
+                                              slipResolve!("component:payments", *pCh) |
+                                              for (@p <- pCh) {
+                                                match p {
+                                                  (true, Payments) => {
+                                                    new iCh in {
+                                                      @Payments!("issuer",
+                                                        req.get("terms").get("assetId"), *iCh) |
+                                                      for (@i <- iCh) {
+                                                        match i {
+                                                          (true, brand, issuer) => {
+                                                            new puCh in {
+                                                              @issuer!("makeEmptyPurse", *puCh) |
+                                                              for (@pu <- puCh) {
+                                                                match pu {
+                                                                  (true, purse) => {
+                                                                    new slipToken, policyToken, claimToken, sidCh in {
+                                                                      nowHeight!(*sidCh) |
+                                                                      for (@h2 <- sidCh) {
+                                                                        match h2 {
+                                                                          (true, now) => {
+                                                                            match "slp:" ++ brokerId ++ ":" ++ now.toString() {
+                                                                              sid => {
+                                                                                slipMake!(*dId, brokerId, sid,
+                                                                                  req.set("termsHash", termsHash)
+                                                                                     .set("class", req.get("class")),
+                                                                                  *purse, brand, *issuer,
+                                                                                  *slipToken, *policyToken,
+                                                                                  *claimToken, *ret)
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                          _ => { ret!(h2) }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                  _ => { ret!(pu) }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                          _ => { ret!(i) }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                  _ => { ret!((false, "payments unavailable")) }
+                                                }
+                                              }
+                                            }
+                                          }
+                                          _ => { ret!(h) }
+                                        }
+                                      }
+                                    }
+                                  }
+                                  _ => { ret!(v) }
+                                }
+                              }
+                            }
+                          }
+                          _ => { ret!((false, "terms unavailable")) }
+                        }
+                      }
+                    }
+                  }
+                  _ => { ret!((false, "broker not registered")) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "broker unavailable")) }
+        }
+      }
+    }
+  } |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*SlipFactory}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:slip-factory", uri, 1, "slip",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

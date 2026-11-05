@@ -1,0 +1,404 @@
+// Distribution: an exactly-once cash-flow plan over a contract-held purse.
+// Plan entries are account, fund or line payees; fixed amounts or bps of the base.
+// The last entry absorbs the remainder. Reusable by r-share for revenue waterfalls.
+// Placeholders: __ROOT_URI__.
+new
+  DistributionFactory,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  distResolve, allocPlan, allocLast, planAmount, payPlan, payAccount, payFund, payLine,
+  planOk
+in {
+  contract distResolve(@key, ret) = {
+    new rCh, Root, kCh in {
+      rl!(`__ROOT_URI__`, *rCh) |
+      for (Root <- rCh) {
+        Root!("resolve", key, 1, *kCh) |
+        for (@r <- kCh) {
+          match r {
+            (true, uri, _) => {
+              new cCh in {
+                rl!(uri, *cCh) |
+                for (@C <- cCh) { ret!((true, *C)) }
+              }
+            }
+            _ => { ret!((false, "unavailable", key)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract planOk(@plan, @i, ret) = {
+    if (i >= plan.length()) { ret!((true, Nil)) }
+    else {
+      match plan.nth(i) {
+        e => {
+          match (e.get("kind"), e.get("fixed"), e.get("bps")) {
+            (kind, fixed, bps) => {
+              if (kind == "account" || kind == "fund" || kind == "line") {
+                if (kind == "line" && e.get("uri") == Nil) {
+                  ret!((false, "line uri"))
+                } else {
+                  if (kind == "account" && e.get("owner") == Nil) {
+                    ret!((false, "account owner"))
+                  } else {
+                    if (fixed == Nil && bps == Nil) {
+                      ret!((false, "amount"))
+                    } else {
+                      planOk!(plan, i + 1, *ret)
+                    }
+                  }
+                }
+              } else { ret!((false, "kind")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract planAmount(@e, @base, ret) = {
+    match e.get("fixed") {
+      Nil => {
+        match e.get("bps") {
+          Nil => { ret!((false, "amount")) }
+          bps => {
+            if (bps < 0 || bps > 10000) { ret!((false, "bps")) }
+            else { ret!((true, base * bps / 10000)) }
+          }
+        }
+      }
+      fixed => {
+        if (fixed < 0) { ret!((false, "amount")) }
+        else { ret!((true, fixed)) }
+      }
+    }
+  } |
+
+  contract allocLast(@plan, @i, @base, @paid, @acc, ret) = {
+    if (i >= plan.length()) {
+      if (paid == base) { ret!((true, acc)) }
+      else { ret!((false, "shares")) }
+    } else {
+      match plan.nth(i) {
+        e => {
+          if (i + 1 == plan.length()) {
+            match base - paid {
+              last => {
+                if (last < 0) { ret!((false, "shares")) }
+                else {
+                  allocLast!(plan, i + 1, base, base,
+                             acc ++ [{"kind": e.get("kind"),
+                                      "owner": e.get("owner"),
+                                      "uri": e.get("uri"),
+                                      "amount": last}], *ret)
+                }
+              }
+            }
+          } else {
+            planAmount!(e, base, *ret)
+          }
+        }
+      }
+    }
+  } |
+
+  contract allocPlan(@plan, @i, @base, @paid, @acc, ret) = {
+    if (i >= plan.length()) {
+      if (paid == base) { ret!((true, acc)) }
+      else { ret!((false, "shares")) }
+    } else {
+      match plan.nth(i) {
+        e => {
+          if (i + 1 == plan.length()) {
+            match base - paid {
+              last => {
+                if (last < 0) { ret!((false, "shares")) }
+                else {
+                  allocPlan!(plan, i + 1, base, base,
+                             acc ++ [{"kind": e.get("kind"),
+                                      "owner": e.get("owner"),
+                                      "uri": e.get("uri"),
+                                      "amount": last}], *ret)
+                }
+              }
+            }
+          } else {
+            new aCh in {
+              planAmount!(e, base, *aCh) |
+              for (@a <- aCh) {
+                match a {
+                  (true, amount) => {
+                    allocPlan!(plan, i + 1, base, paid + amount,
+                               acc ++ [{"kind": e.get("kind"),
+                                        "owner": e.get("owner"),
+                                        "uri": e.get("uri"),
+                                        "amount": amount}], *ret)
+                  }
+                  _ => { ret!(a) }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract payPlan(@plan, @i, @purse, @brand, @assetId, @policyId,
+                   policyToken, ret) = {
+    if (i >= plan.length()) {
+      ret!((true, Nil))
+    } else {
+      match plan.nth(i) {
+        p => {
+          match p.get("kind") {
+            "account" => {
+              new nCh in {
+                payAccount!(p, *purse, brand, assetId, *nCh) |
+                for (@r <- nCh) {
+                  match r {
+                    (true, Nil) => {
+                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                               *policyToken, *ret)
+                    }
+                    _ => { 1/0 }
+                  }
+                }
+              }
+            }
+            "fund" => {
+              new nCh in {
+                payFund!(p, *purse, brand, assetId, policyId, *nCh) |
+                for (@r <- nCh) {
+                  match r {
+                    (true, Nil) => {
+                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                               *policyToken, *ret)
+                    }
+                    _ => { 1/0 }
+                  }
+                }
+              }
+            }
+            "line" => {
+              new nCh in {
+                payLine!(p, *purse, brand, *policyToken, *nCh) |
+                for (@r <- nCh) {
+                  match r {
+                    (true, _) => {
+                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                               *policyToken, *ret)
+                    }
+                    _ => { 1/0 }
+                  }
+                }
+              }
+            }
+            _ => { 1/0 }
+          }
+        }
+      }
+    }
+  } |
+
+  contract payAccount(@p, purse, brand, assetId, ret) = {
+    new fCh in {
+      distResolve!("component:payments", *fCh) |
+      for (@pay <- fCh) {
+        match pay {
+          (true, Payments) => {
+            new facetCh in {
+              @Payments!("depositFacet", p.get("owner"), assetId, *facetCh) |
+              for (@fr <- facetCh) {
+                match fr {
+                  (true, facet) => {
+                    new wCh in {
+                      @purse!("withdraw", (brand, p.get("amount")), *wCh) |
+                      for (@w <- wCh) {
+                        match w {
+                          (true, payment) => {
+                            new dCh in {
+                              @facet!("deposit", payment, *dCh) |
+                              for (@d <- dCh) {
+                                match d {
+                                  (true, _) => { ret!((true, Nil)) }
+                                  _ => { 1/0 }
+                                }
+                              }
+                            }
+                          }
+                          _ => { 1/0 }
+                        }
+                      }
+                    }
+                  }
+                  _ => { ret!(fr) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract payFund(@p, purse, brand, assetId, policyId, ret) = {
+    new fCh in {
+      distResolve!("component:fund", *fCh) |
+      for (@f <- fCh) {
+        match f {
+          (true, SureFund) => {
+            new wCh in {
+              @purse!("withdraw", (brand, p.get("amount")), *wCh) |
+              for (@w <- wCh) {
+                match w {
+                  (true, payment) => {
+                    new dCh in {
+                      @SureFund!("contribute", payment, policyId, *dCh) |
+                      for (@d <- dCh) {
+                        match d {
+                          (true, _) => { ret!((true, Nil)) }
+                          _ => { 1/0 }
+                        }
+                      }
+                    }
+                  }
+                  _ => { 1/0 }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "fund unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract payLine(@p, purse, brand, policyToken, ret) = {
+    new lCh in {
+      rl!(p.get("uri"), *lCh) |
+      for (Line <- lCh) {
+        new wCh in {
+          @purse!("withdraw", (brand, p.get("amount")), *wCh) |
+          for (@w <- wCh) {
+            match w {
+              (true, payment) => {
+                new dCh in {
+                  @Line!("credit", *policyToken, payment, *dCh) |
+                  for (@d <- dCh) {
+                    match d {
+                      (true, _) => { ret!((true, Nil)) }
+                      _ => { 1/0 }
+                    }
+                  }
+                }
+              }
+              _ => { 1/0 }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract DistributionFactory(@"create", purse, brand, @assetId, @policyId,
+                               @base, @plan, policyToken, ret) = {
+    new okCh in {
+      planOk!(plan, 0, *okCh) |
+      for (@ok <- okCh) {
+        match ok {
+          (false, reason) => { ret!((false, reason)) }
+          (true, Nil) => {
+            new Distribution, distState, uriCh in {
+              distState!({
+                "uri": "",
+                "assetId": assetId,
+                "base": base,
+                "plan": plan,
+                "status": "pending",
+                "paid": [],
+                "nonce": 0
+              }) |
+
+              contract Distribution(@"info", ret2) = {
+                for (@s <<- distState) { ret2!((true, s)) }
+              } |
+
+              contract Distribution(@"plan", ret2) = {
+                for (@s <<- distState) { ret2!((true, s.get("plan"))) }
+              } |
+
+              contract Distribution(@"paid", ret2) = {
+                for (@s <<- distState) { ret2!((true, s.get("paid"))) }
+              } |
+
+              contract Distribution(@"run", @runToken, ret2) = {
+                if (*runToken != *policyToken) {
+                  ret2!((false, "not holder"))
+                } else {
+                  for (@s <- distState) {
+                    if (s.get("status") != "pending") {
+                      distState!(s) | ret2!((false, "closed"))
+                    } else {
+                      new aCh in {
+                        allocPlan!(s.get("plan"), 0, s.get("base"), 0, [], *aCh) |
+                        for (@alloc <- aCh) {
+                          match alloc {
+                            (true, payments) => {
+                              new pCh in {
+                                payPlan!(payments, 0, *purse, brand, assetId,
+                                         policyId, *policyToken, *pCh) |
+                                for (@pr <- pCh) {
+                                  match pr {
+                                    (true, Nil) => {
+                                      for (@s2 <- distState) {
+                                        distState!(s2.set("status", "paid")
+                                                     .set("paid", payments)
+                                                     .set("nonce", s2.get("nonce") + 1)) |
+                                        ret2!((true, payments))
+                                      }
+                                    }
+                                    _ => { 1/0 }
+                                  }
+                                }
+                              }
+                            }
+                            _ => { ret2!(alloc) }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              } |
+
+              rs!(bundle+{*Distribution}, *uriCh) |
+              for (@uri <- uriCh) {
+                for (@s2 <- distState) {
+                  distState!(s2.set("uri", uri)) |
+                  ret!((true, uri))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*DistributionFactory}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:distribution-factory", uri, 1, "distribution",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+# Coverage manifest. Only `passing` counts as coverage.
+# statuses: passing | mapping | design | not_implemented
+classes:
+  - name: engineering
+    kind: engineering
+    claims:
+      constructionDefect: mapping
+      delayInStartup: design
+      designLiability: design
+  - name: property
+    kind: property
+    claims:
+      physicalDamage: mapping
+      businessInterruption: design
+  - name: equipment
+    kind: equipment
+    claims:
+      breakdown: mapping
+      wearAndTear: design
+  - name: liability
+    kind: liability
+    claims:
+      thirdPartyInjury: design
+      thirdPartyProperty: design
+  - name: marine
+    kind: marine
+    claims:
+      cargoLoss: design
+      hullDamage: design
+  - name: cyber
+    kind: cyber
+    claims:
+      ransomware: design
+      dataBreach: design

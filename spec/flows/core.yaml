@@ -1,0 +1,45 @@
+# Arm -> Lean flow manifest. `owed` means the arm is implemented but not yet proved.
+schema: rsure.flows/v1
+source_globs:
+  - contracts/src/deploy
+rules:
+  - id: F-001
+    arm: 'Syndicate@"quote"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean_status: owed
+    note: capacity reservation and one-shot grant
+  - id: F-002
+    arm: 'Syndicate@"openLine"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean_status: owed
+    note: committed -> written and line capability creation
+  - id: F-003
+    arm: 'Slip@"bind"'
+    source: contracts/src/deploy/13_slip.rho
+    lean_status: owed
+    note: full subscription, line creation, policy creation and premium distribution
+  - id: F-004
+    arm: 'Policy@"distribute"'
+    source: contracts/src/deploy/17_policy.rho
+    lean_status: owed
+    note: premium conservation
+  - id: F-005
+    arm: 'Claim@"settle"'
+    source: contracts/src/deploy/18_claim.rho
+    lean_status: owed
+    note: payable bound and exactly-once settlement
+  - id: F-006
+    arm: 'Policy@"settleClaim"'
+    source: contracts/src/deploy/17_policy.rho
+    lean_status: owed
+    note: line conservation and aggregate update
+  - id: F-007
+    arm: 'Distribution@"run"'
+    source: contracts/src/deploy/15_distribution.rho
+    lean_status: owed
+    note: plan conservation
+  - id: F-008
+    arm: 'SureFund@"cover"'
+    source: contracts/src/deploy/16_fund.rho
+    lean_status: owed
+    note: capped one-shot cover

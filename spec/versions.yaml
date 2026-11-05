@@ -1,0 +1,12 @@
+# Deployment version map.
+schema: rsure.versions/v1
+
+v1:
+  label: v1
+  status: devnet-scaffold
+  semantics: initial contract set
+  install: fresh devnet from contracts/build, new SureRoot
+  evidence: audit/evidence/
+  compatibility:
+    migration: clean install; no in-place state migration
+    rollback: keep the previous Root and manifest; switch clients before new state is written

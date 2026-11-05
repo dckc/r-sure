@@ -1,0 +1,366 @@
+// Risk: the insured's submission. It carries the asset reference, the three insurability
+// questions and r-gen evidence references. Assessment is an underwriting record; the
+// binding terms live on the slip.
+// Placeholders: __ROOT_URI__.
+new
+  RiskBook, riskBookState,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  authOwner, nowHeight, riskClassOk, evidenceOk, triOk, riskReqOk, riskMake
+in {
+// Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
+
+contract authOwner(dId, ret) = {
+  new dops(`rho:rchain:deployerId:ops`), rev(`rho:rev:address`), pkCh, addrCh in {
+    dops!("pubKeyBytes", *dId, *pkCh) |
+    for (@pk <- pkCh) {
+      rev!("fromPublicKey", pk, *addrCh) |
+      for (@addr <- addrCh) { ret!((true, addr)) }
+    }
+  }
+} |
+
+contract authIsOwner(dId, @ownerId, ret) = {
+  new c in {
+    authOwner!(*dId, *c) |
+    for (@r <- c) {
+      match r {
+        (true, addr) => {
+          if (addr == ownerId) { ret!((true, Nil)) }
+          else { ret!((false, "not owner")) }
+        }
+        _ => { ret!((false, "not owner")) }
+      }
+    }
+  }
+} |
+
+  contract nowHeight(ret) = {
+    new rCh in {
+      rl!(`__ROOT_URI__`, *rCh) |
+      for (Root <- rCh) {
+        new kCh in {
+          Root!("resolve", "component:clock", 1, *kCh) |
+          for (@r <- kCh) {
+            match r {
+              (true, uri, _) => {
+                new cCh in {
+                  rl!(uri, *cCh) |
+                  for (@Clock <- cCh) { @Clock!("now", *ret) }
+                }
+              }
+              _ => { ret!((false, "clock unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract riskClassOk(@class, ret) = {
+    if (class == "engineering" || class == "property" || class == "equipment"
+        || class == "liability" || class == "marine" || class == "cyber") {
+      ret!((true, Nil))
+    } else { ret!((false, "class")) }
+  } |
+
+  contract evidenceOk(@evidence, @i, ret) = {
+    if (i >= evidence.length()) { ret!((true, Nil)) }
+    else {
+      match evidence.nth(i) {
+        e => {
+          match (e.get("kind"), e.get("hash")) {
+            (kind, hash) => {
+              if (kind == Nil || hash == Nil) { ret!((false, "evidence")) }
+              else {
+                if (hash.length() == 0 || hash.length() > 128) {
+                  ret!((false, "evidence hash"))
+                } else { evidenceOk!(evidence, i + 1, *ret) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract triOk(@tri, ret) = {
+    match (tri.get("exposureRef"), tri.get("probabilityBasis"),
+           tri.get("consequenceBasis"), tri.get("consequenceRef")) {
+      (a, b, c, d) => {
+        if (a == Nil || b == Nil || c == Nil || d == Nil) {
+          ret!((false, "tri-test"))
+        } else {
+          if (a.length() == 0 || b.length() == 0 || c.length() == 0 || d.length() == 0) {
+            ret!((false, "tri-test"))
+          } else { ret!((true, Nil)) }
+        }
+      }
+    }
+  } |
+
+  contract riskReqOk(@req, ret) = {
+    match (req.get("class"), req.get("assetRef"), req.get("evidence"),
+           req.get("triTest"), req.get("periodStart"), req.get("periodEnd"),
+           req.get("declaredValue"), req.get("requestedLimit"),
+           req.get("requestedDeductible")) {
+      (class, assetRef, evidence, tri, start, end, value, limit, deductible) => {
+        if (class == Nil || assetRef == Nil || evidence == Nil || tri == Nil
+            || start == Nil || end == Nil || value == Nil || limit == Nil
+            || deductible == Nil) {
+          ret!((false, "fields"))
+        } else {
+          new clCh, evCh, tCh in {
+            riskClassOk!(class, *clCh) |
+            evidenceOk!(evidence, 0, *evCh) |
+            triOk!(tri, *tCh) |
+            for (@cl <- clCh; @ev <- evCh; @t <- tCh) {
+              match (cl, ev, t) {
+                ((true, Nil), (true, Nil), (true, Nil)) => {
+                  if (start >= end || value < 1 || limit < 1 || deductible < 0) {
+                    ret!((false, "terms"))
+                  } else {
+                    match (assetRef.get("kind"), assetRef.get("hash")) {
+                      (kind, hash) => {
+                        if (kind == Nil || hash == Nil || hash.length() == 0) {
+                          ret!((false, "asset"))
+                        } else { ret!((true, Nil)) }
+                      }
+                    }
+                  }
+                }
+                _ => { ret!((false, "fields")) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract riskMake(@ownerId, @req, ret) = {
+    new Risk, riskState, uriCh in {
+      riskState!({
+        "id": "",
+        "uri": "",
+        "insured": ownerId,
+        "broker": req.get("broker"),
+        "class": req.get("class"),
+        "assetRef": req.get("assetRef"),
+        "declaredValue": req.get("declaredValue"),
+        "requestedLimit": req.get("requestedLimit"),
+        "requestedDeductible": req.get("requestedDeductible"),
+        "periodStart": req.get("periodStart"),
+        "periodEnd": req.get("periodEnd"),
+        "evidence": req.get("evidence"),
+        "triTest": req.get("triTest"),
+        "assessment": Nil,
+        "status": "submitted",
+        "slipUri": Nil,
+        "nonce": 0
+      }) |
+
+      contract Risk(@"info", ret2) = {
+        for (@s <<- riskState) { ret2!((true, s)) }
+      } |
+
+      contract Risk(@"evidence", ret2) = {
+        for (@s <<- riskState) { ret2!((true, s.get("evidence"))) }
+      } |
+
+      contract Risk(@"addEvidence", dId, @evidence, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- riskState) {
+              if (s.get("status") == "declined" || s.get("status") == "expired") {
+                riskState!(s) | ret2!((false, "closed"))
+              } else {
+                riskState!(s.set("evidence", s.get("evidence") ++ evidence)
+                            .set("nonce", s.get("nonce") + 1)) |
+                ret2!((true, Nil))
+              }
+            }
+          }
+        }
+      } |
+
+      contract Risk(@"assess", dId, @assessment, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- riskState) {
+              if (s.get("status") == "declined" || s.get("status") == "expired") {
+                riskState!(s) | ret2!((false, "closed"))
+              } else {
+                match assessment.get("quotedPremium") {
+                  premium => {
+                    riskState!(s.set("assessment", assessment.set("by", who)
+                                  .set("at", 0))
+                                .set("status", "assessed")
+                                .set("nonce", s.get("nonce") + 1)) |
+                    ret2!((true, Nil))
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Risk(@"accept", dId, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- riskState) {
+              if (who != s.get("insured") && who != s.get("broker")) {
+                riskState!(s) | ret2!((false, "not insured"))
+              } else {
+                if (s.get("status") != "assessed") {
+                  riskState!(s) | ret2!((false, "not assessed"))
+                } else {
+                  riskState!(s.set("status", "accepted")
+                              .set("nonce", s.get("nonce") + 1)) |
+                  ret2!((true, Nil))
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Risk(@"decline", dId, @reasonHash, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, _) <- aCh) {
+            for (@s <- riskState) {
+              riskState!(s.set("status", "declined")
+                          .set("assessment", {"reasonHash": reasonHash})
+                          .set("nonce", s.get("nonce") + 1)) |
+              ret2!((true, Nil))
+            }
+          }
+        }
+      } |
+
+      contract Risk(@"expire", ret2) = {
+        new hCh in {
+          nowHeight!(*hCh) |
+          for (@h <- hCh) {
+            match h {
+              (true, now) => {
+                for (@s <- riskState) {
+                  if (now <= s.get("periodEnd")) {
+                    riskState!(s) | ret2!((false, "not expired"))
+                  } else {
+                    riskState!(s.set("status", "expired")
+                                .set("nonce", s.get("nonce") + 1)) |
+                    ret2!((true, Nil))
+                  }
+                }
+              }
+              _ => { ret2!(h) }
+            }
+          }
+        }
+      } |
+
+      rs!(bundle+{*Risk}, *uriCh) |
+      for (@uri <- uriCh) {
+        for (@s2 <- riskState) {
+          riskState!(s2.set("uri", uri)) |
+          for (@b <- riskBookState) {
+            match "rsk:" ++ ownerId ++ ":" ++ b.get("count").toString() {
+              id2 => {
+                match b.get("byInsured").get(ownerId) {
+                  Nil => {
+                    riskBookState!(b.set("risks", b.get("risks").set(id2, uri))
+                      .set("byInsured", b.get("byInsured").set(ownerId, [id2]))
+                      .set("count", b.get("count") + 1)) |
+                    for (@s3 <- riskState) {
+                      riskState!(s3.set("id", id2)) |
+                      ret!((true, id2, uri))
+                    }
+                  }
+                  ids => {
+                    riskBookState!(b.set("risks", b.get("risks").set(id2, uri))
+                      .set("byInsured", b.get("byInsured").set(ownerId, ids ++ [id2]))
+                      .set("count", b.get("count") + 1)) |
+                    for (@s3 <- riskState) {
+                      riskState!(s3.set("id", id2)) |
+                      ret!((true, id2, uri))
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract RiskBook(@"submit", dId, @req, ret) = {
+    new aCh, okCh in {
+      authOwner!(*dId, *aCh) |
+      riskReqOk!(req, *okCh) |
+      for (@(true, ownerId) <- aCh; @ok <- okCh) {
+        match ok {
+          (false, reason) => { ret!((false, reason)) }
+          (true, Nil) => { riskMake!(ownerId, req, *ret) }
+        }
+      }
+    }
+  } |
+
+  contract RiskBook(@"risk", @riskId, ret) = {
+    for (@b <<- riskBookState) {
+      match b.get("risks").get(riskId) {
+        Nil => { ret!((false, "unknown risk")) }
+        uri => { ret!((true, uri)) }
+      }
+    }
+  } |
+
+  contract RiskBook(@"risks", ret) = {
+    for (@b <<- riskBookState) { ret!((true, b.get("risks"))) }
+  } |
+
+  contract RiskBook(@"byInsured", @insured, ret) = {
+    for (@b <<- riskBookState) {
+      match b.get("byInsured").get(insured) {
+        Nil => { ret!((true, [])) }
+        ids => { ret!((true, ids)) }
+      }
+    }
+  } |
+
+  contract RiskBook(@"byBroker", @broker, ret) = {
+    for (@b <<- riskBookState) {
+      match b.get("byBroker").get(broker) {
+        Nil => { ret!((true, [])) }
+        ids => { ret!((true, ids)) }
+      }
+    }
+  } |
+
+  riskBookState!({
+    "risks": {},
+    "byInsured": {},
+    "byBroker": {},
+    "count": 0
+  }) |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*RiskBook}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:risk-book", uri, 1, "risk",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

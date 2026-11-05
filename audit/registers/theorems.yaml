@@ -1,0 +1,23 @@
+theorems:
+  - id: TH-001
+    name: share_zero
+    module: RSure.Basic
+    kind: theorem
+    status: proved-model
+    statement: share amount 0 = 0
+    axioms: [propext]
+    scope: integer bps arithmetic
+    evidence: spec/lean/RSure/Basic.lean
+    reviewer: internal
+    audit_line: true
+  - id: TH-002
+    name: share_bps_zero
+    module: RSure.Basic
+    kind: theorem
+    status: proved-model
+    statement: share amount BPS = amount
+    axioms: [propext]
+    scope: integer bps arithmetic
+    evidence: spec/lean/RSure/Basic.lean
+    reviewer: internal
+    audit_line: true

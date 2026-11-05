@@ -1,0 +1,270 @@
+{
+  "limits": {
+    "bytes": 57344,
+    "depth": 96,
+    "contracts": 64,
+    "per_file": {}
+  },
+  "serialization_points": {
+    "rootState": "installer-gated root directory; registration only",
+    "adminState": "2-of-3 admin set and global pause",
+    "rgenState": "optional r-gen factory URIs; disabled by default",
+    "paymentsState": "r-cash Root URI, asset allowlist and platform owner"
+  },
+  "components": {
+    "SureRoot": {
+      "file": "00_root.rho",
+      "state_cells": [
+        "rootState"
+      ],
+      "depends_on": []
+    },
+    "Clock": {
+      "file": "01_kernel.rho",
+      "state_cells": [],
+      "depends_on": []
+    },
+    "Verifier": {
+      "file": "01_kernel.rho",
+      "state_cells": [],
+      "depends_on": []
+    },
+    "Codec": {
+      "file": "01_kernel.rho",
+      "state_cells": [],
+      "depends_on": []
+    },
+    "AdminGuard": {
+      "file": "02_admin.rho",
+      "state_cells": [],
+      "depends_on": [
+        "Clock",
+        "Verifier",
+        "Codec"
+      ]
+    },
+    "SureAdmin": {
+      "file": "02_admin.rho",
+      "state_cells": [
+        "adminState"
+      ],
+      "depends_on": [
+        "AdminGuard"
+      ]
+    },
+    "CoverTerms": {
+      "file": "03_terms.rho",
+      "state_cells": [],
+      "depends_on": [
+        "Codec"
+      ]
+    },
+    "SureMath": {
+      "file": "04_math.rho",
+      "state_cells": [],
+      "depends_on": []
+    },
+    "RgenAdapter": {
+      "file": "05_rgen.rho",
+      "state_cells": [
+        "rgenState"
+      ],
+      "depends_on": [
+        "SureAdmin",
+        "AdminGuard"
+      ]
+    },
+    "Payments": {
+      "file": "40_payments.rho",
+      "state_cells": [
+        "paymentsState"
+      ],
+      "depends_on": [
+        "SureAdmin",
+        "AdminGuard"
+      ]
+    },
+    "SyndicateBook": {
+      "file": "10_syndicate.rho",
+      "state_cells": [
+        "syndicateBookState"
+      ],
+      "depends_on": [
+        "Payments"
+      ]
+    },
+    "Syndicate": {
+      "file": "10_syndicate.rho",
+      "state_cells": [
+        "syndicateState"
+      ],
+      "depends_on": [
+        "Payments",
+        "CoverTerms",
+        "SureMath",
+        "SyndicateBook"
+      ]
+    },
+    "LineGrant": {
+      "file": "10_syndicate.rho",
+      "state_cells": [
+        "grantState"
+      ],
+      "depends_on": [
+        "Syndicate"
+      ]
+    },
+    "LineFactory": {
+      "file": "14_line.rho",
+      "state_cells": [],
+      "depends_on": []
+    },
+    "Line": {
+      "file": "14_line.rho",
+      "state_cells": [
+        "lineState"
+      ],
+      "depends_on": [
+        "LineFactory"
+      ]
+    },
+    "BrokerBook": {
+      "file": "11_broker.rho",
+      "state_cells": [
+        "brokerBookState"
+      ],
+      "depends_on": [
+        "Broker"
+      ]
+    },
+    "Broker": {
+      "file": "11_broker.rho",
+      "state_cells": [
+        "brokerState"
+      ],
+      "depends_on": []
+    },
+    "RiskBook": {
+      "file": "12_risk.rho",
+      "state_cells": [
+        "riskBookState"
+      ],
+      "depends_on": [
+        "Risk",
+        "Clock"
+      ]
+    },
+    "Risk": {
+      "file": "12_risk.rho",
+      "state_cells": [
+        "riskState"
+      ],
+      "depends_on": [
+        "Clock"
+      ]
+    },
+    "DistributionFactory": {
+      "file": "15_distribution.rho",
+      "state_cells": [],
+      "depends_on": [
+        "Payments",
+        "SureFund",
+        "Line"
+      ]
+    },
+    "Distribution": {
+      "file": "15_distribution.rho",
+      "state_cells": [
+        "distributionState"
+      ],
+      "depends_on": [
+        "DistributionFactory"
+      ]
+    },
+    "SureFund": {
+      "file": "16_fund.rho",
+      "state_cells": [
+        "fundState"
+      ],
+      "depends_on": [
+        "Payments",
+        "SureAdmin"
+      ]
+    },
+    "SlipFactory": {
+      "file": "13_slip.rho",
+      "state_cells": [],
+      "depends_on": [
+        "BrokerBook",
+        "CoverTerms",
+        "Payments"
+      ]
+    },
+    "Slip": {
+      "file": "13_slip.rho",
+      "state_cells": [
+        "slipState"
+      ],
+      "depends_on": [
+        "SlipFactory",
+        "Syndicate",
+        "RiskBook",
+        "Broker"
+      ]
+    },
+    "PolicyFactory": {
+      "file": "17_policy.rho",
+      "state_cells": [],
+      "depends_on": [
+        "Policy"
+      ]
+    },
+    "Policy": {
+      "file": "17_policy.rho",
+      "state_cells": [
+        "policyState"
+      ],
+      "depends_on": [
+        "SureMath",
+        "SureFund",
+        "Line",
+        "ClaimFactory"
+      ]
+    },
+    "ClaimFactory": {
+      "file": "18_claim.rho",
+      "state_cells": [],
+      "depends_on": [
+        "Claim",
+        "RgenAdapter"
+      ]
+    },
+    "Claim": {
+      "file": "18_claim.rho",
+      "state_cells": [
+        "claimState"
+      ],
+      "depends_on": [
+        "RgenAdapter"
+      ]
+    },
+    "PolicyBook": {
+      "file": "19_books.rho",
+      "state_cells": [
+        "policyBookState"
+      ],
+      "depends_on": [
+        "Policy"
+      ]
+    },
+    "ClaimBook": {
+      "file": "19_books.rho",
+      "state_cells": [
+        "claimBookState"
+      ],
+      "depends_on": [
+        "Claim"
+      ]
+    }
+  }
+}

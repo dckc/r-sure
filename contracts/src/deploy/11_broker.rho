@@ -1,0 +1,221 @@
+// Brokers: a registered intermediary with a licence hash, credential reference,
+// commission cap and class list. The broker opens placing slips for an insured.
+// Placeholders: __ROOT_URI__.
+new
+  BrokerBook, brokerBookState,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  authOwner, brokerProfileOk, brokerMake
+in {
+  // @@INLINE:lib/Auth.rho@@
+
+  contract brokerProfileOk(@profile, ret) = {
+    match (profile.get("name"), profile.get("licenceHash"),
+           profile.get("commissionBps"), profile.get("classes")) {
+      (name, licence, commission, classes) => {
+        if (name == Nil || licence == Nil || commission == Nil || classes == Nil) {
+          ret!((false, "profile"))
+        } else {
+          if (name.length() == 0 || name.length() > 64) { ret!((false, "name")) }
+          else {
+            if (licence.length() == 0 || licence.length() > 128) {
+              ret!((false, "licence"))
+            } else {
+              if (commission < 0 || commission > 3000) {
+                ret!((false, "commission"))
+              } else {
+                if (classes.length() == 0 || classes.length() > 16) {
+                  ret!((false, "classes"))
+                } else { ret!((true, Nil)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract brokerMake(@ownerId, @profile, ret) = {
+    new Broker, brokerState, uriCh in {
+      brokerState!({
+        "id": "brk:" ++ ownerId,
+        "uri": "",
+        "ownerId": ownerId,
+        "name": profile.get("name"),
+        "licenceHash": profile.get("licenceHash"),
+        "credentialUri": profile.get("credentialUri"),
+        "commissionBps": profile.get("commissionBps"),
+        "classes": profile.get("classes"),
+        "slips": {},
+        "status": "active",
+        "nonce": 0
+      }) |
+
+      contract Broker(@"info", ret2) = {
+        for (@s <<- brokerState) { ret2!((true, s)) }
+      } |
+
+      contract Broker(@"profile", ret2) = {
+        for (@s <<- brokerState) {
+          ret2!((true, {"name": s.get("name"),
+                        "licenceHash": s.get("licenceHash"),
+                        "credentialUri": s.get("credentialUri"),
+                        "commissionBps": s.get("commissionBps"),
+                        "classes": s.get("classes"),
+                        "status": s.get("status")}))
+        }
+      } |
+
+      contract Broker(@"slips", ret2) = {
+        for (@s <<- brokerState) { ret2!((true, s.get("slips"))) }
+      } |
+
+      contract Broker(@"addSlip", dId, @slipId, @uri, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- brokerState) {
+              if (who != s.get("ownerId")) {
+                brokerState!(s) | ret2!((false, "not owner"))
+              } else {
+                if (s.get("status") != "active") {
+                  brokerState!(s) | ret2!((false, "not active"))
+                } else {
+                  match s.get("slips").get(slipId) {
+                    Nil => {
+                      brokerState!(s.set("slips", s.get("slips").set(slipId, uri))
+                                    .set("nonce", s.get("nonce") + 1)) |
+                      ret2!((true, Nil))
+                    }
+                    _ => { brokerState!(s) | ret2!((false, "duplicate")) }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } |
+
+      contract Broker(@"pause", dId, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- brokerState) {
+              if (who != s.get("ownerId")) {
+                brokerState!(s) | ret2!((false, "not owner"))
+              } else {
+                brokerState!(s.set("status", "paused")
+                              .set("nonce", s.get("nonce") + 1)) |
+                ret2!((true, Nil))
+              }
+            }
+          }
+        }
+      } |
+
+      contract Broker(@"resume", dId, ret2) = {
+        new aCh in {
+          authOwner!(*dId, *aCh) |
+          for (@(true, who) <- aCh) {
+            for (@s <- brokerState) {
+              if (who != s.get("ownerId")) {
+                brokerState!(s) | ret2!((false, "not owner"))
+              } else {
+                brokerState!(s.set("status", "active")
+                              .set("nonce", s.get("nonce") + 1)) |
+                ret2!((true, Nil))
+              }
+            }
+          }
+        }
+      } |
+
+      rs!(bundle+{*Broker}, *uriCh) |
+      for (@uri <- uriCh) {
+        for (@s2 <- brokerState) {
+          brokerState!(s2.set("uri", uri)) |
+          new doneCh in {
+            BrokerBook!("registerDone", ownerId, s2.get("id"), uri, *doneCh) |
+            for (@d <- doneCh) {
+              match d {
+                (true, Nil) => { ret!((true, s2.get("id"), uri)) }
+                _ => { ret!(d) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract BrokerBook(@"register", dId, @profile, ret) = {
+    new aCh, pCh in {
+      authOwner!(*dId, *aCh) |
+      brokerProfileOk!(profile, *pCh) |
+      for (@(true, ownerId) <- aCh; @ok <- pCh) {
+        match ok {
+          (false, reason) => { ret!((false, reason)) }
+          (true, Nil) => {
+            for (@b <<- brokerBookState) {
+              match b.get("byOwner").get(ownerId) {
+                Nil => { brokerMake!(ownerId, profile, *ret) }
+                existing => { ret!((false, "duplicate owner", existing)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract BrokerBook(@"registerDone", @ownerId, @id, @uri, ret) = {
+    for (@b <- brokerBookState) {
+      match b.get("byOwner").get(ownerId) {
+        Nil => {
+          brokerBookState!(b.set("brokers", b.get("brokers").set(id, uri))
+            .set("byOwner", b.get("byOwner").set(ownerId, id))
+            .set("nonce", b.get("nonce") + 1)) |
+          ret!((true, Nil))
+        }
+        existing => { brokerBookState!(b) | ret!((false, "duplicate owner", existing)) }
+      }
+    }
+  } |
+
+  contract BrokerBook(@"brokerOf", @ownerId, ret) = {
+    for (@b <<- brokerBookState) {
+      match b.get("byOwner").get(ownerId) {
+        Nil => { ret!((false, "unknown broker")) }
+        id => {
+          match b.get("brokers").get(id) {
+            Nil => { ret!((false, "unknown broker")) }
+            uri => { ret!((true, id, uri)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract BrokerBook(@"brokers", ret) = {
+    for (@b <<- brokerBookState) { ret!((true, b.get("brokers"))) }
+  } |
+
+  brokerBookState!({
+    "brokers": {},
+    "byOwner": {},
+    "nonce": 0
+  }) |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*BrokerBook}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:broker-book", uri, 1, "broker",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

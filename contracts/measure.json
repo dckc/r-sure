@@ -1,0 +1,95 @@
+{
+  "limits": {
+    "bytes": 57344,
+    "depth": 96,
+    "contracts": 64,
+    "per_file": {}
+  },
+  "terms": {
+    "00_root.rho": {
+      "bytes": 8731,
+      "depth": 21,
+      "contracts": 8
+    },
+    "01_kernel.rho": {
+      "bytes": 2589,
+      "depth": 9,
+      "contracts": 6
+    },
+    "02_admin.rho": {
+      "bytes": 4662,
+      "depth": 21,
+      "contracts": 5
+    },
+    "03_terms.rho": {
+      "bytes": 5005,
+      "depth": 22,
+      "contracts": 6
+    },
+    "04_math.rho": {
+      "bytes": 3690,
+      "depth": 16,
+      "contracts": 3
+    },
+    "05_rgen.rho": {
+      "bytes": 5425,
+      "depth": 24,
+      "contracts": 5
+    },
+    "10_syndicate.rho": {
+      "bytes": 21103,
+      "depth": 35,
+      "contracts": 21
+    },
+    "11_broker.rho": {
+      "bytes": 5362,
+      "depth": 14,
+      "contracts": 6
+    },
+    "12_risk.rho": {
+      "bytes": 7929,
+      "depth": 15,
+      "contracts": 10
+    },
+    "13_slip.rho": {
+      "bytes": 13932,
+      "depth": 43,
+      "contracts": 15
+    },
+    "14_line.rho": {
+      "bytes": 3011,
+      "depth": 17,
+      "contracts": 3
+    },
+    "15_distribution.rho": {
+      "bytes": 6959,
+      "depth": 23,
+      "contracts": 11
+    },
+    "16_fund.rho": {
+      "bytes": 6886,
+      "depth": 31,
+      "contracts": 6
+    },
+    "17_policy.rho": {
+      "bytes": 11080,
+      "depth": 41,
+      "contracts": 10
+    },
+    "18_claim.rho": {
+      "bytes": 9954,
+      "depth": 26,
+      "contracts": 13
+    },
+    "19_books.rho": {
+      "bytes": 4335,
+      "depth": 17,
+      "contracts": 4
+    },
+    "40_payments.rho": {
+      "bytes": 5485,
+      "depth": 24,
+      "contracts": 6
+    }
+  }
+}

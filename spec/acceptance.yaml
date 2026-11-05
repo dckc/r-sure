@@ -1,0 +1,29 @@
+# Milestone acceptance map. Each entry names the gate that must pass.
+M0:
+  static: [build-check, measure-check, check-arch, check-captures, check-select,
+           check-placeholders, check-money, check-suites, parse-check]
+M1:
+  suite: unit_root
+  also: [unit_payments]
+M2:
+  suite: unit_syndicate
+  also: [unit_capital, unit_broker, unit_risk]
+M3:
+  suite: unit_slip
+  also: [unit_subscription, unit_binding, unit_line, unit_policy, unit_distribution,
+         unit_premium, unit_fund]
+M4:
+  suite: unit_claim_lifecycle
+  also: [unit_claim_refusals, unit_settlement, unit_shortfall, unit_oracle, unit_evidence]
+M5:
+  invariants: spec/invariants.md
+M6:
+  formal: [lean-check, vectors, check-flows]
+M7:
+  rust: [client-lint, client-test, client-wasm]
+  web: [typecheck, test, build]
+  devnet: [client-fixtures, client-journey, web-e2e]
+M8:
+  audit: [check-audit, check-arm-inventory, audit-trace-check]
+  devnet: [unit_conservation, unit_pause_scope, unit_cell_liveness, unit_factory_auth,
+           unit_replay, unit_shortfall]

@@ -1,0 +1,152 @@
+// Line: one policy-syndicate share. The Line holds the syndicate's credit/pay/release
+// capabilities and the policy token in closure; its state is scalar only.
+// Placeholders: __ROOT_URI__.
+new
+  LineFactory,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  lineReqOk
+in {
+  contract lineReqOk(@req, ret) = {
+    match (req.get("lineId"), req.get("policy"), req.get("syndicate"),
+           req.get("shareBps"), req.get("exposure")) {
+      (lineId, policy, syndicate, shareBps, exposure) => {
+        if (lineId == Nil || policy == Nil || syndicate == Nil) {
+          ret!((false, "line"))
+        } else {
+          if (shareBps < 1 || shareBps > 10000 || exposure < 1) {
+            ret!((false, "share"))
+          } else { ret!((true, Nil)) }
+        }
+      }
+    }
+  } |
+
+  contract LineFactory(@"create", @req, creditCap, settleCap, releaseCap,
+                       policyToken, ret) = {
+    new okCh in {
+      lineReqOk!(req, *okCh) |
+      for (@ok <- okCh) {
+        match ok {
+          (false, reason) => { ret!((false, reason)) }
+          (true, Nil) => {
+            new Line, lineState, uriCh in {
+              lineState!({
+                "lineId": req.get("lineId"),
+                "policy": req.get("policy"),
+                "syndicate": req.get("syndicate"),
+                "shareBps": req.get("shareBps"),
+                "exposure": req.get("exposure"),
+                "status": "bound",
+                "credited": 0,
+                "paid": 0,
+                "paidFor": {},
+                "nonce": 0
+              }) |
+
+              contract Line(@"info", ret2) = {
+                for (@s <<- lineState) { ret2!((true, s)) }
+              } |
+
+              contract Line(@"remaining", ret2) = {
+                for (@s <<- lineState) {
+                  ret2!((true, s.get("exposure") - s.get("paid")))
+                }
+              } |
+
+              contract Line(@"paidFor", @claimId, ret2) = {
+                for (@s <<- lineState) {
+                  match s.get("paidFor").get(claimId) {
+                    Nil => { ret2!((false, "not paid")) }
+                    amount => { ret2!((true, amount)) }
+                  }
+                }
+              } |
+
+              contract Line(@"credit", @lineToken, payment, ret2) = {
+                new rCh in {
+                  @creditCap!("credit", *lineToken, payment, *rCh) |
+                  for (@r <- rCh) {
+                    match r {
+                      (true, amount) => {
+                        for (@s <- lineState) {
+                          lineState!(s.set("credited", s.get("credited") + amount)
+                                      .set("nonce", s.get("nonce") + 1)) |
+                          ret2!((true, amount))
+                        }
+                      }
+                      _ => { ret2!(r) }
+                    }
+                  }
+                }
+              } |
+
+              contract Line(@"pay", @lineToken, @claimId, @amount, @targetOwner, ret2) = {
+                new rCh in {
+                  @settleCap!("pay", *lineToken, claimId, amount, targetOwner, *rCh) |
+                  for (@r <- rCh) {
+                    match r {
+                      (true, amount2) => {
+                        for (@s <- lineState) {
+                          if (s.get("paidFor").get(claimId) != Nil) {
+                            lineState!(s) | ret2!((false, "already paid"))
+                          } else {
+                            lineState!(s.set("paid", s.get("paid") + amount2)
+                                        .set("paidFor",
+                                          s.get("paidFor").set(claimId, amount2))
+                                        .set("nonce", s.get("nonce") + 1)) |
+                            ret2!((true, amount2))
+                          }
+                        }
+                      }
+                      _ => { ret2!(r) }
+                    }
+                  }
+                }
+              } |
+
+              contract Line(@"release", @lineToken, ret2) = {
+                new rCh in {
+                  @releaseCap!("release", *lineToken, *rCh) |
+                  for (@r <- rCh) {
+                    match r {
+                      (true, _) => {
+                        for (@s <- lineState) {
+                          lineState!(s.set("status", "released")
+                                      .set("nonce", s.get("nonce") + 1)) |
+                          ret2!((true, Nil))
+                        }
+                      }
+                      _ => { ret2!(r) }
+                    }
+                  }
+                }
+              } |
+
+              rs!(bundle+{*Line}, *uriCh) |
+              for (@uri <- uriCh) {
+                for (@s2 <- lineState) {
+                  lineState!(s2) |
+                  ret!((true, uri))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*LineFactory}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:line-factory", uri, 1, "line",
+            *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

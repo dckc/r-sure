@@ -1,0 +1,282 @@
+// RgenAdapter: optional bridge to r-gen. It stores factory URIs and verifies evidence.
+// Nothing in install, premium or settlement requires r-gen. Admin can disable it.
+// Placeholders: __ROOT_URI__, __RGEN_ROOT_URI__.
+new
+  RgenAdapter, rgenState,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  adminGuard, rgenResolve, rgenUri, resolveComponent
+in {
+contract resolveComponent(@key, ret) = {
+  new rCh, Root, kCh in {
+    rl!(`__ROOT_URI__`, *rCh) |
+    for (Root <- rCh) {
+      Root!("resolve", key, 1, *kCh) |
+      for (@r <- kCh) {
+        match r {
+          (true, uri, _) => {
+            new cCh in {
+              rl!(uri, *cCh) |
+              for (C <- cCh) { ret!((true, *C)) }
+            }
+          }
+          _ => { ret!((false, "unavailable", key)) }
+        }
+      }
+    }
+  }
+} |
+contract adminGuard(@domain, @nonce, @action, @args, @sigs,
+                    @admins, @threshold, ret) = {
+  new rCh, Root, gCh, gc in {
+    rl!(`__ROOT_URI__`, *rCh) |
+    for (Root <- rCh) {
+      Root!("resolve", "component:admin-guard", 1, *gCh) |
+      for (@r <- gCh) {
+        match r {
+          (true, uri, _) => {
+            rl!(uri, *gc) |
+            for (AdminGuard <- gc) {
+              AdminGuard!("verify", domain, nonce, action, args, sigs,
+                          admins, threshold, *ret)
+            }
+          }
+          _ => { ret!((false, "below threshold")) }
+        }
+      }
+    }
+  }
+} |
+
+  contract rgenResolve(@key, ret) = {
+    for (@s <<- rgenState) {
+      if (s.get("rgenRootUri").length() == 0) {
+        ret!((false, "rgen disabled"))
+      } else {
+        new rCh, Root, kCh in {
+          rl!(s.get("rgenRootUri"), *rCh) |
+          for (Root <- rCh) {
+            Root!("resolve", key, s.get("minVersion"), *kCh) |
+            for (@r <- kCh) {
+              match r {
+                (true, uri, version) => { ret!((true, uri, version)) }
+                _ => { ret!((false, "rgen unavailable", key)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract rgenUri(@key, ret) = {
+    for (@s <<- rgenState) {
+      if (s.get("rgenRootUri").length() == 0) {
+        ret!((false, "rgen disabled"))
+      } else {
+        new uCh in {
+          rgenResolve!(key, *uCh) |
+          for (@u <- uCh) {
+            match u {
+              (true, uri, _) => {
+                new cCh in {
+                  rl!(uri, *cCh) |
+                  for (C <- cCh) { ret!((true, *C)) }
+                }
+              }
+              _ => { ret!(u) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract RgenAdapter(@"health", ret) = {
+    for (@s <<- rgenState) {
+      if (s.get("enabled") == false) {
+        ret!((false, "disabled"))
+      } else {
+        new oCh, cCh, kCh, pCh in {
+          rgenResolve!("component:oracle-factory", *oCh) |
+          rgenResolve!("component:credential-factory", *cCh) |
+          rgenResolve!("component:claim-factory", *kCh) |
+          rgenResolve!("component:provenance-factory", *pCh) |
+          for (@o <- oCh; @c <- cCh; @k <- kCh; @p <- pCh) {
+            match (o, c, k, p) {
+              ((true, ou, ov), (true, cu, cv), (true, ku, kv), (true, pu, pv)) => {
+                ret!((true, {"oracle": ou, "credential": cu, "claim": ku,
+                             "provenance": pu, "versions": [ov, cv, kv, pv]}))
+              }
+              _ => { ret!((false, "rgen unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract RgenAdapter(@"config", ret) = {
+    for (@s <<- rgenState) { ret!((true, s)) }
+  } |
+
+  contract RgenAdapter(@"oracleFactory", ret) = {
+    new cCh in {
+      rgenUri!("component:oracle-factory", *cCh) |
+      for (@r <- cCh) { ret!(r) }
+    }
+  } |
+
+  contract RgenAdapter(@"credentialFactory", ret) = {
+    new cCh in {
+      rgenUri!("component:credential-factory", *cCh) |
+      for (@r <- cCh) { ret!(r) }
+    }
+  } |
+
+  contract RgenAdapter(@"claimFactory", ret) = {
+    new cCh in {
+      rgenUri!("component:claim-factory", *cCh) |
+      for (@r <- cCh) { ret!(r) }
+    }
+  } |
+
+  contract RgenAdapter(@"verifyCredential", @uri, ret) = {
+    new cCh in {
+      rgenUri!("component:credential-factory", *cCh) |
+      for (@r <- cCh) {
+        match r {
+          (true, CredentialFactory) => {
+            @CredentialFactory!("verify", uri, *ret)
+          }
+          _ => { ret!(r) }
+        }
+      }
+    }
+  } |
+
+  contract RgenAdapter(@"verifyClaim", @uri, ret) = {
+    new cCh in {
+      rgenUri!("component:claim-factory", *cCh) |
+      for (@r <- cCh) {
+        match r {
+          (true, ClaimFactory) => {
+            @ClaimFactory!("verify", uri, *ret)
+          }
+          _ => { ret!(r) }
+        }
+      }
+    }
+  } |
+
+  contract RgenAdapter(@"verifyProvenance", @uri, @hash, ret) = {
+    new cCh in {
+      rl!(uri, *cCh) |
+      for (Provenance <- cCh) {
+        @Provenance!("verify", hash, *ret)
+      }
+    }
+  } |
+
+  contract RgenAdapter(@"admin", @nonce, @action, @args, @sigs, ret) = {
+    for (@s <- rgenState) {
+      if (nonce <= s.get("nonce")) {
+        rgenState!(s) | ret!((false, "replay"))
+      } else {
+        new uCh in {
+          resolveComponent!("component:admin", *uCh) |
+          for (@u <- uCh) {
+            match u {
+              (true, SureAdmin) => {
+                new kCh in {
+                  @SureAdmin!("keys", *kCh) |
+                  for (@k <- kCh) {
+                    match k {
+                      (true, admins, threshold) => {
+                        new vCh in {
+                          adminGuard!("rgen", nonce, action, args, sigs,
+                                       admins, threshold, *vCh) |
+                          for (@v <- vCh) {
+                            match v {
+                              (true, ok) => {
+                                if (ok == false) {
+                                  rgenState!(s) | ret!((false, "below threshold"))
+                                } else {
+                                  match action {
+                                    "setRgenRoot" => {
+                                      match args.nth(0) {
+                                        root => {
+                                          rgenState!(s.set("rgenRootUri", root)
+                                                      .set("nonce", nonce)) |
+                                          ret!((true, Nil))
+                                        }
+                                      }
+                                    }
+                                    "setEnabled" => {
+                                      match args.nth(0) {
+                                        enabled => {
+                                          if ((enabled == true || enabled == false) == false) {
+                                            rgenState!(s) | ret!((false, "enabled"))
+                                          } else {
+                                            rgenState!(s.set("enabled", enabled)
+                                                        .set("nonce", nonce)) |
+                                            ret!((true, Nil))
+                                          }
+                                        }
+                                      }
+                                    }
+                                    "setStrict" => {
+                                      match args.nth(0) {
+                                        strict => {
+                                          if ((strict == true || strict == false) == false) {
+                                            rgenState!(s) | ret!((false, "strict"))
+                                          } else {
+                                            rgenState!(s.set("strictCredentials", strict)
+                                                        .set("nonce", nonce)) |
+                                            ret!((true, Nil))
+                                          }
+                                        }
+                                      }
+                                    }
+                                    _ => { rgenState!(s) | ret!((false, "unknown action")) }
+                                  }
+                                }
+                              }
+                              _ => { rgenState!(s) | ret!((false, "below threshold")) }
+                            }
+                          }
+                        }
+                      }
+                      _ => { rgenState!(s) | ret!((false, "admin unavailable")) }
+                    }
+                  }
+                }
+              }
+              _ => { rgenState!(s) | ret!((false, "admin unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  rgenState!({
+    "rgenRootUri": "__RGEN_ROOT_URI__",
+    "minVersion": 1,
+    "enabled": false,
+    "strictCredentials": false,
+    "nonce": 0
+  }) |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*RgenAdapter}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:rgen", uri, 1, "adapter", *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

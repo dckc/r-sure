@@ -1,0 +1,11 @@
+{
+  "pinned_commit": "c4f8a91cc5fa8f35a2f5be4230c4866282077499",
+  "min_version": 1,
+  "manifest": "../RGen/deployments/devnet.json",
+  "required_components": [
+    "component:oracle-factory",
+    "component:credential-factory",
+    "component:claim-factory",
+    "component:provenance-factory"
+  ]
+}

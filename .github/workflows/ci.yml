@@ -1,0 +1,81 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make venv
+      - run: make spec-check
+      - run: make audit-check
+      - run: make docs-check
+
+  formal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+      - run: make formal-check
+
+  parse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rchain-community/rchain-rust
+          ref: e2d073dcd02f1e560ccb84749937138a1e184b0b
+          path: RNodeRust
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make venv
+      - run: make build
+      - run: tools/parse_check.sh contracts/build/*.rho
+
+  client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+
+  devnet:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rhovision-org/r-cash
+          ref: 49b441dea4f5561992387ed670ab263fcd5dd164
+          path: Rholphin
+      - uses: actions/checkout@v4
+        with:
+          repository: rhovision-org/r-gen
+          ref: c4f8a91cc5fa8f35a2f5be4230c4866282077499
+          path: RGen
+      - uses: actions/checkout@v4
+        with:
+          repository: rchain-community/rchain-rust
+          ref: e2d073dcd02f1e560ccb84749937138a1e184b0b
+          path: RNodeRust
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make venv
+      - run: make setup
+      - run: make unit-all
+      - run: make integration-rcash integration-rgen

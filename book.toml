@@ -1,0 +1,13 @@
+[book]
+title = "r-sure"
+authors = ["rhovision-org"]
+description = "Lloyd's-style insurance primitives for rholo"
+language = "en"
+src = "docs"
+
+[build]
+build-dir = "docs/book"
+
+[output.html]
+git-repository-url = "https://github.com/rhovision-org/r-sure"
+edit-url-template = "https://github.com/rhovision-org/r-sure/edit/main/docs/{path}"

@@ -1,0 +1,21 @@
+[package]
+name = "rsure-wasm"
+description = "wasm-bindgen facade for the r-sure browser client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rsure-core.workspace = true
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

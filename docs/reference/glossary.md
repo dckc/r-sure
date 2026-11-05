@@ -1,0 +1,26 @@
+# Glossary
+
+- **Aggregate limit**: the maximum total the policy pays across all claims.
+- **Bps**: basis points, denominator 10000.
+- **Broker**: a registered intermediary that opens slips.
+- **Claim**: a notified loss, assessed and agreed before settlement.
+- **Commission**: the broker's share of the premium.
+- **Complex claim**: a claim requiring the lead and second managers to agree.
+- **CoverTerms**: the ordered coverage fields, validation and canonical hash.
+- **Deductible**: the insured's retained amount on a claim.
+- **Distribution**: an exactly-once cash-flow plan over a purse.
+- **Free capacity**: `capital - committed - written`.
+- **K-Asset**: an r-gen claim + validation pair.
+- **Lead**: the first syndicate on a slip; it manages standard claims.
+- **Levy**: the central fund's share of the premium.
+- **Line**: one policy-syndicate share; holds credit/pay/release capabilities.
+- **LineGrant**: a one-shot capacity reservation bound to a slip token.
+- **Managing agent**: the syndicate's manager; the underwriting authority.
+- **Payable**: `max(0, min(agreed, perClaimLimit, aggregateRemaining) - deductible)`.
+- **Policy**: a bound slip with lines, premium and aggregate accounting.
+- **Risk**: the insured's submission with asset, evidence and insurability answers.
+- **Second**: the following syndicate that shares complex-claim agreement.
+- **Slip**: the placing document; subscriptions sum to 10000 bps.
+- **Standard claim**: a claim the lead can agree for all followers.
+- **Syndicate**: capacity provider with a contract-owned claims purse.
+- **Written**: capacity consumed by bound lines.

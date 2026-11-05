@@ -1,0 +1,16 @@
+tests:
+  - id: T-001
+    name: unit_syndicate
+    file: harness/unit_syndicate.py
+    status: not_run
+    focus: capacity, quotes, grants and lines
+  - id: T-002
+    name: unit_slip
+    file: harness/unit_slip.py
+    status: not_run
+    focus: subscriptions, funding, bind and expiry
+  - id: T-003
+    name: unit_claim_lifecycle
+    file: harness/unit_claim_lifecycle.py
+    status: not_run
+    focus: classify, assess, agree and settle

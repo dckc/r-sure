@@ -1,0 +1,199 @@
+// Discovery books. Registration verifies the object URI by reading its info arm.
+// Placeholders: __ROOT_URI__.
+new
+  PolicyBook, policyBookState, ClaimBook, claimBookState,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  bookAdd, bookList
+in {
+  contract bookAdd(@m, @key, @value, ret) = {
+    match m.get(key) {
+      Nil => { ret!(m.set(key, [value])) }
+      xs => { ret!(m.set(key, xs ++ [value])) }
+    }
+  } |
+
+  contract bookList(@m, @key, ret) = {
+    match m.get(key) {
+      Nil => { ret!([]) }
+      xs => { ret!(xs) }
+    }
+  } |
+
+  contract PolicyBook(@"register", @policyId, @uri, @slipId, @insured, @broker, ret) = {
+    new pCh in {
+      rl!(uri, *pCh) |
+      for (Policy <- pCh) {
+        new iCh in {
+          @Policy!("info", *iCh) |
+          for (@i <- iCh) {
+            match i {
+              (true, s) => {
+                if (s.get("id") != policyId) {
+                  ret!((false, "policy id"))
+                } else {
+                  for (@b <- policyBookState) {
+                    match b.get("policies").get(policyId) {
+                      Nil => {
+                        new iCh2, brCh, slCh in {
+                          bookAdd!(b.get("byInsured"), insured, policyId, *iCh2) |
+                          bookAdd!(b.get("byBroker"), broker, policyId, *brCh) |
+                          for (@byInsured <- iCh2; @byBroker <- brCh) {
+                            policyBookState!(b.set("policies", b.get("policies").set(policyId, uri))
+                              .set("byInsured", byInsured)
+                              .set("byBroker", byBroker)
+                              .set("bySlip", b.get("bySlip").set(slipId, policyId))
+                              .set("nonce", b.get("nonce") + 1)) |
+                            ret!((true, Nil))
+                          }
+                        }
+                      }
+                      _ => { policyBookState!(b) | ret!((false, "duplicate")) }
+                    }
+                  }
+                }
+              }
+              _ => { ret!((false, "policy unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract PolicyBook(@"policy", @policyId, ret) = {
+    for (@b <<- policyBookState) {
+      match b.get("policies").get(policyId) {
+        Nil => { ret!((false, "unknown policy")) }
+        uri => { ret!((true, uri)) }
+      }
+    }
+  } |
+
+  contract PolicyBook(@"policies", ret) = {
+    for (@b <<- policyBookState) { ret!((true, b.get("policies"))) }
+  } |
+
+  contract PolicyBook(@"byInsured", @insured, ret) = {
+    for (@b <<- policyBookState) {
+      new lCh in {
+        bookList!(b.get("byInsured"), insured, *lCh) |
+        for (@l <- lCh) { ret!((true, l)) }
+      }
+    }
+  } |
+
+  contract PolicyBook(@"byBroker", @broker, ret) = {
+    for (@b <<- policyBookState) {
+      new lCh in {
+        bookList!(b.get("byBroker"), broker, *lCh) |
+        for (@l <- lCh) { ret!((true, l)) }
+      }
+    }
+  } |
+
+  contract PolicyBook(@"bySlip", @slipId, ret) = {
+    for (@b <<- policyBookState) {
+      match b.get("bySlip").get(slipId) {
+        Nil => { ret!((false, "unknown slip")) }
+        id => { ret!((true, id)) }
+      }
+    }
+  } |
+
+  contract ClaimBook(@"register", @claimId, @uri, @policyId, @insured, ret) = {
+    new cCh in {
+      rl!(uri, *cCh) |
+      for (Claim <- cCh) {
+        new iCh in {
+          @Claim!("info", *iCh) |
+          for (@i <- iCh) {
+            match i {
+              (true, s) => {
+                if (s.get("id") != claimId) {
+                  ret!((false, "claim id"))
+                } else {
+                  for (@b <- claimBookState) {
+                    match b.get("claims").get(claimId) {
+                      Nil => {
+                        new iCh2, pCh in {
+                          bookAdd!(b.get("byInsured"), insured, claimId, *iCh2) |
+                          bookAdd!(b.get("byPolicy"), policyId, claimId, *pCh) |
+                          for (@byInsured <- iCh2; @byPolicy <- pCh) {
+                            claimBookState!(b.set("claims", b.get("claims").set(claimId, uri))
+                              .set("byInsured", byInsured)
+                              .set("byPolicy", byPolicy)
+                              .set("nonce", b.get("nonce") + 1)) |
+                            ret!((true, Nil))
+                          }
+                        }
+                      }
+                      _ => { claimBookState!(b) | ret!((false, "duplicate")) }
+                    }
+                  }
+                }
+              }
+              _ => { ret!((false, "claim unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract ClaimBook(@"claim", @claimId, ret) = {
+    for (@b <<- claimBookState) {
+      match b.get("claims").get(claimId) {
+        Nil => { ret!((false, "unknown claim")) }
+        uri => { ret!((true, uri)) }
+      }
+    }
+  } |
+
+  contract ClaimBook(@"claims", ret) = {
+    for (@b <<- claimBookState) { ret!((true, b.get("claims"))) }
+  } |
+
+  contract ClaimBook(@"byPolicy", @policyId, ret) = {
+    for (@b <<- claimBookState) {
+      new lCh in {
+        bookList!(b.get("byPolicy"), policyId, *lCh) |
+        for (@l <- lCh) { ret!((true, l)) }
+      }
+    }
+  } |
+
+  contract ClaimBook(@"byInsured", @insured, ret) = {
+    for (@b <<- claimBookState) {
+      new lCh in {
+        bookList!(b.get("byInsured"), insured, *lCh) |
+        for (@l <- lCh) { ret!((true, l)) }
+      }
+    }
+  } |
+
+  policyBookState!({
+    "policies": {}, "byInsured": {}, "byBroker": {}, "bySlip": {},
+    "nonce": 0
+  }) |
+  claimBookState!({
+    "claims": {}, "byInsured": {}, "byPolicy": {},
+    "nonce": 0
+  }) |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*PolicyBook}, *c) |
+    rs!(bundle+{*ClaimBook}, *ack) |
+    for (@u1 <- c; @u2 <- ack) {
+      new a1, a2 in {
+        Root!("register", "component:policy-book", u1, 1, "book", *deployerId, *a1) |
+        Root!("register", "component:claim-book", u2, 1, "book", *deployerId, *a2) |
+        for (@r1 <- a1; @r2 <- a2) { deployId!([u1, u2]) }
+      }
+    }
+  }
+}

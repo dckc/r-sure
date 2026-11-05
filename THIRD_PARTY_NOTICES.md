@@ -1,0 +1,44 @@
+# Third-party notices
+
+r-sure is licensed AGPL-3.0-only. It adapts architectural patterns from three AGPL-3.0
+projects.
+
+## r-share — https://github.com/rhovision-org/r-share
+
+Local reference checkout: `/home/patrick/RShare`.
+
+Patterns referenced: the component directory and installer gate, consume-then-repost state
+discipline, owner-auth helpers, the r-cash Payments adapter, the per-object escrow payout
+sequence, the Keystore port and the static-gate/harness structure. r-sure writes its own
+contracts and does not modify r-share.
+
+## r-gen — https://github.com/rhovision-org/r-gen
+
+Local reference checkout: `/home/patrick/RGen`, commit `c4f8a91`.
+
+Patterns referenced: `OracleFactory.open` and the private `applyDecision` execution protocol
+(`contracts/src/deploy/30_oracle.rho`); the claim/validation/K-Asset evidence model; and the
+insurability tri-test in `legacy/lib/RiskMath.rho`. r-sure consumes the interface only; it has
+no compile-time r-gen dependency.
+
+## r-cash — https://github.com/rhovision-org/r-cash
+
+Local reference checkout: `/home/patrick/Rholphin`, commit `49b441d`.
+
+The Rust client uses `rcash-core`, `rcash-chain` and `rcash-sdk` as git dependencies pinned to
+`49b441dea4f5561992387ed670ab263fcd5dd164` (AGPL-3.0-only). They provide amounts, deploy
+signing, the rholo HTTP client, finality polling and `RhoValue` decoding. `rcash-keystore`
+patterns are ported from the same family. The rholo crates `rchain-crypto`/`rchain-shared` are
+pinned to `841cb842876369deaa63e3b3e26c20d60e6c74c6`.
+
+## rchain-rust — https://github.com/rchain-community/rchain-rust
+
+Local reference checkout: `/home/patrick/RNodeRust`. The parser gate uses the node parser at
+`e2d073dcd02f1e560ccb84749937138a1e184b0b`. Platform facts referenced: `select` desugars to
+parallel receives; the 64 KiB deploy cap; ERTP receive-only deposit facets; and the
+`rho:block:data`, deployerId, registry, secp256k1 and blake2b system channels.
+
+## Papers
+
+`docs/papers/NAIC_CIPR_2C_20July_2016.pdf` is third-party background (NAIC/CIPR). It is not
+relicensed and is not a source of the contracts.

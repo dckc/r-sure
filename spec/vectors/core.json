@@ -1,0 +1,13 @@
+{
+  "generated_by": "spec/lean/RSure/Emit.lean",
+  "vectors": {
+    "share_half": {
+      "input": "1000,5000",
+      "output": "500"
+    },
+    "share_zero": {
+      "input": "0",
+      "output": "0"
+    }
+  }
+}

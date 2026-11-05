@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.pyc
+.devnet/
+deployments/*.json
+!deployments/.gitkeep
+!deployments/catalogue.json
+.pytest_cache/
+.DS_Store
+
+# mdBook build output
+/docs/book/
+/contracts/metrics-current.json
+
+# Lean build output
+/spec/lean/.lake/
+
+# Rust client build output
+/target/
+
+# Web client build output and generated manifests/wasm
+/web/node_modules/
+/web/dist/
+/web/src/wasm/pkg/
+/web/public/*.json
+/web/test-results/
+/web/playwright-report/

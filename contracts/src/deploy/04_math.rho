@@ -1,0 +1,174 @@
+// SureMath: pure integer insurance arithmetic. Amounts are minor units; bps denominator
+// is 10000. Division rounds toward zero. The last bucket absorbs the remainder.
+// Placeholders: __ROOT_URI__.
+new
+  SureMath,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  sharesSum, planBuild
+in {
+  contract sharesSum(@items, @i, @acc, ret) = {
+    if (i >= items.length()) { ret!(acc) }
+    else {
+      match items.nth(i) {
+        it => { sharesSum!(items, i + 1, acc + it.get("shareBps"), *ret) }
+      }
+    }
+  } |
+
+  // planBuild: allocate @amount across @items by shareBps; the last item gets the
+  // remainder. Returns (true, [{uri, amount}, ...]) or (false, reason).
+  contract planBuild(@items, @i, @amount, @paid, @acc, ret) = {
+    if (i >= items.length()) {
+      if (paid == amount) { ret!((true, acc)) }
+      else { ret!((false, "shares")) }
+    } else {
+      match items.nth(i) {
+        it => {
+          match it.get("shareBps") {
+            bps => {
+              if (bps < 0 || bps > 10000) {
+                ret!((false, "bps"))
+              } else {
+                if (i + 1 == items.length()) {
+                  match amount - paid {
+                    last => {
+                      if (last < 0) { ret!((false, "shares")) }
+                      else {
+                        planBuild!(items, i + 1, amount, amount,
+                                   acc ++ [{"uri": it.get("uri"), "amount": last}], *ret)
+                      }
+                    }
+                  }
+                } else {
+                  match amount * bps / 10000 {
+                    part => {
+                      planBuild!(items, i + 1, amount, paid + part,
+                                 acc ++ [{"uri": it.get("uri"), "amount": part}], *ret)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"bpsSum", @items, ret) = {
+    new sCh in {
+      sharesSum!(items, 0, 0, *sCh) |
+      for (@s <- sCh) { ret!((true, s)) }
+    }
+  } |
+
+  contract SureMath(@"share", @amount, @bps, ret) = {
+    if (amount < 0 || bps < 0 || bps > 10000) {
+      ret!((false, "bps"))
+    } else {
+      match amount * bps / 10000 {
+        part => { ret!((true, part, amount - part)) }
+      }
+    }
+  } |
+
+  contract SureMath(@"lineExposures", @aggregateLimit, @lines, ret) = {
+    if (aggregateLimit < 1 || lines.length() == 0) {
+      ret!((false, "lines"))
+    } else {
+      new sCh in {
+        sharesSum!(lines, 0, 0, *sCh) |
+        for (@sum <- sCh) {
+          if (sum != 10000) { ret!((false, "shares")) }
+          else { planBuild!(lines, 0, aggregateLimit, 0, [], *ret) }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"premiumSplit", @premiumTotal, @brokerBps, @fundBps, ret) = {
+    if (premiumTotal < 0 || brokerBps < 0 || fundBps < 0
+        || brokerBps > 10000 || fundBps > 10000
+        || brokerBps + fundBps > 10000) {
+      ret!((false, "bps"))
+    } else {
+      match premiumTotal * brokerBps / 10000 {
+        commission => {
+          match premiumTotal * fundBps / 10000 {
+            fund => {
+              match premiumTotal - commission - fund {
+                net => { ret!((true, commission, fund, net)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"lineShares", @netPremium, @lines, ret) = {
+    if (netPremium < 0 || lines.length() == 0) {
+      ret!((false, "lines"))
+    } else {
+      new sCh in {
+        sharesSum!(lines, 0, 0, *sCh) |
+        for (@sum <- sCh) {
+          if (sum != 10000) { ret!((false, "shares")) }
+          else { planBuild!(lines, 0, netPremium, 0, [], *ret) }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"payable", @agreed, @perClaimLimit, @aggregateRemaining,
+                   @deductible, ret) = {
+    if (agreed < 0 || perClaimLimit < 0 || aggregateRemaining < 0 || deductible < 0) {
+      ret!((false, "amount"))
+    } else {
+      match (agreed < perClaimLimit, agreed < aggregateRemaining) {
+        (true, true) => {
+          match agreed - deductible {
+            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+          }
+        }
+        (true, false) => {
+          match aggregateRemaining - deductible {
+            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+          }
+        }
+        (false, _) => {
+          match perClaimLimit - deductible {
+            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"settlePlan", @payable, @lines, ret) = {
+    if (payable < 0 || lines.length() == 0) {
+      ret!((false, "lines"))
+    } else {
+      new sCh in {
+        sharesSum!(lines, 0, 0, *sCh) |
+        for (@sum <- sCh) {
+          if (sum != 10000) { ret!((false, "shares")) }
+          else { planBuild!(lines, 0, payable, 0, [], *ret) }
+        }
+      }
+    }
+  } |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*SureMath}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:suremath", uri, 1, "math", *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}

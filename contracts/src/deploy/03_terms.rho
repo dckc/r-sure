@@ -1,0 +1,184 @@
+// CoverTerms: the single ordered coverage field list, validation and canonical hash.
+// Placeholders: __ROOT_URI__.
+new
+  CoverTerms,
+  rl(`rho:registry:lookup`),
+  rs(`rho:registry:insertArbitrary`),
+  deployerId(`rho:rchain:deployerId`),
+  deployId(`rho:rchain:deployId`),
+  rootCh, c, ack,
+  termsNumOk, termsCheckList, termsResolve, coverTail,
+  resolveComponent
+in {
+  // @@INLINE:lib/Resolve.rho@@
+
+  contract termsResolve(@key, ret) = {
+    resolveComponent!(key, *ret)
+  } |
+
+  contract CoverTerms(@"fields", ret) = {
+    ret!(["coverageClass", "assetId", "aggregateLimit", "perClaimLimit", "deductible",
+          "premiumTotal", "periodStartHeight", "periodEndHeight", "waitingBlocks",
+          "noticeBlocks", "runOffBlocks", "standardClaimMax", "minSyndicates",
+          "maxSyndicates", "brokerCommissionBps", "centralFundBps", "evidencePolicy",
+          "claimsLeadPolicy"])
+  } |
+
+  contract CoverTerms(@"values", @terms, ret) = {
+    ret!([terms.get("coverageClass"), terms.get("assetId"),
+          terms.get("aggregateLimit"), terms.get("perClaimLimit"),
+          terms.get("deductible"), terms.get("premiumTotal"),
+          terms.get("periodStartHeight"), terms.get("periodEndHeight"),
+          terms.get("waitingBlocks"), terms.get("noticeBlocks"),
+          terms.get("runOffBlocks"), terms.get("standardClaimMax"),
+          terms.get("minSyndicates"), terms.get("maxSyndicates"),
+          terms.get("brokerCommissionBps"), terms.get("centralFundBps"),
+          terms.get("evidencePolicy"), terms.get("claimsLeadPolicy")])
+  } |
+
+  contract termsNumOk(@terms, @check, ret) = {
+    match check.get("key") {
+      key => {
+        match terms.get(key) {
+          Nil => { ret!((false, key)) }
+          v => {
+            if (v < check.get("min") || v > check.get("max")) {
+              ret!((false, key))
+            } else {
+              ret!((true, Nil))
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract termsCheckList(@checks, @i, @terms, ret) = {
+    if (i >= checks.length()) {
+      ret!((true, Nil))
+    } else {
+      new cCh in {
+        termsNumOk!(terms, checks.nth(i), *cCh) |
+        for (@r <- cCh) {
+          match r {
+            (true, Nil) => { termsCheckList!(checks, i + 1, terms, *ret) }
+            _ => { ret!(r) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract CoverTerms(@"validate", @terms, ret) = {
+    match terms.get("coverageClass") {
+      Nil => { ret!((false, "class")) }
+      klass => {
+        if ((klass == "engineering" || klass == "property" || klass == "equipment"
+             || klass == "liability" || klass == "marine" || klass == "cyber") == false) {
+          ret!((false, "class"))
+        } else {
+          match terms.get("assetId") {
+            Nil => { ret!((false, "asset")) }
+            asset => {
+              if (asset.length() == 0 || asset.length() > 32) {
+                ret!((false, "asset"))
+              } else {
+                new cCh in {
+                  termsCheckList!([
+                    {"key": "aggregateLimit", "min": 1, "max": 1000000000000},
+                    {"key": "perClaimLimit", "min": 1, "max": 1000000000000},
+                    {"key": "deductible", "min": 0, "max": 1000000000000},
+                    {"key": "premiumTotal", "min": 1, "max": 1000000000000},
+                    {"key": "periodStartHeight", "min": 0, "max": 1000000000000},
+                    {"key": "periodEndHeight", "min": 1, "max": 1000000000000},
+                    {"key": "waitingBlocks", "min": 0, "max": 1000000},
+                    {"key": "noticeBlocks", "min": 0, "max": 1000000},
+                    {"key": "runOffBlocks", "min": 0, "max": 1000000},
+                    {"key": "standardClaimMax", "min": 0, "max": 1000000000000},
+                    {"key": "minSyndicates", "min": 1, "max": 8},
+                    {"key": "maxSyndicates", "min": 1, "max": 8},
+                    {"key": "brokerCommissionBps", "min": 0, "max": 10000},
+                    {"key": "centralFundBps", "min": 0, "max": 10000}
+                  ], 0, terms, *cCh) |
+                  for (@r <- cCh) {
+                    match r {
+                      (true, Nil) => {
+                        if (terms.get("perClaimLimit") > terms.get("aggregateLimit")) {
+                          ret!((false, "limits"))
+                        } else {
+                          if (terms.get("deductible") >= terms.get("perClaimLimit")) {
+                            ret!((false, "deductible"))
+                          } else {
+                            if (terms.get("standardClaimMax") > terms.get("perClaimLimit")) {
+                              ret!((false, "threshold"))
+                            } else {
+                              if (terms.get("minSyndicates") > terms.get("maxSyndicates")) {
+                                ret!((false, "syndicates"))
+                              } else {
+                                if (terms.get("brokerCommissionBps")
+                                    + terms.get("centralFundBps") > 3000) {
+                                  ret!((false, "bps"))
+                                } else {
+                                  if (terms.get("periodEndHeight")
+                                      <= terms.get("periodStartHeight")) {
+                                    ret!((false, "period"))
+                                  } else {
+                                    match terms.get("evidencePolicy") {
+                                      "none" => { coverTail!(terms, *ret) }
+                                      "optional" => { coverTail!(terms, *ret) }
+                                      "required" => { coverTail!(terms, *ret) }
+                                      _ => { ret!((false, "evidence")) }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      _ => { ret!(r) }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract coverTail(@terms, ret) = {
+    match terms.get("claimsLeadPolicy") {
+      "lead" => { ret!((true, Nil)) }
+      "lead+second" => { ret!((true, Nil)) }
+      _ => { ret!((false, "claims lead")) }
+    }
+  } |
+
+  contract CoverTerms(@"hash", @terms, ret) = {
+    new vCh, cCh in {
+      CoverTerms!("values", terms, *vCh) |
+      for (@values <- vCh) {
+        termsResolve!("component:codec", *cCh) |
+        for (@r <- cCh) {
+          match r {
+            (true, Codec) => {
+              @Codec!("hash", "rsure:terms:v1", values, *ret)
+            }
+            _ => { ret!((false, "codec")) }
+          }
+        }
+      }
+    }
+  } |
+
+  rl!(`__ROOT_URI__`, *rootCh) |
+  for (Root <- rootCh) {
+    rs!(bundle+{*CoverTerms}, *c) |
+    for (@uri <- c) {
+      Root!("register", "component:terms", uri, 1, "terms", *deployerId, *ack) |
+      for (@r <- ack) { deployId!([uri]) }
+    }
+  }
+}
