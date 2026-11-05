@@ -28,6 +28,7 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         check-concurrency-audit check-composition-audit check-invariant-guards \
         check-pause-scope check-suite-results coverage-report coverage-check audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
+        client-terms-check \
         client-fixtures client-journey client-keystores web-install web-lint web-test web-build web-e2e \
         check ci clean
 
@@ -251,7 +252,11 @@ client-wasm-smoke: web-install
 
 client-gates: client-lint client-test client-wasm web-install
 
-client-check: client-gates client-wasm-smoke
+client-terms-check:
+	cargo run -q -p rsure-sdk --example term_preview -- .devnet/client-terms
+	tools/normalize_check.sh .devnet/client-terms/*.rho
+
+client-check: client-gates client-wasm-smoke client-terms-check
 
 client-fixtures:
 	$(PY) harness/run_suites.py --fixtures

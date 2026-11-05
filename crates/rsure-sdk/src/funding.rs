@@ -20,7 +20,9 @@ fn check(term: &str) -> Result<()> {
     Ok(())
 }
 
-fn fund_term(payments: &str, amount: i64) -> String {
+/// The native-REV to r-cash account funding term. Exposed so the parser gate and tests
+/// can normalize exactly the bytes a deploy would send.
+pub fn fund_term(payments: &str, amount: i64) -> String {
     format!(
         r#"new rl(`rho:registry:lookup`), paymentsCh, accountCh, facetCh,
     ertpCh, issuerCh, purseCh, fundCh, wdCh, depCh,
@@ -70,7 +72,9 @@ fn fund_term(payments: &str, amount: i64) -> String {
     )
 }
 
-fn payment_term(
+/// The payment-carrying write term: withdraw from the caller's account and call one arm
+/// with the payment in the requested argument position.
+pub fn payment_term(
     payments: &str,
     target: &str,
     arm: &str,

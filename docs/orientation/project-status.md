@@ -88,5 +88,6 @@ The detailed gate list and honesty rule are in [Verification](../reference/verif
 
 1. Run the three `not_run` process gates as first-class campaign rows.
 2. Extend the Playwright journey through subscribe, fund, bind and the claim lifecycle.
-3. Return to the a-priori program: a normalizer-backed `rho-lint` and a local reducer so
-   more defects are found before a devnet deploy.
+3. Continue the a-priori program: the client-term normalizer now checks reads, writes,
+   funding and payment terms; next are a normalizer-backed `rho-lint` over source arms and a
+   local reducer, so more defects are found before a devnet deploy.

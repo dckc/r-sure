@@ -44,7 +44,7 @@ simulation, not an independent audit. See `audit/report.md`.
 make unit-all         # honest pass/fail/not-run
 make formal-check     # Lean build, axioms, vectors, flows, claims, critical path
 make audit-check      # registers, traceability, concurrency, interfaces, guards and pause scope
-make client-check     # Rust fmt/clippy/tests/wasm
+make client-check     # Rust fmt/clippy/tests/wasm and the client-term normalizer
 make web-lint web-test web-build
 make web-e2e          # Playwright, devnet-gated
 ```
@@ -63,6 +63,11 @@ check-flows: 51 rules, 40 arms, 11 core arms proved-model, 0 proof-quality warni
 claims: covered=24, partial=1, deferred=0, tool=1, substantive=161, weak=1, unaudited=0
 check-critical-path: 14 critical primitives covered, arms/flows/suites/hazards joined
 ```
+
+`make client-terms-check` prints the read, resolve, write, funding and payment terms the
+SDK builds and runs the node's normalizer over them. The rendered contract terms have the
+same gate in `make normalize-check`; the client terms are checked separately because they
+are assembled at runtime.
 
 The suite inventory is in `harness/run_suites.py`. A suite that has not been run must report
 `not_run`, not `pass`. The audit evidence directory holds campaign snapshots.
