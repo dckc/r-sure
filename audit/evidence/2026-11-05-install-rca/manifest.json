@@ -1,0 +1,218 @@
+{
+  "schema": "rsure.evidence/v2",
+  "id": "2026-11-05-install-rca",
+  "date": "2026-11-05",
+  "kind": "Install failure RCA and fix verification",
+  "commit": "d9c0045907c03045f6dc4cafe1574b0e90c8030d",
+  "scope": {
+    "audit": "internal",
+    "production": false,
+    "dynamic": "install",
+    "note": "E2 covers the 17-term install only. The behavioural campaign is incomplete: the root suite passes, the other registered suites are not_run or implemented, and are not covered."
+  },
+  "artifacts": [
+    {
+      "path": "commit.txt",
+      "role": "provenance",
+      "sha256": "f0df895527de91b7d7fe4371a23bb83206addd75f565d5d6f319bccadc30eed5",
+      "bytes": 41,
+      "description": "Commit under audit (git rev-parse HEAD at capture)."
+    },
+    {
+      "path": "devnet-up-after-fix.log",
+      "role": "intermediate",
+      "sha256": "8bd6722372dc81f571289ef1c8fdd720183ae53623c5529af148f7e28d96abc5",
+      "bytes": 1453,
+      "description": "Intermediate fresh devnet start."
+    },
+    {
+      "path": "devnet-up-no-manual-propose.log",
+      "role": "experiment",
+      "sha256": "9926350d8773532394bd4b961edf7b812ba013593849610af9dbd5b804db67c2",
+      "bytes": 1453,
+      "description": "Fresh devnet start for the no-manual-propose run."
+    },
+    {
+      "path": "devnet-up-recursion-fix.log",
+      "role": "final",
+      "sha256": "484498e8f50a53ed43da7d9442a488e25a5ec2c0ad8ff3208ba2c7932c416d04",
+      "bytes": 1453,
+      "description": "Fresh devnet start used for the 17-term install."
+    },
+    {
+      "path": "devnet-up.log",
+      "role": "baseline",
+      "sha256": "88c7ab4ff536d2aaaddb28c1b3323d646e171c614e607e22af1970706cdf2b42",
+      "bytes": 1453,
+      "description": "Baseline fresh single-validator devnet start."
+    },
+    {
+      "path": "failed-deploy.json",
+      "role": "baseline",
+      "sha256": "aac575d607cdf884068c071153821403af022f10498984aa405fc53a83e34b2a",
+      "bytes": 36,
+      "description": "Deploy API response while the chain was stalled: NotProcessed/Pooled."
+    },
+    {
+      "path": "install-after-fix.log",
+      "role": "intermediate",
+      "sha256": "2725377e45dd09e2a3bf435e21ecefb782e45af772fbc774934fe94dbe45d7d0",
+      "bytes": 2976,
+      "description": "Intermediate install after the bundle/harness work: still stopped before 12_risk."
+    },
+    {
+      "path": "install-baseline.log",
+      "role": "baseline",
+      "sha256": "7f37c5bb5170573ad126b2c56c80de7937cd4afe1fdaa4a413380f9fbf77cf8d",
+      "bytes": 3145,
+      "description": "Baseline install: stopped at 12_risk after a 180 s Pooled timeout."
+    },
+    {
+      "path": "install-no-manual-propose.log",
+      "role": "experiment",
+      "sha256": "b0a9682c32b1a4abd9f7749444841c34f1ce1f019cb1a1ea6d5fa76ceed216fa",
+      "bytes": 3137,
+      "description": "Install with manual propose disabled before the node codec fix: still fails."
+    },
+    {
+      "path": "install-recursion-fix.log",
+      "role": "final",
+      "sha256": "aad29c2faf8235018549abbeadaa1fe0737fafb27d73519775e2d10b7a48f4f0",
+      "bytes": 3051,
+      "description": "Final install: all 17 terms deployed and processed."
+    },
+    {
+      "path": "keys-after-fix.log",
+      "role": "keys",
+      "sha256": "7d64778f07cb7e5c0f6a71b7362cff76a2195b78d09e6676f5a6f59160391a9e",
+      "bytes": 99,
+      "description": "Key material summary after the harness/bundle work."
+    },
+    {
+      "path": "keys.log",
+      "role": "keys",
+      "sha256": "7d64778f07cb7e5c0f6a71b7362cff76a2195b78d09e6676f5a6f59160391a9e",
+      "bytes": 99,
+      "description": "Baseline key material summary."
+    },
+    {
+      "path": "node-after-fix.log",
+      "role": "node-log",
+      "sha256": "769a1ab182bf7ba89fa1761d14bd2ae2d1b3a8a8515f72cf28ff4f7161636090",
+      "bytes": 183129,
+      "description": "Intermediate node log: decode failures continue before the node rebuild."
+    },
+    {
+      "path": "node-image.txt",
+      "role": "provenance",
+      "sha256": "2994e9d65004ca75902e67418039fc0cb23db82304e68f0d4728cb71d0867939",
+      "bytes": 84,
+      "description": "RNodeRust image digest used for the recursion-fixed devnet."
+    },
+    {
+      "path": "node-syn-broker.log",
+      "role": "node-log",
+      "sha256": "1c31d3e76fe1861fec458157d186625662c5534a94728497d34b30a3ca33c284",
+      "bytes": 169436,
+      "description": "Pre-rebuild node log from the syndicate/broker investigation: decode failures continue."
+    },
+    {
+      "path": "node.log",
+      "role": "node-log",
+      "sha256": "7f1b2afda0fac057c9eaa799d2f39838608602710719db892d98974dfc8af370",
+      "bytes": 188761,
+      "description": "Baseline node log: 94 decode continuation failures."
+    },
+    {
+      "path": "rca.md",
+      "role": "narrative",
+      "sha256": "e4bbc88643648288fea2558cbab9f8a965fbe8f0117b69a7f4a8b8c9373c4cd9",
+      "bytes": 10362,
+      "description": "Human-readable RCA-001 narrative."
+    },
+    {
+      "path": "rcash-bootstrap-after-fix.log",
+      "role": "rail",
+      "sha256": "0e4f4bdf7c7fff87c9358f9e7563d5dc8658947c91071770c5cb2d4f8640672a",
+      "bytes": 4286,
+      "description": "Intermediate r-cash bootstrap log."
+    },
+    {
+      "path": "rcash-bootstrap-no-manual-propose.log",
+      "role": "rail",
+      "sha256": "14148ffe074a241efec766a369cdcaca11683e33398847e3d3723fd2d9d98842",
+      "bytes": 4286,
+      "description": "r-cash bootstrap on the no-manual-propose run."
+    },
+    {
+      "path": "rcash-bootstrap-recursion-fix.log",
+      "role": "rail",
+      "sha256": "3f18fedae6d48b80ab8bffa3e29431a2b12aeb4325f2627189330cfcf6991c07",
+      "bytes": 4286,
+      "description": "Final r-cash bootstrap: account factory installed; 51_pool refused with parse depth exceeded."
+    },
+    {
+      "path": "rcash-bootstrap.log",
+      "role": "rail",
+      "sha256": "1544e4900f4679c04bce41c94d25eefb67f91ea7918e82ccce2e38f3b2b16298",
+      "bytes": 4286,
+      "description": "Baseline r-cash bootstrap log."
+    },
+    {
+      "path": "rcash-keys-after-fix.log",
+      "role": "keys",
+      "sha256": "7d64778f07cb7e5c0f6a71b7362cff76a2195b78d09e6676f5a6f59160391a9e",
+      "bytes": 99,
+      "description": "r-cash key material summary after the harness/bundle work."
+    },
+    {
+      "path": "rcash-keys.log",
+      "role": "keys",
+      "sha256": "7d64778f07cb7e5c0f6a71b7362cff76a2195b78d09e6676f5a6f59160391a9e",
+      "bytes": 99,
+      "description": "Baseline r-cash key material summary."
+    },
+    {
+      "path": "status-after-fix.json",
+      "role": "status",
+      "sha256": "df18214b1d94c0a446c4f7bb94feb7c7c705bfcef5bfdd6df24ae00811a3bba5",
+      "bytes": 326,
+      "description": "Node status after the node rebuild."
+    },
+    {
+      "path": "status.json",
+      "role": "status",
+      "sha256": "af1e4eed88e8dd3428e76100d86667850787776341b1a24c80562153a07a36ef",
+      "bytes": 326,
+      "description": "Baseline node status: autopropose true, manualPropose false."
+    }
+  ],
+  "commands": [
+    "make devnet-up",
+    "make install",
+    "make rcash-bootstrap",
+    "grep -n 'decode continuation failed' audit/evidence/2026-11-05-install-rca/node.log",
+    "python3 tools/check_audit.py",
+    "python3 tools/check_evidence.py",
+    "python3 tools/check_rca.py",
+    "python3 tools/check_experiments.py"
+  ],
+  "results": {
+    "install": "pass (17/17 terms; install-recursion-fix.log)",
+    "devnet_up": "pass (devnet-up-recursion-fix.log)",
+    "rcash_bootstrap": "partial (account factory installed; 51_pool refused with parse depth exceeded)",
+    "node_codec_regression": "implemented-not-executed (source and test present; no test execution log)",
+    "behavioural_suites": "partial (root suite passes; other registered suites not_run or unimplemented)"
+  },
+  "reasons": {
+    "rcash_bootstrap": "The r-cash 51_pool term exceeds the node parser depth; the pool/market rail is absent and needs an upstream r-cash fix.",
+    "behavioural_suites": "The root suite passes with 11 assertions; the other registered suites are not_run or unimplemented. Install E2 is deployment evidence, not behavioural coverage."
+  },
+  "limitations": [
+    "Internal audit, not an independent review; no production-safety claim is made.",
+    "E2 is the 17-term install only; no behavioural suite ran.",
+    "The successful install log is present, but the node log for that specific run is not in this directory; the node logs here predate the rebuild.",
+    "The r-cash rail is partial: the account factory installed, 51_pool was refused with parse depth exceeded.",
+    "The deep Par codec regression source is present, but its execution log is not part of this evidence set."
+  ]
+}

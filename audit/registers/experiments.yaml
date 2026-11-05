@@ -1,0 +1,163 @@
+schema: rsure.experiments/v1
+experiments:
+- id: X-001
+  rca: RCA-001
+  question: Does the reported install failure reproduce on a fresh devnet?
+  method: Start a clean devnet, run make install, and capture the install output and the
+    node log.
+  command: make devnet-up && make install
+  artifact: audit/evidence/2026-11-05-install-rca/install-baseline.log
+  supporting_artifacts:
+  - audit/evidence/2026-11-05-install-rca/node.log
+  - audit/evidence/2026-11-05-install-rca/status.json
+  result: fail
+  observed: Install reached 12_risk and then the deploy stayed Pooled for 180 seconds.
+    node.log records 94 consecutive `decode continuation failed` proposer errors.
+  status: completed
+  tests_hypotheses:
+  - H-001
+  - H-002
+  conclusion: inconclusive
+  notes: The baseline reproduces the stall but does not by itself separate a contract
+    rejection from a node codec failure.
+- id: X-002
+  rca: RCA-001
+  question: Is the stall caused by the node proposer rather than a contract refusal?
+  method: Read the node log around the first failed proposal and count the decode errors.
+  command: grep -n "decode continuation failed" audit/evidence/2026-11-05-install-rca/node.log
+  artifact: audit/evidence/2026-11-05-install-rca/node.log
+  result: pass
+  observed: >-
+    The proposer repeats `propose failed with an internal error: decode
+    continuation failed` 94 times and produces no block. The deploy API never reports a
+    contract error.
+  status: completed
+  tests_hypotheses:
+  - H-002
+  conclusion: supports
+- id: X-003
+  rca: RCA-001
+  question: Does the RNodeRust wire codec impose a decode recursion limit lower than the
+    normalized Par depth?
+  method: Inspect models/Cargo.toml and models/src/wire.rs for the prost recursion
+    setting and the decode path used by RSpace continuations.
+  command: grep -n "recursion" ../RNodeRust/models/Cargo.toml ../RNodeRust/models/src/wire.rs
+  artifact: ../RNodeRust/models/Cargo.toml
+  supporting_artifacts:
+  - ../RNodeRust/models/src/wire.rs
+  result: pass
+  observed: prost's default decode recursion limit is 100. The codec used the default;
+    the fix enables the `no-recursion-limit` feature.
+  status: completed
+  tests_hypotheses:
+  - H-002
+  conclusion: supports
+- id: X-004
+  rca: RCA-001
+  question: Is there a regression test that exercises decode past the old limit?
+  method: Inspect the added deep Par codec test and the builder it uses.
+  command: sed -n '1,80p' ../RNodeRust/rholang/tests/deep_par_codec.rs
+  artifact: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  result: pass
+  observed: The test builds a 130-deep Par, above prost's default limit of 100, encodes
+    it and asserts that decode succeeds.
+  status: completed
+  tests_hypotheses:
+  - H-002
+  conclusion: supports
+  scope: static source inspection; the test execution log is not in this evidence set
+- id: X-005
+  rca: RCA-001
+  question: Does the install complete against the rebuilt node with the three fixes?
+  method: Rebuild the node, start a fresh devnet, run make install and capture the result.
+  command: make devnet-up && make install
+  artifact: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  supporting_artifacts:
+  - audit/evidence/2026-11-05-install-rca/devnet-up-recursion-fix.log
+  - audit/evidence/2026-11-05-install-rca/status-after-fix.json
+  result: pass
+  observed: All 17 terms deploy, including 12_risk and 13_slip, and the installer writes
+    deployments/devnet.json. The chain advances.
+  status: completed
+  tests_hypotheses:
+  - H-002
+  - H-004
+  - H-005
+  conclusion: supports
+  notes: This verifies the fixes jointly; it does not isolate the contribution of each
+    contract fix.
+- id: X-006
+  rca: RCA-001
+  question: Does removing manual propose alone unblock the install?
+  method: Run the install with the autopropose-aware harness before the node codec fix.
+  command: make devnet-up && make install
+  artifact: audit/evidence/2026-11-05-install-rca/install-no-manual-propose.log
+  supporting_artifacts:
+  - audit/evidence/2026-11-05-install-rca/devnet-up-no-manual-propose.log
+  result: fail
+  observed: The install still stops at 11_broker with the deploy Pooled until timeout.
+    The harness fix removes the masking but is not the root-cause fix.
+  status: completed
+  tests_hypotheses:
+  - H-003
+  conclusion: rejects
+- id: X-007
+  rca: RCA-001
+  question: Did the bundled Risk body use a wildcard auth binder?
+  method: Inspect the Risk auth receives and compare them with the named binder used after
+    the fix.
+  command: grep -n "@(true" contracts/src/deploy/12_risk.rho
+  artifact: contracts/src/deploy/12_risk.rho
+  result: pass
+  observed: Every Risk auth receive now binds a named `who`; the wildcard-binder form is
+    gone. 12_risk deploys in the 17-term install.
+  status: completed
+  tests_hypotheses:
+  - H-004
+  conclusion: supports
+- id: X-008
+  rca: RCA-001
+  question: Was authIsOwner missing from the Slip term's top-level bindings?
+  method: Inspect the 13_slip.rho top-level new sequence and the helper names used by the
+    term.
+  command: sed -n '1,20p' contracts/src/deploy/13_slip.rho
+  artifact: contracts/src/deploy/13_slip.rho
+  result: pass
+  observed: authIsOwner is now in the top-level new sequence; 13_slip deploys in the
+    17-term install.
+  status: completed
+  tests_hypotheses:
+  - H-005
+  conclusion: supports
+- id: X-009
+  rca: RCA-001
+  question: Is the r-cash rail fully bootstrapped by the same run?
+  method: Read the r-cash bootstrap log produced with the recursion-fixed node.
+  command: make rcash-bootstrap
+  artifact: audit/evidence/2026-11-05-install-rca/rcash-bootstrap-recursion-fix.log
+  result: fail
+  observed: >-
+    The account factory installs, but 51_pool is refused three times with
+    `Parsing error: Error in parsing term: parse depth exceeded`. The r-cash pool and
+    market rail are absent from this devnet.
+  status: completed
+  tests_hypotheses:
+  - H-006
+  conclusion: rejects
+- id: X-010
+  rca: RCA-001
+  question: Does a green install verify contract behaviour?
+  method: Read the last suite run and the test register after the install.
+  command: python3 tools/check_suite_results.py --check
+  artifact: deployments/suite-results.json
+  supporting_artifacts:
+  - audit/registers/tests.yaml
+  result: fail
+  observed: >-
+    The suite run records the root suite passing with 11 assertions and 7 covered arms;
+    the other registered suites are not_run or unimplemented. A green install is not
+    behavioural coverage.
+  status: completed
+  tests_hypotheses:
+  - H-007
+  conclusion: rejects

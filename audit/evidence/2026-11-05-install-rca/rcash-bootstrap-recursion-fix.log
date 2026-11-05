@@ -1,0 +1,75 @@
+.venv/bin/python harness/rcash_bootstrap.py
+make[1]: Entering directory '/home/patrick/Rholphin'
+.venv/bin/python tools/build_contracts.py
+built contracts/build/deploy/v3/00_root.rho
+built contracts/build/deploy/v3/01_kernel.rho
+built contracts/build/deploy/v3/02_bounds.rho
+built contracts/build/deploy/v3/03_admin_guard.rho
+built contracts/build/deploy/v3/04_governor.rho
+built contracts/build/deploy/v3/05_amm_math.rho
+built contracts/build/deploy/v3/06_collateral_math.rho
+built contracts/build/deploy/v3/07_oracle_math.rho
+built contracts/build/deploy/v3/08_claim_code.rho
+built contracts/build/deploy/v3/09_identity.rho
+built contracts/build/deploy/v3/12_oracle_registry.rho
+built contracts/build/deploy/v3/13_oracle_hub.rho
+built contracts/build/deploy/v3/14_asset_resolver.rho
+built contracts/build/deploy/v3/31_feed.rho
+built contracts/build/deploy/v3/31_stablecoin.rho
+built contracts/build/deploy/v3/32_currency_registry.rho
+built contracts/build/deploy/v3/40_transfer.rho
+built contracts/build/deploy/v3/50_market.rho
+built contracts/build/deploy/v3/51_pool.rho
+.venv/bin/python harness/install_testnet.py --node http://localhost:40403 \
+  --keys .devnet/keys.json --admin-keys .devnet/keys.json \
+  --ops .devnet/ops --state .devnet/v3-install.json \
+  --manifest deployments/devnet-v4.json --min-lock-blocks 10 --fresh
+51_pool: attempt 1 failed: deploy produced no JSON (rc=3): rcash: the node rejected the deploy: "Parsing error: Error in parsing term: \nparse depth exceeded"
+
+51_pool: attempt 2 failed: deploy produced no JSON (rc=3): rcash: the node rejected the deploy: "Parsing error: Error in parsing term: \nparse depth exceeded"
+
+51_pool: attempt 3 failed: deploy produced no JSON (rc=3): rcash: the node rejected the deploy: "Parsing error: Error in parsing term: \nparse depth exceeded"
+
+node: degraded=None acceptsDeploys=None tip=None…
+00_root: 6258 bytes
+00_root: ['rho:id:3655gkfon179rn69ymw8daxjxabepc96b3kxnr7rr6zg9m6ibp9y']
+03_admin_guard: 1768 bytes
+03_admin_guard: ['rho:id:ix7z1bks4tg76h3a31j5ty1pju89kanz9ansojmoimp77gg6n6dy']
+01_kernel: 1746 bytes
+01_kernel: ['rho:id:kyoit6rgfmkszrhdi1w9omho3hhsqm9q8rbs35geoh1p8ywu67uy', 'rho:id:7pfboek9b5xkejk5cbj8x7tufquj9c4jruiuef1zc7khie4iq41o', 'rho:id:bayyp18ogxrucqxzczwghd9ss1986o7fnzu7h9famarneerbxqno']
+02_bounds: 6478 bytes
+02_bounds: ['rho:id:k6guuy8bjm68yp9msoy4oe97oz83ttwwx693icoqnyh55qdcn8yo']
+04_governor: 6307 bytes
+04_governor: ['rho:id:1c5y8bxs88bewcitmdz46ets79619ff5ubb3tbuikg6xic4n4g4o']
+05_amm_math: 2025 bytes
+05_amm_math: ['rho:id:radmq5u76ur8qhkowzmmhs4spws3d1itcbsqf7yn41adqo15um4o']
+06_collateral_math: 1365 bytes
+06_collateral_math: ['rho:id:z6js8dtkzm9ocb5y4475bud3f78tkyuoyh9eh5dp8dxm1s5r1w7y']
+07_oracle_math: 2697 bytes
+07_oracle_math: ['rho:id:g1jthrqu17rkgcf8gs17cde5gnodmppi31n5on3nyqe59ikfnfzo']
+08_claim_code: 568 bytes
+08_claim_code: ['rho:id:q3dzta73juwfgqm7qe7him3ooousfoeqo6mhpuwhmwx9wbentogy']
+12_oracle_registry: 7112 bytes
+12_oracle_registry: ['rho:id:qzyjkwq7cr3a6ihe3ibtz5oozfkk8u4zzqz15nf57fhyhjdbau8o']
+13_oracle_hub: 2892 bytes
+13_oracle_hub: ['rho:id:opqti784y4n8rrndnomscks6uxkrfkj67y8dk7y18bdxsazzt99y']
+32_currency_registry: 8456 bytes
+32_currency_registry: ['rho:id:tgeo4q4khzeakos9s6f8rdygtg1j5e4nnrpjn8pn51mhc4awkmxo', 'rho:id:zq3a9iz8ydbq56txuhuw3czjxapkrgafrwfw3anwqd71yox18ijo']
+14_asset_resolver: 2376 bytes
+14_asset_resolver: ['rho:id:ubc8t4doh3mn7zkns6w6hryh6533o5homg5npe49ik53khwdu7oo']
+40_transfer: 5520 bytes
+40_transfer: ['rho:id:ujubbiqs9apuweefjdoe3mhpcxijjft4gabdcrjia18jeb5xngry']
+51_pool: 17373 bytes
+51_pool: 17373 bytes
+51_pool: 17373 bytes
+REFUSED step=51_pool detail=deploy produced no JSON (rc=3): rcash: the node rejected the deploy: "Parsing error: Error in parsing term: \nparse depth exceeded"
+
+make[1]: *** [Makefile:66: install] Error 1
+make[1]: Leaving directory '/home/patrick/Rholphin'
+rcash-bootstrap: running the r-cash installer
+rcash-bootstrap: r-cash installer stopped early; checking the rail
+rcash-bootstrap: installing the account factory
+09_identity: 9995 bytes
+09_identity: ['rho:id:z6jqjiqn4qqsndp3dc85xaontgopzdx4isdd1gpss5bwwr71deby']
+rcash-bootstrap: root rho:id:3655gkfon179rn69ymw8daxjxabepc96b3kxnr7rr6zg9m6ibp9y
+rcash-bootstrap: account factory rho:id:z6jqjiqn4qqsndp3dc85xaontgopzdx4isdd1gpss5bwwr71deby

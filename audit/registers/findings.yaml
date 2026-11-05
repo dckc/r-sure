@@ -69,7 +69,7 @@ findings:
   - HZ-007
   invariants:
   - INV-11
-  evidence_level: E1
+  evidence_level: E2
   evidence:
   - kind: source
     ref: contracts/src/deploy/13_slip.rho
@@ -77,10 +77,17 @@ findings:
     ref: tools/check_bundle_closedness.py
   - kind: tool
     ref: tools/parse_check.sh
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - kind: rca
+    ref: audit/registers/rca.yaml#RCA-001
   description: 'Fix: split the deep Slip arms into slipSubscribe/slipFundDeposit/slipBindPolicy
     helpers, then rebind all maker parameters through cfg channels before publishing
-    bundle+{*Slip}. The bundle scanner and parser are clean; make install remains
-    the E2 check.'
+    bundle+{*Slip}. The bundle scanner and parser are clean. E2 follow-up: after the
+    RNodeRust codec fix, the 12_risk wildcard-binder fix and the 13_slip binding fix,
+    install-recursion-fix.log shows all 17 terms installed; see RCA-001. The 36
+    behavioural suites remain not_run, so this finding is fixed for install, not for
+    behaviour.'
   preconditions: A caller reaches the arm on the affected path.
   impact: Devnet install is blocked; no instance can be created.
   proposed_fix: R-002
@@ -615,5 +622,172 @@ findings:
   impact: 'INV-10 does not hold: a settled claim can be re-opened and potentially
     re-settled.'
   proposed_fix: R-021
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-022
+  title: RSpace continuation decode fails on a deep normalized Par
+  severity: P0
+  class: platform
+  status: fixed
+  confidence: high
+  components:
+  - RNodeRust
+  - SureRoot
+  arms:
+  - all
+  hazards:
+  - HZ-028
+  - HZ-032
+  invariants:
+  - INV-11
+  evidence_level: E2
+  evidence:
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/node.log
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - kind: source
+    ref: ../RNodeRust/models/Cargo.toml
+  - kind: source
+    ref: ../RNodeRust/models/src/wire.rs
+  - kind: test
+    ref: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  - kind: rca
+    ref: audit/registers/rca.yaml#RCA-001
+  description: >-
+    RNodeRust's Par wire codec used prost's default decode recursion limit
+    (100). A deploy term such as 10_syndicate normalizes to a Par nested deeper than
+    100; encoding succeeds, but decoding the RSpace continuation fails on the next
+    proposal. node.log records 94 consecutive `decode continuation failed` proposer
+    errors. Fix: models/Cargo.toml enables prost `no-recursion-limit`; a 130-deep Par
+    round-trip regression was added in rholang/tests/deep_par_codec.rs. After the
+    rebuilt node, install-recursion-fix.log shows all 17 terms installed.
+  preconditions: A deploy term normalizes to a Par nested deeper than 100 and the node
+    proposes the following block.
+  impact: The proposer cannot build the next block. The chain does not advance, every
+    later deploy stays Pooled, and the install cannot complete.
+  proposed_fix: R-022
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-023
+  title: Risk bundle wildcard receive breaks bundle closure
+  severity: P0
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - Risk
+  arms:
+  - Risk@"addEvidence"
+  - Risk@"assess"
+  - Risk@"accept"
+  - Risk@"decline"
+  hazards:
+  - HZ-030
+  invariants:
+  - INV-11
+  evidence_level: E2
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy/12_risk.rho
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-baseline.log
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - kind: tool
+    ref: tools/check_bundle_closedness.py
+  - kind: rca
+    ref: audit/registers/rca.yaml#RCA-001
+  description: 'The bundled Risk body received the auth reply with a wildcard binder,
+    `for (@(true, _) <- aCh)`, which is open under the wildcard-binder bundle class.
+    The 12_risk deploy was the first term rejected after 11_broker in the baseline
+    install. Fix: replace the wildcard with the named binder `who` in every Risk auth
+    arm; the term now deploys in the 17-term install.'
+  preconditions: The installer deploys 12_risk.rho.
+  impact: The Risk deploy is rejected, install stops before Slip and Line, and risk
+    submission is unavailable.
+  proposed_fix: R-023
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-024
+  title: Slip term omits the authIsOwner top-level binding
+  severity: P0
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - Slip
+  - SlipFactory
+  arms:
+  - SlipFactory@"open"
+  - Slip@"bind"
+  hazards:
+  - HZ-031
+  invariants:
+  - INV-11
+  evidence_level: E2
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy/13_slip.rho
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - kind: rca
+    ref: audit/registers/rca.yaml#RCA-001
+  description: >-
+    The Slip term's top-level `new` sequence did not bind authIsOwner, so
+    the helper name was unbound in the deploy term. Fix: add authIsOwner to the
+    top-level binding sequence in 13_slip.rho; the term now deploys in the 17-term
+    install, publishing SlipFactory and the Slip arms.
+  preconditions: The installer deploys 13_slip.rho.
+  impact: The Slip deploy fails; SlipFactory and every subscription, funding and bind
+    arm are not published.
+  proposed_fix: R-024
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-025
+  title: Harness manual propose masks proposer internal errors as timeouts
+  severity: P1
+  class: harness
+  status: fixed
+  confidence: high
+  components:
+  - harness/deploy.py
+  arms:
+  - all
+  hazards:
+  - HZ-029
+  - HZ-034
+  - HZ-035
+  invariants:
+  - INV-11
+  evidence_level: E2
+  evidence:
+  - kind: source
+    ref: harness/deploy.py
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/node.log
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-baseline.log
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-no-manual-propose.log
+  - kind: log
+    ref: audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - kind: status
+    ref: audit/evidence/2026-11-05-install-rca/status.json
+  - kind: rca
+    ref: audit/registers/rca.yaml#RCA-001
+  description: 'deploy_and_wait always called the manual propose endpoint. The node
+    advertised autopropose true and manualPropose false (status.json), so that call
+    raced the node proposer. A deploy whose proposal failed remained Pooled until the
+    180-second timeout, and the harness reported only the timeout, hiding the node
+    internal `decode continuation failed` error. Fix: _manual_propose defaults to
+    false and calls the endpoint only when configured or RSURE_FORCE_PROPOSE=1. The
+    no-manual-propose run isolated the masking; install-recursion-fix.log then
+    completed all 17 terms.'
+  preconditions: The node advertises autopropose and the harness is not configured to
+    force manual propose.
+  impact: Install failures are misattributed to the term being deployed; operators
+    cannot distinguish a platform codec failure from a contract refusal.
+  proposed_fix: R-025
   reviewer: internal
   verified_at: '2026-11-05'

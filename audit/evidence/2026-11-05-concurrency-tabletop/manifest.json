@@ -1,8 +1,45 @@
 {
-  "schema": "rsure.evidence/v1",
+  "schema": "rsure.evidence/v2",
+  "id": "2026-11-05-concurrency-tabletop",
   "date": "2026-11-05",
-  "kind": "internal desk review and tabletop HAZOP",
+  "kind": "Internal desk review and tabletop HAZOP",
   "commit": "working-tree",
+  "scope": {
+    "audit": "internal",
+    "production": false,
+    "dynamic": "none",
+    "note": "Static desk review and scanners only. Install and behavioural evidence are recorded separately in 2026-11-05-install-rca."
+  },
+  "artifacts": [
+    {
+      "path": "audit-scan.txt",
+      "role": "scanner",
+      "sha256": "e27d4d48bbdc0a9623543cc1c90a50e49ecf8f21608bc9a267f689ba94d2fa46",
+      "bytes": 5652,
+      "description": "Pre-fix scanner output for bundle closedness, take/repost, reply shapes and pause scope."
+    },
+    {
+      "path": "bundle-closedness.txt",
+      "role": "scanner",
+      "sha256": "fd76c147e128c641f00974fdc8c71fa8c796360c85e72fabb8a35981ef6b144e",
+      "bytes": 81,
+      "description": "Pre-fix bundle-closure candidates."
+    },
+    {
+      "path": "take-repost-prefix.txt",
+      "role": "scanner",
+      "sha256": "3beb67e3e65785fad1aa7c026e55f036901ed3fd9d3f08de1309a10bbb1dc043",
+      "bytes": 998,
+      "description": "Pre-fix take/repost scanner prefix."
+    },
+    {
+      "path": "take-repost.txt",
+      "role": "scanner",
+      "sha256": "fa6a6097bda30ef7578a85fc73383b48e2d327186ef0934111540a520c16dd1b",
+      "bytes": 1079,
+      "description": "Pre-fix take/repost scanner output."
+    }
+  ],
   "commands": [
     "make spec-check",
     "make parse-check",
@@ -17,8 +54,16 @@
     "docs_check": "pass",
     "formal_check": "pass",
     "audit_check": "pass (coverage registers)",
-    "audit_scan": "fail (open Slip bundle and dead pause)",
-    "install": "not_run (devnet unavailable; Slip bundle open)"
+    "audit_scan": "fail (open Slip bundle and dead pause at that pass)",
+    "install": "not_run (devnet unavailable at that pass; superseded by 2026-11-05-install-rca)"
   },
-  "notes": "audit-scan.txt is the pre-fix scanner output. take-repost.txt is the pre-fix take-await-take report. The scanners are heuristics; the reviews are the normative record."
+  "reasons": {
+    "audit_scan": "The pre-fix scanner output found the open Slip bundle and the dead pause; both were fixed later in the same day.",
+    "install": "The devnet was unavailable during this pass; the install RCA and its E2 evidence are in 2026-11-05-install-rca."
+  },
+  "limitations": [
+    "Internal desk review and tabletop, not an independent facilitated HAZOP.",
+    "The scanners are heuristics; the component reviews are the normative record.",
+    "No dynamic install or behavioural run is included in this evidence set."
+  ]
 }

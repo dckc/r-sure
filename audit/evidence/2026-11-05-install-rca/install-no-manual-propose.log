@@ -1,0 +1,31 @@
+.venv/bin/python harness/install.py
+install: 00_root.rho -> 3045022100e88459fe2f87f3952f8d838989816bef17ac185ca2d8a9aafd18160d6563a3b00220463f228653dfff080539b6dfbcf58b80bd67f40b42f025cb442ae061849f8792
+install: root rho:id:rpegyuap5rhuh39q5r44uoqytudtgmqayb5uz5seddf3ugjsxwoo
+install: 01_kernel.rho -> 3044022022e3d9165031a3470504cc220bdc4c7059761fb3264ec169c3a33882cac246940220527b7d44d7196567a4c3149a590b20e6df48243eca700ed00c938a9abb330e39
+install: 02_admin.rho -> 304502210092e1eafadcbf0d7fb1fe9bdb1af8344046a109a472959cef33c6a04222fb8b0a022076423bdea5500c173bf4f988c0a49b9e08c1c26e322771fb06755603c16206f5
+install: 03_terms.rho -> 3044022005a60345936623257fefddad4e4b014cbd24064814aa8e7aa22584256fae85af022009a332e82456ec496fab3963af3908d26bffb08846a94e284fb66b1bba8bbfa7
+install: 04_math.rho -> 304402200d0218a7344301786633263ad33a9898e4948e8d3234df9479d3f7362c8bde9702207e1c7ede78210c7ddd1eceb3da3d35077f805f73b9ec7b0d6d67bf6290ebc55d
+install: 05_rgen.rho -> 304402204dde72268aa58f1b161e69bab5eff13a67ee7408f49dc6761fb41f3d04f637c5022057fa2253bae359cff31b945cf59bf4a6d379922da56cba475239663793f44dc2
+install: 40_payments.rho -> 3045022100ec4f6059ed674fa8afc7eebbe709ff872e6322825a0db208a6d90b41a70cc3a6022039fbbc34a3e7c63ba7437890c739fae0b87f9bb5606f5d2f8aed3ed77a87b20d
+install: platform account ensured
+install: 15_distribution.rho -> 304402205e4db15b3598aadca1b99c363ce571a97d611ac1a8b00e359b81e95e30cb9288022060ddfe9d1770019cd3e65ed54e4866df2722e5a5d23d7b2b12b605bfb43a8a79
+install: 16_fund.rho -> 30440220657b809447c6765a2f973388a048e5b96eb1215afeb167daf9f87977d10009f102200379f64008508102dff8b841ad00e2cc0e0e0469810cbaf6a878de97831f9daa
+install: 10_syndicate.rho -> 30440220445d6cc6dad889386d8c2a017838d4a64435b84b7d115b920860177542622ad202203e814707dbb0170919b2b197a245c07bfc84993449e4ecf22ab4480197847032
+install: 11_broker.rho -> 304402200177356c97394dd548b0230043b24429a5e1fbbf9ff4f88ecb2c50d026614e750220103d33d4463c3b5ad8d5b992c4878b83492dde5679e81b357ec4237dd338c961
+Traceback (most recent call last):
+  File "/home/patrick/RSure/harness/install.py", line 231, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/patrick/RSure/harness/install.py", line 193, in main
+    deploy_id, result = node.deploy_and_wait(term, secret)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 154, in deploy_and_wait
+    return deploy_id, deploy_result(deploy_id)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 115, in deploy_result
+    variant, payload = wait_processed(deploy_id, timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 111, in wait_processed
+    raise DevnetError(f"deploy {deploy_id} not processed within {timeout}s: {last}")
+deploy.DevnetError: deploy 30440220672ae058cf2c407bdfe0553fcaaf5ad043d363fd8afe6bdc48fef5352af352db02200adde3bfc030a2ccd5b5591aa70997d6fd2cc4dc4038365d406d2c38e1dc6f01 not processed within 180.0s: {'NotProcessed': {'status': 'Pooled'}}
+make: *** [Makefile:129: install] Error 1

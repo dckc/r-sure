@@ -39,7 +39,7 @@ in {
 
   contract SureRoot(@"keys", ret) = {
     for (@s <<- rootState) {
-      ret!((true, s.get("entries").keys()))
+      ret!((true, s.get("entries").keys().toList()))
     }
   } |
 

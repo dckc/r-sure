@@ -22,6 +22,10 @@
 9. **Formal review**: Lean model, vectors, flow manifest and axiom audit.
 10. **Traceability**: every arm maps to hazards, findings, improvements, tests and Lean
     declarations where applicable.
+11. **RCA**: for an install or liveness incident, record a fault tree with evidence at
+    every leaf, five whys, hypotheses, experiments with artifacts, root cause, escape
+    analysis, corrective actions, verification and residual risk in
+    `audit/registers/rca.yaml` and `audit/evidence/<date>-<slug>/rca.md`.
 
 Evidence lives in `audit/evidence/<date>/`. A finding is not "fixed" unless the change and
 its regression (or a documented `not_run`) are in the tree.

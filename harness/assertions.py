@@ -14,14 +14,21 @@ import deploy as node  # noqa: E402
 
 MANIFEST = ROOT / "deployments" / "devnet.json"
 
-_STATE = {"passed": 0, "failed": 0, "covered": []}
+_STATE = {"passed": 0, "failed": 0, "covered": [], "behaviours": {}}
 
 
 def cover(arm: str, scenario: str) -> None:
-    """Record that a suite asserted a component arm in a behaviour category."""
-    key = f"{arm}:{scenario}"
-    if key not in _STATE["covered"]:
-        _STATE["covered"].append(key)
+    """Record that a suite asserted a component arm in a behaviour category.
+
+    `covered_arms` is the arm identity used by the coverage report; `behaviours` keeps the
+    scenario categories separately so one arm can be counted once but still show that both
+    success and refusal were asserted.
+    """
+    if arm not in _STATE["covered"]:
+        _STATE["covered"].append(arm)
+    categories = _STATE["behaviours"].setdefault(arm, [])
+    if scenario not in categories:
+        categories.append(scenario)
 
 
 def _record(label: str, ok: bool, message: str = "") -> None:
@@ -38,7 +45,8 @@ def _record(label: str, ok: bool, message: str = "") -> None:
 def summary() -> dict:
     return {"assertions": _STATE["passed"] + _STATE["failed"],
             "passed": _STATE["passed"], "failed": _STATE["failed"],
-            "covered_arms": list(_STATE["covered"])}
+            "covered_arms": list(_STATE["covered"]),
+            "behaviours": {arm: list(cats) for arm, cats in _STATE["behaviours"].items()}}
 
 
 def finish(suite: str) -> int:

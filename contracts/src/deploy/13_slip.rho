@@ -48,7 +48,7 @@ in {
   } |
 
   contract mapKeys(@m, ret) = {
-    ret!(m.keys())
+    ret!(m.keys().toList())
   } |
 
   contract slipStatus(@sum, ret) = {
@@ -596,6 +596,9 @@ in {
 
       contract Slip(@"bind", ret2) = {
         for (@s <- slipState) {
+          if (s.get("status") == "bound" || s.get("status") == "expired") {
+            slipState!(s) | ret2!((false, "closed"))
+          } else {
           if (s.get("insuredAccepted") != true) {
             slipState!(s) | ret2!((false, "not accepted"))
           } else {
@@ -636,6 +639,7 @@ in {
                 }
               }
             }
+          }
           }
         }
       } |
@@ -739,7 +743,7 @@ in {
         match (bb, ok, o) {
           ((true, BrokerBook), (true, Nil), (true, ownerId)) => {
             new boCh in {
-              @BrokerBook!("brokerOf", *dId, *boCh) |
+              @BrokerBook!("brokerOf", ownerId, *boCh) |
               for (@bo <- boCh) {
                 match bo {
                   (true, brokerId, brokerUri) => {

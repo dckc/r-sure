@@ -236,7 +236,7 @@ in {
   contract SyndicateBook(@"verify", @uri, ret) = {
     for (@b <<- syndicateBookState) {
       new kCh in {
-        kCh!(b.get("syndicates").keys()) |
+        kCh!(b.get("syndicates").keys().toList()) |
         for (@keys <- kCh) {
           new hCh in {
             bookHasUri!(b.get("syndicates"), keys, 0, uri, *hCh) |
@@ -307,7 +307,7 @@ in {
                       } else {
                         new balCh in {
                           @purse!("getCurrentAmount", *balCh) |
-                          for (@bal <- balCh) {
+                          for (@(true, bal) <- balCh) {
                                 if (bal < amount) {
                                   stateCell!(s) | ret2!((false, "insufficient"))
                                 } else {

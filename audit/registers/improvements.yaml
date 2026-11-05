@@ -358,3 +358,82 @@ improvements:
     settled, denied or closed claims.
   tests:
   - T-027
+- id: R-022
+  priority: P0
+  findings:
+  - F-022
+  hazards:
+  - HZ-028
+  - HZ-032
+  change: Enable prost `no-recursion-limit` for the RNodeRust models crate and add a
+    130-deep Par round-trip regression in rholang/tests/deep_par_codec.rs. The parser
+    and normalizer own the source-depth contract; the wire codec must not impose a
+    second, lower decode limit.
+  type: platform
+  breaking: false
+  migration: rebuild and restart the devnet node from the patched RNodeRust tree
+  compatibility_window: devnet node image pinned by digest in the evidence manifest
+  tests:
+  - T-038
+  - T-037
+  rollout_stage: devnet
+  rollback: restart the previous node image; do not deploy terms deeper than the
+    previous prost limit
+  status: implemented
+- id: R-023
+  priority: P0
+  findings:
+  - F-023
+  hazards:
+  - HZ-030
+  change: Replace the wildcard auth receive in the bundled Risk arms with the named
+    binder `who` so the bundle body is closed under the wildcard-binder class.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-037
+  rollout_stage: devnet
+  rollback: redeploy the previous Root
+  status: implemented
+- id: R-024
+  priority: P0
+  findings:
+  - F-024
+  hazards:
+  - HZ-031
+  change: Add authIsOwner to the 13_slip.rho top-level `new` sequence so every helper
+    name in the term is bound before the bundled bodies are built.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-037
+  rollout_stage: devnet
+  rollback: redeploy the previous Root
+  status: implemented
+- id: R-025
+  priority: P1
+  findings:
+  - F-025
+  hazards:
+  - HZ-029
+  - HZ-034
+  - HZ-035
+  change: 'Make the deploy harness autopropose-aware: _manual_propose returns false
+    unless config sets manual_propose/manualPropose or RSURE_FORCE_PROPOSE=1; keep
+    RSURE_STRICT_PROPOSE=1 for diagnosis. Evidence v2 records the node status and
+    the install scope explicitly.'
+  type: harness
+  breaking: false
+  migration: no contract change; rerun the install with the updated harness
+  compatibility_window: harness only
+  tests:
+  - T-039
+  - T-037
+  rollout_stage: devnet
+  rollback: restore the previous harness; set RSURE_FORCE_PROPOSE=1 only on a node
+    that advertises manual propose
+  status: implemented

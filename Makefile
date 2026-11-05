@@ -11,7 +11,8 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
 
 .PHONY: venv build build-check measure measure-check metrics metrics-compare \
         check-arch check-captures check-select check-placeholders check-money \
-        check-suites check-docs spec-check parse-check docs docs-serve docs-check \
+        check-suites check-toplevel-bindings check-bundle-wildcards install-check \
+        check-docs spec-check parse-check normalize-check docs docs-serve docs-check \
         devnet devnet-up devnet-wait down status rcash-install rcash-keys \
         rcash-bootstrap rgen-install rgen-keys keys install setup \
         unit-root unit-payments unit-syndicate unit-capital unit-broker unit-risk \
@@ -22,12 +23,12 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         unit-shortfall unit-conservation unit-behavior unit-generality unit-share-reuse \
         integration-rcash integration-rgen integration-rshare unit-all \
         lean-build lean-check vectors check-flows check-flows-strict check-claims \
-        formal-check \
+        critical-check formal-check check-evidence check-rca check-experiments \
         audit-check audit-trace audit-trace-check check-audit check-arm-inventory audit-dynamic \
         check-concurrency-audit check-composition-audit check-invariant-guards \
         check-pause-scope check-suite-results coverage-report coverage-check audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
-        client-fixtures client-journey client-keystores web-install web-test web-build web-e2e \
+        client-fixtures client-journey client-keystores web-install web-lint web-test web-build web-e2e \
         check ci clean
 
 venv:
@@ -71,15 +72,29 @@ check-money:
 check-suites:
 	$(PY) tools/check_suites.py
 
+check-toplevel-bindings:
+	$(PY) tools/check_toplevel_bindings.py
+
+check-bundle-wildcards:
+	$(PY) tools/check_bundle_wildcards.py
+
+install-check:
+	$(PY) tools/check_install_manifest.py
+
 check-docs:
 	$(PY) tools/check_docs.py
 
 spec-check: build-check measure-check check-arch check-captures check-select \
-            check-placeholders check-money check-suites
+            check-placeholders check-money check-suites check-toplevel-bindings \
+            check-bundle-wildcards
 
 parse-check:
 	$(PY) harness/install.py --dry-run
 	tools/parse_check.sh contracts/build/*.rho .devnet/rendered/*.rho
+
+normalize-check:
+	$(PY) harness/install.py --dry-run
+	tools/normalize_check.sh .devnet/rendered/*.rho
 
 docs:
 	$(MDBOOK) build
@@ -131,7 +146,7 @@ install:
 setup: devnet rcash-keys rcash-bootstrap keys install
 
 unit-%:
-	$(PY) harness/run_suites.py $*
+	$(PY) harness/run_suites.py $(subst -,_,$*)
 
 integration-rcash:
 	$(PY) harness/run_suites.py integration_rcash
@@ -163,9 +178,21 @@ check-flows-strict:
 check-claims:
 	$(PY) tools/check_claims.py --check --strict-audit
 
-formal-check: lean-check vectors check-flows check-flows-strict check-claims
+critical-check:
+	$(PY) tools/check_critical_path.py --check
 
-audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit check-invariant-guards check-pause-scope check-suite-results coverage-check
+formal-check: lean-check vectors check-flows check-flows-strict check-claims critical-check
+
+audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit check-invariant-guards check-pause-scope check-suite-results coverage-check check-evidence check-rca check-experiments
+
+check-evidence:
+	$(PY) tools/check_evidence.py
+
+check-rca:
+	$(PY) tools/check_rca.py
+
+check-experiments:
+	$(PY) tools/check_experiments.py
 
 check-concurrency-audit:
 	$(PY) tools/check_concurrency_audit.py
@@ -238,6 +265,9 @@ client-keystores:
 web-install:
 	npm --prefix web install
 
+web-lint: web-install
+	npm --prefix web run lint
+
 web-test: web-install
 	npm --prefix web run test
 
@@ -247,9 +277,12 @@ web-build: web-install
 web-e2e: web-build
 	npm --prefix web run test:e2e
 
-check: spec-check parse-check docs-check
+web-seed:
+	$(PY) harness/web_seed.py
 
-ci: check formal-check audit-check client-check web-test web-build
+check: spec-check parse-check normalize-check docs-check
+
+ci: check formal-check audit-check client-check web-lint web-test web-build
 
 clean:
 	rm -rf .devnet/rendered contracts/build docs/book web/dist web/node_modules

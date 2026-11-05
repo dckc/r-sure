@@ -1,0 +1,1490 @@
+2026-11-05T15:53:07.955Z INFO  [coop.rchain.node.runtime.NodeRuntime] trying to open ports using UPnP....
+2026-11-05T15:53:07.955Z INFO  [coop.rchain.node.runtime.NodeRuntime] INFO - No gateway devices found
+2026-11-05T15:53:07.955Z INFO  [coop.rchain.node.runtime.NodeRuntime] No need to open any port
+2026-11-05T15:53:08.068Z INFO  [casper.engine.NodeLaunch] Starting as genesis master, creating genesis block...
+[pos] not proposing: 04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4 is not in the active set this node reads, which is the newest block's bond cache — either it is not bonded, or the draw left it out for this epoch
+replay complete — starting listeners; the API answers once they are up
+[deploy] deployer=040126690519dc9b ok cost=64343 
+[deploy] deployer=04e1559d809924e5 ok cost=8744 
+[deploy] deployer=0470256c078e105d ok cost=22314 
+[deploy] deployer=04f4b4417f930e6f ok cost=7557 
+[deploy] deployer=04fe2eb1e0e7462b ok cost=50746 
+[deploy] deployer=04e8db1be33c8d72 ok cost=59234 
+["#define $Kudos", `rho:id:9spnmtw9g3qdi1kpxcbgbuyuukbkryp1wfdwsy6iunb9g44icrjy`]
+[deploy] deployer=04554298164a859f ok cost=4177 
+"begin"
+["#define $Inbox", `rho:id:3spfkanxkeq3d1s6wdbjz5gpy4oio5uzd9hnsmfbukjeakyiubky`]
+[deploy] deployer=04e0b4d8e6a8c374 ok cost=13644 
+["#define $Directory", `rho:id:zcn8i36nea5u7sgkkuoh38nomzcg9gpfi4qs3c5ou7bmp6ygasio`]
+[deploy] deployer=04d117de6cfb9d25 ok cost=8910 
+[deploy] deployer=04012a28f5d2a91f ok cost=14891 
+["#define $Issue", `rho:id:netuaaypr6ryw3ab5yk8e7fjhqx1gfxnnkm9mdif7wswmgkegfxo`]
+[deploy] deployer=04ccd4fe4c07e784 ok cost=149970 
+["#define $Ballot", `rho:id:kuhtaexp36f3rjygs8t5oosxfhx7m6kuy9iwi3ew5jz63fppbroy`]
+`rho:id:kuhtaexp36f3rjygs8t5oosxfhx7m6kuy9iwi3ew5jz63fppbroy`
+[deploy] deployer=04123c3485abc307 ok cost=21214 
+"starting"
+["#define $Chat", `rho:id:twqdgghs4dz3sd8ronngpg1kdwrtikq8pdgmjzd7z9d1k5kt1poy`]
+[deploy] deployer=045c635532cb18d2 ok cost=7853 
+"request"
+["#define $Group", `rho:id:s9hd3eoq1trqjsbeay3j1ihsue6zfz6tauy1wyii3zwj1pkh7r3o`]
+[deploy] deployer=047c8255d9e2275a ok cost=26161 
+[deploy] deployer=04f700a417754b77 ok cost=385945 
+["MCAread", bundle+ {   Unforgeable(0x7ab62ea39c23346344dedf8aa6548802c0432374b6a4a4d81a357a6ec284915e) }]
+["GetMe", ("published", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau/GetMe", 0), "SendThem", ("published", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau/SendThem", 0)]
+["getting deployer rev address"]
+["got pub key", "04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4".hexToBytes()]
+["got revaddr", {"deployer REV address" : "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "deployerId" : DeployerId(0x04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4), "pubKeyBytes" : "04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4".hexToBytes()}]
+["getMe", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "everyone size", 0]
+["creating your stuff", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau"]
+["inbox creation", bundle+ {   Unforgeable(0x109d074f7ca037d43d4a42c063c37bf3a6980cb86a5ed9c242e23ec27277d088) }, "dir creation", bundle+ {   Unforgeable(0x74206e9f2a2fd1d16e885372201da64ffc57070d693c85556af5cb2811852e94) }]
+["read", bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }, "write", bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek", bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "dirMap", {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}]
+["creating you", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "with your stuff", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}]
+["Inbox returning", bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }, bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }]
+["you don't exist", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau"]
+["your inserted stuff", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}, "everyone size", 1]
+["inbox", {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}]
+["x", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}]
+["writing inbox and dictionary for bootstrap", {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}, {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}]
+["everyone size", 0]
+[deploy] deployer=04f700a417754b77 ok cost=174355 
+2026-11-05T15:53:09.226Z INFO  [casper.engine.NodeLaunch] Sending genesis block 0076e13380647ac8ae069ae9bd76f44a5ced480a5262e46e8ccc3681b0ffba8e to peers...
+2026-11-05T15:53:09.274Z INFO  [casper.engine.NodeLaunch] Making a transition to Running state.
+2026-11-05T15:53:10.086Z INFO  [casper.blocks.Proposer] attestation at tip 0: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #1
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 1 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:10.189Z WARN  [casper.interpreter.validate] finality did not advance at tip 0: a layer exists but its supporting stake is not a supermajority — 0 of 100 (0 full partition(s) among 0 candidate(s) of a 1-sender partition)
+[pos] close_block 1 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:10.248Z INFO  [casper.protocol.CommUtil] Sent hash def7f65d4700b4f4b3b65b014897d9c1457348d98769a293aef94ee42fca4244 to peers
+2026-11-05T15:53:10.248Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #1 (seq 1)
+2026-11-05T15:53:10.578Z INFO  [casper.blocks.Proposer] attestation at tip 1: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=39814 
+[pos] close_block 2 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 2 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:10.817Z INFO  [casper.protocol.CommUtil] Sent hash d8db81bbc4f974280793a08e13448534e38d3db038864f380b06714201bc69cc to peers
+2026-11-05T15:53:10.817Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #2 (seq 2)
+2026-11-05T15:53:12.082Z INFO  [casper.blocks.Proposer] attestation at tip 2: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #3
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 3 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 3 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:12.253Z INFO  [casper.protocol.CommUtil] Sent hash bc9b5fb8ce6a3966cedffac4fd8d549defe448a651dbd037ad2c38588dd34ef7 to peers
+2026-11-05T15:53:12.253Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #3 (seq 3)
+["#define $Kudos", `rho:id:9spnmtw9g3qdi1kpxcbgbuyuukbkryp1wfdwsy6iunb9g44icrjy`]
+"begin"
+["#define $Inbox", `rho:id:3spfkanxkeq3d1s6wdbjz5gpy4oio5uzd9hnsmfbukjeakyiubky`]
+["#define $Directory", `rho:id:zcn8i36nea5u7sgkkuoh38nomzcg9gpfi4qs3c5ou7bmp6ygasio`]
+["#define $Issue", `rho:id:netuaaypr6ryw3ab5yk8e7fjhqx1gfxnnkm9mdif7wswmgkegfxo`]
+["#define $Ballot", `rho:id:kuhtaexp36f3rjygs8t5oosxfhx7m6kuy9iwi3ew5jz63fppbroy`]
+`rho:id:kuhtaexp36f3rjygs8t5oosxfhx7m6kuy9iwi3ew5jz63fppbroy`
+"starting"
+["#define $Chat", `rho:id:twqdgghs4dz3sd8ronngpg1kdwrtikq8pdgmjzd7z9d1k5kt1poy`]
+"request"
+["#define $Group", `rho:id:s9hd3eoq1trqjsbeay3j1ihsue6zfz6tauy1wyii3zwj1pkh7r3o`]
+["MCAread", bundle+ {   Unforgeable(0x7ab62ea39c23346344dedf8aa6548802c0432374b6a4a4d81a357a6ec284915e) }]
+["GetMe", ("published", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau/GetMe", 0), "SendThem", ("published", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau/SendThem", 0)]
+["getting deployer rev address"]
+["got pub key", "04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4".hexToBytes()]
+["got revaddr", {"deployer REV address" : "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "deployerId" : DeployerId(0x04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4), "pubKeyBytes" : "04f700a417754b775d95421973bdbdadb2d23c8a5af46f1829b1431f5c136e549e8a0d61aa0c793f1a614f8e437711c7758473c6ceb0859ac7e9e07911ca66b5c4".hexToBytes()}]
+["getMe", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "everyone size", 0]
+["creating your stuff", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau"]
+["inbox creation", bundle+ {   Unforgeable(0x109d074f7ca037d43d4a42c063c37bf3a6980cb86a5ed9c242e23ec27277d088) }, "dir creation", bundle+ {   Unforgeable(0x74206e9f2a2fd1d16e885372201da64ffc57070d693c85556af5cb2811852e94) }]
+["read", bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }, "write", bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek", bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "dirMap", {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}]
+["creating you", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau", "with your stuff", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}]
+["Inbox returning", bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }, bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }]
+["you don't exist", "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau"]
+["your inserted stuff", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}, "everyone size", 1]
+["inbox", {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}]
+["x", {"claimed" : false, "dictionary" : {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}, "inbox" : {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}}]
+["writing inbox and dictionary for bootstrap", {"URI" : `rho:id:1dowt16ek6squ9iycd3iyz8gtzn8wfp8wzef59qtwuyqz5z5cgby`, "dict" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "inbox" : bundle+ {   Unforgeable(0x67945f3348c4e24133e4ac67f8cdbf94600c1dedeba8820d27c50fc01cfa9662) }, "peek" : bundle+ {   Unforgeable(0xdd2e50727b44423dbb4fb121bbd77046322b47fff7f310d5562600e92172edb1) }, "receive" : bundle+ {   Unforgeable(0x9c3e3fa972dc564a5fed48f03053fb0376f6d9bc91d745f33cfdc1710d55c10b) }}, {"grant" : bundle+ {   Unforgeable(0x930d5e796b482da0445c99179ca84aaeb5712c0b4f986b15dbb9f34c1835b2a1) }, "read" : bundle+ {   Unforgeable(0x1c4de4b28717d075e2a7bcee6aa8e480352a38e8836cf276abc6e3c9ba0d4ba7) }, "write" : bundle+ {   Unforgeable(0xb2eacb8ed80f56f0a20860e77f960e22be12aeba0b087f33047cd9b4d37a66ef) }}]
+["everyone size", 0]
+No pooled deploys; injecting dummy deploy for block #4
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 4 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:15.680Z WARN  [casper.interpreter.validate] merge search: 4 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [4, 0, 0, 0, 0] · cost buckets [4, 0, 0, 0, 0]
+[pos] close_block 4 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:15.744Z INFO  [casper.protocol.CommUtil] Sent hash 7f12b96b388678b5f4ad789a8c5463a858dfa8c06401ac86c4564521de13ad0e to peers
+2026-11-05T15:53:15.744Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #4 (seq 4)
+No pooled deploys; injecting dummy deploy for block #5
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 5 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 5 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:16.325Z INFO  [casper.protocol.CommUtil] Sent hash 6f602f52eba92d422791532e1cdd145dbc910489aed090864d2228664685f7b2 to peers
+2026-11-05T15:53:16.325Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #5 (seq 5)
+No pooled deploys; injecting dummy deploy for block #6
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 6 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 6 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:18.280Z INFO  [casper.protocol.CommUtil] Sent hash bdd8c5754afd6c351ddfdf0c46ff16bf489bbe10dc87602d4a287f287ebe0707 to peers
+2026-11-05T15:53:18.280Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #6 (seq 6)
+2026-11-05T15:53:19.859Z INFO  [casper.blocks.Proposer] attestation at tip 6: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5044 
+[pos] close_block 7 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 7 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:20.011Z INFO  [casper.protocol.CommUtil] Sent hash 96a33201504f04692757bfee79593037288fd4b0d44e9f55a8ffbcf70cbeaf0a to peers
+2026-11-05T15:53:20.011Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #7 (seq 7)
+2026-11-05T15:53:20.082Z INFO  [casper.blocks.Proposer] attestation at tip 7: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #8
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 8 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 8 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:20.188Z INFO  [casper.protocol.CommUtil] Sent hash 25d8283eb75b1722589c47e8c8b9b12d2a8b94a420dceee5a3e797d95c4c416b to peers
+2026-11-05T15:53:20.188Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #8 (seq 8)
+No pooled deploys; injecting dummy deploy for block #9
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 9 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:22.153Z WARN  [casper.interpreter.validate] merge search: 14 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [14, 0, 0, 0, 0] · cost buckets [14, 0, 0, 0, 0]
+[pos] close_block 9 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:22.204Z INFO  [casper.protocol.CommUtil] Sent hash b6b4b89db6c6a8238f39c85a605f5d087fd6a58d4b710f5d0ba0d07c07b71f97 to peers
+2026-11-05T15:53:22.204Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #9 (seq 9)
+No pooled deploys; injecting dummy deploy for block #10
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 10 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 10 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:24.204Z INFO  [casper.protocol.CommUtil] Sent hash 5ddd2a6b1b4b94c43d3ffd1a20eb01ae2ef1a37b1ce3024806cff64dbcf028b2 to peers
+2026-11-05T15:53:24.204Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #10 (seq 10)
+2026-11-05T15:53:25.099Z INFO  [casper.blocks.Proposer] attestation at tip 10: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=16902 
+[pos] close_block 11 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 11 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:25.290Z INFO  [casper.protocol.CommUtil] Sent hash 40461bc167fe1cfab3cd573b092a037d13e132cea535cbedadb43470517d4b8e to peers
+2026-11-05T15:53:25.290Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #11 (seq 11)
+2026-11-05T15:53:26.082Z INFO  [casper.blocks.Proposer] attestation at tip 11: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #12
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 12 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 12 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:26.188Z INFO  [casper.protocol.CommUtil] Sent hash 22123d5d52bdbdefc9ee80b72ff8e6074db2d2c485c8e01eb31b96b75a15db92 to peers
+2026-11-05T15:53:26.188Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #12 (seq 12)
+No pooled deploys; injecting dummy deploy for block #13
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 13 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:28.142Z WARN  [casper.interpreter.validate] merge search: 22 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [22, 0, 0, 0, 0] · cost buckets [22, 0, 0, 0, 0]
+[pos] close_block 13 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:28.188Z INFO  [casper.protocol.CommUtil] Sent hash 0980481091793153465097279f56064e462a45a4f582a923f74f1368387d9129 to peers
+2026-11-05T15:53:28.188Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #13 (seq 13)
+No pooled deploys; injecting dummy deploy for block #14
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 14 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 14 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:30.295Z INFO  [casper.protocol.CommUtil] Sent hash 7e31d3242589f5fe1bbcd5459935b62e1a093ff7f6d558a0eae5615930b81df5 to peers
+2026-11-05T15:53:30.295Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #14 (seq 14)
+2026-11-05T15:53:30.400Z INFO  [casper.blocks.Proposer] attestation at tip 14: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5095 
+[pos] close_block 15 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 15 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:30.629Z INFO  [casper.protocol.CommUtil] Sent hash 43af824d94aa34c4723d1e2612dd2abd427cb726a060c7fbeeff20635ec7e72f to peers
+2026-11-05T15:53:30.629Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #15 (seq 15)
+2026-11-05T15:53:32.081Z INFO  [casper.blocks.Proposer] attestation at tip 15: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #16
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 16 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 16 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:32.271Z INFO  [casper.protocol.CommUtil] Sent hash 5a9c2e1dace902ed08600b90bb59fb71832d19efe612b857042023e7490dd83b to peers
+2026-11-05T15:53:32.271Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #16 (seq 16)
+No pooled deploys; injecting dummy deploy for block #17
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 17 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:34.175Z WARN  [casper.interpreter.validate] merge search: 30 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [30, 0, 0, 0, 0] · cost buckets [30, 0, 0, 0, 0]
+[pos] close_block 17 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:34.298Z INFO  [casper.protocol.CommUtil] Sent hash df3ce9c8b75e18a2da5ed3bc882962ca497a256b61a41ac8570a215177d66dca to peers
+2026-11-05T15:53:34.298Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #17 (seq 17)
+No pooled deploys; injecting dummy deploy for block #18
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 18 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 18 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:36.304Z INFO  [casper.protocol.CommUtil] Sent hash 14fda5991f6194f475ce348c757ca280baeddd369a4094734281a74e09b1ec18 to peers
+2026-11-05T15:53:36.304Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #18 (seq 18)
+No pooled deploys; injecting dummy deploy for block #19
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 19 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 19 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:38.289Z INFO  [casper.protocol.CommUtil] Sent hash c799b16f577b50dbbe4b57afbba8a05ed2ffae9f9f7920d6a9241f889a87dadf to peers
+2026-11-05T15:53:38.289Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #19 (seq 19)
+No pooled deploys; injecting dummy deploy for block #20
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 20 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:40.140Z WARN  [casper.interpreter.validate] merge search: 36 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [36, 0, 0, 0, 0] · cost buckets [36, 0, 0, 0, 0]
+[pos] close_block 20 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:40.183Z INFO  [casper.protocol.CommUtil] Sent hash c5017907cf9f9faa7d532c2b34f0e1afaa39bb7e5d5756b71f66c7d1b220000f to peers
+2026-11-05T15:53:40.183Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #20 (seq 20)
+2026-11-05T15:53:40.882Z INFO  [casper.blocks.Proposer] attestation at tip 20: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=35206 
+[pos] close_block 21 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 21 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:41.126Z INFO  [casper.protocol.CommUtil] Sent hash b80008c45a88bd6385fa538be29aba2e265d36f351d2cbb24d3b5e72e4a60003 to peers
+2026-11-05T15:53:41.126Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #21 (seq 21)
+2026-11-05T15:53:42.087Z INFO  [casper.blocks.Proposer] attestation at tip 21: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #22
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 22 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 22 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:42.192Z INFO  [casper.protocol.CommUtil] Sent hash a0497640e3ac04b7914170f01b5cd76e239c415e59b05a55495096c2b9198df4 to peers
+2026-11-05T15:53:42.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #22 (seq 22)
+No pooled deploys; injecting dummy deploy for block #23
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 23 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 23 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:44.196Z INFO  [casper.protocol.CommUtil] Sent hash 687035ad8968c0a6fc9191920a2eabb2019230089f5942415847b25cd1a488c4 to peers
+2026-11-05T15:53:44.196Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #23 (seq 23)
+No pooled deploys; injecting dummy deploy for block #24
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 24 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:46.161Z WARN  [casper.interpreter.validate] merge search: 44 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [44, 0, 0, 0, 0] · cost buckets [44, 0, 0, 0, 0]
+[pos] close_block 24 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:46.205Z INFO  [casper.protocol.CommUtil] Sent hash 5aac5efe8eba2809b189bdf3ef37c26405350b408bbd26e345a41629abf0d53b to peers
+2026-11-05T15:53:46.206Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #24 (seq 24)
+2026-11-05T15:53:46.428Z INFO  [casper.blocks.Proposer] attestation at tip 24: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=13260 
+[pos] close_block 25 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 25 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:46.620Z INFO  [casper.protocol.CommUtil] Sent hash 4850f29d231f27060a1353d7ef0cbf2d45fed8b6533a36a47bbcd5564de52380 to peers
+2026-11-05T15:53:46.620Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #25 (seq 25)
+2026-11-05T15:53:48.090Z INFO  [casper.blocks.Proposer] attestation at tip 25: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #26
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 26 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 26 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:48.199Z INFO  [casper.protocol.CommUtil] Sent hash 81bec90b331f917c83b6f9091bec342faf3f0bf1565a21decb8c404b518de399 to peers
+2026-11-05T15:53:48.199Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #26 (seq 26)
+No pooled deploys; injecting dummy deploy for block #27
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 27 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 27 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:50.183Z INFO  [casper.protocol.CommUtil] Sent hash 8fb475ac4e0d74c5b24dfa9e2296a0392bf65090b28fcbfbc695121be5b1e20a to peers
+2026-11-05T15:53:50.183Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #27 (seq 27)
+No pooled deploys; injecting dummy deploy for block #28
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 28 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:52.138Z WARN  [casper.interpreter.validate] merge search: 52 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [52, 0, 0, 0, 0] · cost buckets [52, 0, 0, 0, 0]
+[pos] close_block 28 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:52.181Z INFO  [casper.protocol.CommUtil] Sent hash 3ff0682a2985aad000369b1bb6f6269fb0527efb900c0644765e6aca46510b8b to peers
+2026-11-05T15:53:52.181Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #28 (seq 28)
+No pooled deploys; injecting dummy deploy for block #29
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 29 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 29 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:54.191Z INFO  [casper.protocol.CommUtil] Sent hash 9f0dfb6821726b752d983b4839c2951a454dc4b781ebc9996b650e5f23d84474 to peers
+2026-11-05T15:53:54.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #29 (seq 29)
+No pooled deploys; injecting dummy deploy for block #30
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 30 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 30 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:56.199Z INFO  [casper.protocol.CommUtil] Sent hash 1c99bd72eddfa122f8e41ae3749c992590b8b560f1dfbbc7bc4c03d39da0e51c to peers
+2026-11-05T15:53:56.199Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #30 (seq 30)
+2026-11-05T15:53:57.528Z INFO  [casper.blocks.Proposer] attestation at tip 30: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=43768 
+[pos] close_block 31 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:57.684Z WARN  [casper.interpreter.validate] merge search: 58 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [58, 0, 0, 0, 0] · cost buckets [58, 0, 0, 0, 0]
+[pos] close_block 31 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:57.854Z INFO  [casper.protocol.CommUtil] Sent hash 8d5116f77bffe0bee6d7da8eaad6df8151e3ece5109e6b60ba3fd7b9f3522835 to peers
+2026-11-05T15:53:57.854Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #31 (seq 31)
+2026-11-05T15:53:58.094Z INFO  [casper.blocks.Proposer] attestation at tip 31: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #32
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 32 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 32 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:53:58.206Z INFO  [casper.protocol.CommUtil] Sent hash 9b3438006f1a6333d96fe48e192b79f0acd7f6c2125b779dd2e3c6026ea3d47b to peers
+2026-11-05T15:53:58.207Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #32 (seq 32)
+No pooled deploys; injecting dummy deploy for block #33
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 33 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 33 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:00.192Z INFO  [casper.protocol.CommUtil] Sent hash 5bf369d4beaaf15e93897bef5115c4750c9deb0017f7ea139219a043a85ab13d to peers
+2026-11-05T15:54:00.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #33 (seq 33)
+No pooled deploys; injecting dummy deploy for block #34
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 34 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 34 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:02.299Z INFO  [casper.protocol.CommUtil] Sent hash 8317fff1e8a2467931e916845405682f4e69f055380b83e6ca731a2535afa8d6 to peers
+2026-11-05T15:54:02.299Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #34 (seq 34)
+2026-11-05T15:54:02.715Z INFO  [casper.blocks.Proposer] attestation at tip 34: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5087 
+[pos] close_block 35 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:02.809Z WARN  [casper.interpreter.validate] merge search: 66 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [66, 0, 0, 0, 0] · cost buckets [66, 0, 0, 0, 0]
+[pos] close_block 35 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:02.886Z INFO  [casper.protocol.CommUtil] Sent hash ac16ddc3f8c4abe5d4cabfdbd4135a8d96f7ae7c947b9745d45079f61e8e3958 to peers
+2026-11-05T15:54:02.886Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #35 (seq 35)
+2026-11-05T15:54:04.090Z INFO  [casper.blocks.Proposer] attestation at tip 35: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #36
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 36 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 36 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:04.187Z INFO  [casper.protocol.CommUtil] Sent hash 3f887b346bda67344edbc7cb2df2c23ffc80bbddce6ade7a78d88011c810bcfd to peers
+2026-11-05T15:54:04.187Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #36 (seq 36)
+No pooled deploys; injecting dummy deploy for block #37
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 37 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 37 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:06.198Z INFO  [casper.protocol.CommUtil] Sent hash cc03b60ccba9b28da3ac78934abae302931616aa586e7570be50932bb43deb98 to peers
+2026-11-05T15:54:06.198Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #37 (seq 37)
+No pooled deploys; injecting dummy deploy for block #38
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 38 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:08.157Z WARN  [casper.interpreter.validate] merge search: 72 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [72, 0, 0, 0, 0] · cost buckets [72, 0, 0, 0, 0]
+[pos] close_block 38 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:08.208Z INFO  [casper.protocol.CommUtil] Sent hash 5c63987b07cbcdcce42bf8c9580a0a87556c75923be2f4192678203aa5740696 to peers
+2026-11-05T15:54:08.208Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #38 (seq 38)
+No pooled deploys; injecting dummy deploy for block #39
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 39 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 39 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:10.191Z INFO  [casper.protocol.CommUtil] Sent hash 03c2c73159e5f0a8a06a6f83eaaec7569e8c23b1117f9514f63dc6cba0a47903 to peers
+2026-11-05T15:54:10.191Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #39 (seq 39)
+No pooled deploys; injecting dummy deploy for block #40
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 40 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 40 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:12.201Z INFO  [casper.protocol.CommUtil] Sent hash e9326ec5c82b5655cef318b1456217529ce649b8902d8475942613872a2c4ff7 to peers
+2026-11-05T15:54:12.201Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #40 (seq 40)
+2026-11-05T15:54:12.336Z INFO  [casper.blocks.Proposer] attestation at tip 40: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=43407 
+[pos] close_block 41 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 41 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:12.610Z INFO  [casper.protocol.CommUtil] Sent hash f1ae36a2ad1db43fd83fd720f4e621d6e700a59fef303e2248a0b1c9aebeb317 to peers
+2026-11-05T15:54:12.611Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #41 (seq 41)
+2026-11-05T15:54:14.082Z INFO  [casper.blocks.Proposer] attestation at tip 41: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #42
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 42 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:14.188Z WARN  [casper.interpreter.validate] merge search: 80 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [80, 0, 0, 0, 0] · cost buckets [80, 0, 0, 0, 0]
+[pos] close_block 42 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:14.299Z INFO  [casper.protocol.CommUtil] Sent hash 29acea3490ea9c835553d49516e5cbcc98184993f7ff0f4e044c67c02ffa73a2 to peers
+2026-11-05T15:54:14.299Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #42 (seq 42)
+No pooled deploys; injecting dummy deploy for block #43
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 43 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 43 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:16.273Z INFO  [casper.protocol.CommUtil] Sent hash 03accdc956f0f14ab3853dd4eba3c08d2916a87326e4f0c078e3d4250248f1cb to peers
+2026-11-05T15:54:16.273Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #43 (seq 43)
+No pooled deploys; injecting dummy deploy for block #44
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 44 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 44 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:18.369Z INFO  [casper.protocol.CommUtil] Sent hash c54d9dcc84c67897de2fa963d5e2994e55021d0958c3c2181e3404195ca1d50a to peers
+2026-11-05T15:54:18.369Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #44 (seq 44)
+No pooled deploys; injecting dummy deploy for block #45
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 45 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:20.230Z WARN  [casper.interpreter.validate] merge search: 86 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [86, 0, 0, 0, 0] · cost buckets [86, 0, 0, 0, 0]
+[pos] close_block 45 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:20.327Z INFO  [casper.protocol.CommUtil] Sent hash f32398bdfa417c90648f6a133116741976b25f0fe53692e4d5634a7658b851ca to peers
+2026-11-05T15:54:20.327Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #45 (seq 45)
+2026-11-05T15:54:21.892Z INFO  [casper.blocks.Proposer] attestation at tip 45: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5101 
+[pos] close_block 46 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 46 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:22.178Z INFO  [casper.protocol.CommUtil] Sent hash cc77c9a8d19957890baeb8ba4a75a09242ee9e6dbce5896c5540436dc39b3646 to peers
+2026-11-05T15:54:22.178Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #46 (seq 46)
+2026-11-05T15:54:22.202Z INFO  [casper.blocks.Proposer] attestation at tip 46: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #47
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 47 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 47 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:22.410Z INFO  [casper.protocol.CommUtil] Sent hash 22f4a4f9498595e05055ee91080e397a164b4b4b555aa6dd14a5bd96d2535b11 to peers
+2026-11-05T15:54:22.410Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #47 (seq 47)
+No pooled deploys; injecting dummy deploy for block #48
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 48 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 48 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:24.196Z INFO  [casper.protocol.CommUtil] Sent hash 9890a2fe131b0f4a265caacd22fa772e5c53b34ef8e5860a251166796f733223 to peers
+2026-11-05T15:54:24.196Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #48 (seq 48)
+No pooled deploys; injecting dummy deploy for block #49
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 49 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:26.157Z WARN  [casper.interpreter.validate] merge search: 94 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [94, 0, 0, 0, 0] · cost buckets [94, 0, 0, 0, 0]
+[pos] close_block 49 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:26.202Z INFO  [casper.protocol.CommUtil] Sent hash 0ccd5fcb2e360ea63ad822b60ce762673a6c9f8ce0e33a79553030cb00d61dd3 to peers
+2026-11-05T15:54:26.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #49 (seq 49)
+2026-11-05T15:54:26.512Z INFO  [casper.blocks.Proposer] attestation at tip 49: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=19084 
+[pos] close_block 50 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 50 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:26.719Z INFO  [casper.protocol.CommUtil] Sent hash 62e81df6c350446fa2b455c94d26b8a7e8920a31f7a0c9aad99ad84fa4543384 to peers
+2026-11-05T15:54:26.720Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #50 (seq 50)
+2026-11-05T15:54:28.082Z INFO  [casper.blocks.Proposer] attestation at tip 50: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #51
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 51 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 51 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:28.194Z INFO  [casper.protocol.CommUtil] Sent hash 6d4aace6d9f88c9d3a203bf1f42c5bbe2d828cf2de59f5ee1cc0a862aa4fb087 to peers
+2026-11-05T15:54:28.194Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #51 (seq 51)
+No pooled deploys; injecting dummy deploy for block #52
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 52 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 52 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:30.258Z INFO  [casper.protocol.CommUtil] Sent hash 565958900ada5299b7d4e98e908bf5ed85cafc000e6d5eadd0a48bfd710c0653 to peers
+2026-11-05T15:54:30.258Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #52 (seq 52)
+No pooled deploys; injecting dummy deploy for block #53
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 53 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:32.223Z WARN  [casper.interpreter.validate] merge search: 102 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [102, 0, 0, 0, 0] · cost buckets [102, 0, 0, 0, 0]
+[pos] close_block 53 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:32.311Z INFO  [casper.protocol.CommUtil] Sent hash ea911072a181684c3ed9f07fb61deb59417e93328ed84dee1ae1ee81906ec603 to peers
+2026-11-05T15:54:32.311Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #53 (seq 53)
+No pooled deploys; injecting dummy deploy for block #54
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 54 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 54 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:34.365Z INFO  [casper.protocol.CommUtil] Sent hash 1788f1458a32ede68e399f7ad1a016ce91842789591a5652e8c8416fe44b2dea to peers
+2026-11-05T15:54:34.365Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #54 (seq 54)
+No pooled deploys; injecting dummy deploy for block #55
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 55 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 55 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:36.271Z INFO  [casper.protocol.CommUtil] Sent hash 007ea815c663c27e2ef34e26d393ad79bdc0c88b90764a5bde3ca79b00b56f35 to peers
+2026-11-05T15:54:36.271Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #55 (seq 55)
+[deploy] deployer=04f700a417754b77 ok cost=5097 
+[pos] close_block 56 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 56 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:36.530Z INFO  [casper.protocol.CommUtil] Sent hash e2d23634a436c25108a63bb10487917d421b59d1f83dc34ddca6f4279959da43 to peers
+2026-11-05T15:54:36.530Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #56 (seq 56)
+No pooled deploys; injecting dummy deploy for block #57
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 57 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:38.168Z WARN  [casper.interpreter.validate] merge search: 110 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [110, 0, 0, 0, 0] · cost buckets [110, 0, 0, 0, 0]
+[pos] close_block 57 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:38.230Z INFO  [casper.protocol.CommUtil] Sent hash 0c0867c8af7319d5d1a04659bf4792fbdf3d0d52939e6fd7c82f8bd6f6a352a6 to peers
+2026-11-05T15:54:38.230Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #57 (seq 57)
+No pooled deploys; injecting dummy deploy for block #58
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 58 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 58 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:40.216Z INFO  [casper.protocol.CommUtil] Sent hash 3178a7f52c37d4e7a5c54441a78d513486ee9780de40fd04aed77c0b782653dd to peers
+2026-11-05T15:54:40.216Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #58 (seq 58)
+No pooled deploys; injecting dummy deploy for block #59
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 59 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 59 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:42.205Z INFO  [casper.protocol.CommUtil] Sent hash 3b1c33f4beb56fb88e8cdb1cf9b43902d0a177e26d14176a68a18d29268205f8 to peers
+2026-11-05T15:54:42.205Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #59 (seq 59)
+No pooled deploys; injecting dummy deploy for block #60
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 60 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:44.147Z WARN  [casper.interpreter.validate] merge search: 116 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [116, 0, 0, 0, 0] · cost buckets [116, 0, 0, 0, 0]
+[pos] close_block 60 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:44.192Z INFO  [casper.protocol.CommUtil] Sent hash 106079c93f4ffe3e7ddfc7a59320339cb459da8afc1bb1a1f97b473a839cdfde to peers
+2026-11-05T15:54:44.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #60 (seq 60)
+2026-11-05T15:54:45.262Z INFO  [casper.blocks.Proposer] attestation at tip 60: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=15301 
+[pos] close_block 61 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 61 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:45.458Z INFO  [casper.protocol.CommUtil] Sent hash e2651494a3aa0c207ab168ac8594678b237d6634bfe98efb782f9f59a81dff1d to peers
+2026-11-05T15:54:45.458Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #61 (seq 61)
+2026-11-05T15:54:46.093Z INFO  [casper.blocks.Proposer] attestation at tip 61: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #62
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 62 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 62 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:46.209Z INFO  [casper.protocol.CommUtil] Sent hash 3fab321acaf8b9d042cd7f8ab7fee0ab0bed9293a31f2b99abedeb4cc97b9f5b to peers
+2026-11-05T15:54:46.209Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #62 (seq 62)
+No pooled deploys; injecting dummy deploy for block #63
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 63 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 63 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:48.203Z INFO  [casper.protocol.CommUtil] Sent hash 9f562da4bbe0f63ecca03749384bc1013bf9d088070998805bc0af357bd26e36 to peers
+2026-11-05T15:54:48.203Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #63 (seq 63)
+No pooled deploys; injecting dummy deploy for block #64
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 64 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:50.217Z WARN  [casper.interpreter.validate] merge search: 124 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [124, 0, 0, 0, 0] · cost buckets [124, 0, 0, 0, 0]
+[pos] close_block 64 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:50.267Z INFO  [casper.protocol.CommUtil] Sent hash fe7a3ccde465ed3cee424c2b27240020a400a877449bc6310d96b73094876192 to peers
+2026-11-05T15:54:50.267Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #64 (seq 64)
+No pooled deploys; injecting dummy deploy for block #65
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 65 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 65 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:52.197Z INFO  [casper.protocol.CommUtil] Sent hash 1edc36c173a47c9be1e7035edcff9b316e0ffa74c99ee2e3c17ab7e8b23422ad to peers
+2026-11-05T15:54:52.197Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #65 (seq 65)
+No pooled deploys; injecting dummy deploy for block #66
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 66 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 66 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:54.195Z INFO  [casper.protocol.CommUtil] Sent hash fd8d44d551fb36204b9bd2561b19bb6960e8d456638f1b76dec84eb61b43d886 to peers
+2026-11-05T15:54:54.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #66 (seq 66)
+2026-11-05T15:54:54.596Z INFO  [casper.blocks.Proposer] attestation at tip 66: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5128 
+[pos] close_block 67 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 67 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:54.782Z INFO  [casper.protocol.CommUtil] Sent hash 3626ab5d1b5c3d41ce1d9f58fd4934287a51972af20e62d530595992499921c8 to peers
+2026-11-05T15:54:54.782Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #67 (seq 67)
+2026-11-05T15:54:56.084Z INFO  [casper.blocks.Proposer] attestation at tip 67: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #68
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 68 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:56.146Z WARN  [casper.interpreter.validate] merge search: 132 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [132, 0, 0, 0, 0] · cost buckets [132, 0, 0, 0, 0]
+[pos] close_block 68 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:56.198Z INFO  [casper.protocol.CommUtil] Sent hash d7cf5204b6ef48ecf3263163b787a41abecacf958979289795b1c49c90766b9f to peers
+2026-11-05T15:54:56.198Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #68 (seq 68)
+No pooled deploys; injecting dummy deploy for block #69
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 69 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 69 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:54:58.195Z INFO  [casper.protocol.CommUtil] Sent hash e4df54308c232a1787d360979e0d1c6482bdcfac5d8aae549d95dd55a49388d6 to peers
+2026-11-05T15:54:58.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #69 (seq 69)
+No pooled deploys; injecting dummy deploy for block #70
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 70 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 70 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:00.200Z INFO  [casper.protocol.CommUtil] Sent hash c8349bd74bf5a9e5f576da09e19c625a13eb2f4d3f57171dfe660200a5d2caf1 to peers
+2026-11-05T15:55:00.200Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #70 (seq 70)
+No pooled deploys; injecting dummy deploy for block #71
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 71 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:02.148Z WARN  [casper.interpreter.validate] merge search: 138 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [138, 0, 0, 0, 0] · cost buckets [138, 0, 0, 0, 0]
+[pos] close_block 71 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:02.192Z INFO  [casper.protocol.CommUtil] Sent hash 8c59daa00691eca9b919dd754743163399be4d13ff20e92e76e3912a30248de8 to peers
+2026-11-05T15:55:02.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #71 (seq 71)
+2026-11-05T15:55:03.423Z INFO  [casper.blocks.Proposer] attestation at tip 71: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=25858 
+[pos] close_block 72 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 72 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:03.655Z INFO  [casper.protocol.CommUtil] Sent hash f518df4cf7916d15749a64237063cabc33e6334774e2ff09887be5d1126d6c56 to peers
+2026-11-05T15:55:03.655Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #72 (seq 72)
+2026-11-05T15:55:04.086Z INFO  [casper.blocks.Proposer] attestation at tip 72: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #73
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 73 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 73 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:04.184Z INFO  [casper.protocol.CommUtil] Sent hash cb7500285aaa44ccc93df0f96f22a403b2a2238a07ca990dab706bc91053c63b to peers
+2026-11-05T15:55:04.184Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #73 (seq 73)
+No pooled deploys; injecting dummy deploy for block #74
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 74 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 74 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:06.230Z INFO  [casper.protocol.CommUtil] Sent hash 994b2309117a23d37a17255ee8b9f0eaf5204648b80fbb1064fe93370892cfd3 to peers
+2026-11-05T15:55:06.230Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #74 (seq 74)
+No pooled deploys; injecting dummy deploy for block #75
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 75 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:08.228Z WARN  [casper.interpreter.validate] merge search: 146 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [146, 0, 0, 0, 0] · cost buckets [146, 0, 0, 0, 0]
+[pos] close_block 75 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:08.308Z INFO  [casper.protocol.CommUtil] Sent hash 2878a644220b013e6e84241e4f82c3ebf6a5a1916ffe029b6bf504a534efea90 to peers
+2026-11-05T15:55:08.308Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #75 (seq 75)
+2026-11-05T15:55:08.706Z INFO  [casper.blocks.Proposer] attestation at tip 75: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5119 
+[pos] close_block 76 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 76 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:08.898Z INFO  [casper.protocol.CommUtil] Sent hash c8fcffb0aaa0db1668cdca166a208d7aac27a1a9d15636215d9eef151ab29c4a to peers
+2026-11-05T15:55:08.898Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #76 (seq 76)
+2026-11-05T15:55:10.088Z INFO  [casper.blocks.Proposer] attestation at tip 76: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #77
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 77 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 77 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:10.314Z INFO  [casper.protocol.CommUtil] Sent hash 77ecc354a8483392f6607cca3fa8432ad26e9ded08a118963a91d99430dc74d8 to peers
+2026-11-05T15:55:10.314Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #77 (seq 77)
+No pooled deploys; injecting dummy deploy for block #78
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 78 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 78 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:12.227Z INFO  [casper.protocol.CommUtil] Sent hash 79561ec12d4a31da27b201f7ffc60602e7c93e42ccbf6b8c56058d7d047e9ead to peers
+2026-11-05T15:55:12.227Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #78 (seq 78)
+No pooled deploys; injecting dummy deploy for block #79
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 79 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:14.211Z WARN  [casper.interpreter.validate] merge search: 154 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [154, 0, 0, 0, 0] · cost buckets [154, 0, 0, 0, 0]
+[pos] close_block 79 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:14.294Z INFO  [casper.protocol.CommUtil] Sent hash 65c63b127897465f6423eea6659be7cd3249bbd0802206585c44ca1378fad251 to peers
+2026-11-05T15:55:14.294Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #79 (seq 79)
+No pooled deploys; injecting dummy deploy for block #80
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 80 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 80 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:16.200Z INFO  [casper.protocol.CommUtil] Sent hash f4dcf6d3a7cc55a9152ad68276c82a0a06fd33a758b1ba09276e40ff04c0a4cf to peers
+2026-11-05T15:55:16.200Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #80 (seq 80)
+2026-11-05T15:55:17.700Z INFO  [casper.blocks.Proposer] attestation at tip 80: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=11504 
+[pos] close_block 81 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 81 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:17.897Z INFO  [casper.protocol.CommUtil] Sent hash a126b4acd4dd57532407838efa228de37b7491d8b711a8a4da6be910549b005d to peers
+2026-11-05T15:55:17.897Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #81 (seq 81)
+2026-11-05T15:55:18.081Z INFO  [casper.blocks.Proposer] attestation at tip 81: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #82
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 82 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 82 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:18.192Z INFO  [casper.protocol.CommUtil] Sent hash 12ebdb33860ef971acd7e67eb48e882375570151ab2a8608eaabdc5ca3adf185 to peers
+2026-11-05T15:55:18.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #82 (seq 82)
+No pooled deploys; injecting dummy deploy for block #83
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 83 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:20.141Z WARN  [casper.interpreter.validate] merge search: 162 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [162, 0, 0, 0, 0] · cost buckets [162, 0, 0, 0, 0]
+[pos] close_block 83 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:20.186Z INFO  [casper.protocol.CommUtil] Sent hash b9cc716edc82f1650c765f93ba4d801e3ddece3d55f7b3a138256d4bd77d6b17 to peers
+2026-11-05T15:55:20.186Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #83 (seq 83)
+No pooled deploys; injecting dummy deploy for block #84
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 84 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 84 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:22.233Z INFO  [casper.protocol.CommUtil] Sent hash dd7db16bc14b4eaa78b79242b0fbae37d68963df5c2daa1fe6e56fc48198e8d5 to peers
+2026-11-05T15:55:22.233Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #84 (seq 84)
+2026-11-05T15:55:23.375Z INFO  [casper.blocks.Proposer] attestation at tip 84: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5114 
+[pos] close_block 85 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 85 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:23.543Z INFO  [casper.protocol.CommUtil] Sent hash 43c0de21fd44027731f95c2f696fe45ebb6fb13a4c03f973935e5316eeee37d4 to peers
+2026-11-05T15:55:23.543Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #85 (seq 85)
+2026-11-05T15:55:24.081Z INFO  [casper.blocks.Proposer] attestation at tip 85: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #86
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 86 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 86 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:24.181Z INFO  [casper.protocol.CommUtil] Sent hash 25061bcace3a8709ae5cbf6ad2bc831921dc7671a98b8c9e8052a487468e4a3a to peers
+2026-11-05T15:55:24.181Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #86 (seq 86)
+No pooled deploys; injecting dummy deploy for block #87
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 87 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:26.186Z WARN  [casper.interpreter.validate] merge search: 170 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [170, 0, 0, 0, 0] · cost buckets [170, 0, 0, 0, 0]
+[pos] close_block 87 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:26.270Z INFO  [casper.protocol.CommUtil] Sent hash cd0065af57c17b9d5b8c7a19f589b12c02a40db296ecb8d32e6272731effab84 to peers
+2026-11-05T15:55:26.270Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #87 (seq 87)
+No pooled deploys; injecting dummy deploy for block #88
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 88 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 88 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:28.380Z INFO  [casper.protocol.CommUtil] Sent hash 7553c79af432b9bb280d6e54accfc9a0fe3f96d24565b3c71ed06af7108d3061 to peers
+2026-11-05T15:55:28.380Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #88 (seq 88)
+2026-11-05T15:55:28.591Z INFO  [casper.blocks.Proposer] attestation at tip 88: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=48959 
+[pos] close_block 89 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 89 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:28.968Z INFO  [casper.protocol.CommUtil] Sent hash d49ff000bc9934b612b5942410be62c759a4e707d587f796f226aea174fa7c1f to peers
+2026-11-05T15:55:28.968Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #89 (seq 89)
+2026-11-05T15:55:30.083Z INFO  [casper.blocks.Proposer] attestation at tip 89: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #90
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 90 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 90 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:30.291Z INFO  [casper.protocol.CommUtil] Sent hash 28b75217b5838491a3024b57fd6a2d809b091cec94593cc4025291166454ccb9 to peers
+2026-11-05T15:55:30.291Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #90 (seq 90)
+No pooled deploys; injecting dummy deploy for block #91
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 91 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:32.166Z WARN  [casper.interpreter.validate] merge search: 178 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [178, 0, 0, 0, 0] · cost buckets [178, 0, 0, 0, 0]
+[pos] close_block 91 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:32.294Z INFO  [casper.protocol.CommUtil] Sent hash 8b80bc77762fd62298ec81fd7e4312aa627014a53662cca70a00885670be78c2 to peers
+2026-11-05T15:55:32.294Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #91 (seq 91)
+No pooled deploys; injecting dummy deploy for block #92
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 92 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 92 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:34.386Z INFO  [casper.protocol.CommUtil] Sent hash 77df2817fe5ac417611801506476cdbeb313e4ff17638f7615860a250431480f to peers
+2026-11-05T15:55:34.386Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #92 (seq 92)
+No pooled deploys; injecting dummy deploy for block #93
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 93 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 93 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:36.190Z INFO  [casper.protocol.CommUtil] Sent hash 50299cd121058d0bdc05c99bd259171f6813af31932a84145d41ff4499bc9ca2 to peers
+2026-11-05T15:55:36.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #93 (seq 93)
+No pooled deploys; injecting dummy deploy for block #94
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 94 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:38.144Z WARN  [casper.interpreter.validate] merge search: 184 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [184, 0, 0, 0, 0] · cost buckets [184, 0, 0, 0, 0]
+[pos] close_block 94 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:38.190Z INFO  [casper.protocol.CommUtil] Sent hash 9b05fb758f310cb9987a2422ad59ad971e20f63ddfbcca97475edbd82ce33bd0 to peers
+2026-11-05T15:55:38.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #94 (seq 94)
+2026-11-05T15:55:38.944Z INFO  [casper.blocks.Proposer] attestation at tip 94: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5139 
+[pos] close_block 95 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 95 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:39.122Z INFO  [casper.protocol.CommUtil] Sent hash c16ab695df6634508d9d5b2287439c9b492ae5b37882ef1590acb697cac22c41 to peers
+2026-11-05T15:55:39.122Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #95 (seq 95)
+2026-11-05T15:55:40.084Z INFO  [casper.blocks.Proposer] attestation at tip 95: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #96
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 96 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 96 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:40.201Z INFO  [casper.protocol.CommUtil] Sent hash 720bafe9c10a328fb2bcfbb18c586c0fd8ecda39196ad1d72d85fbd477663a09 to peers
+2026-11-05T15:55:40.201Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #96 (seq 96)
+No pooled deploys; injecting dummy deploy for block #97
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 97 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 97 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:42.203Z INFO  [casper.protocol.CommUtil] Sent hash efd05fb70695d1d4df070696435884db2db1259ec821d924f28d7bdf42631787 to peers
+2026-11-05T15:55:42.203Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #97 (seq 97)
+No pooled deploys; injecting dummy deploy for block #98
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 98 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:44.152Z WARN  [casper.interpreter.validate] merge search: 192 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [192, 0, 0, 0, 0] · cost buckets [192, 0, 0, 0, 0]
+[pos] close_block 98 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:44.198Z INFO  [casper.protocol.CommUtil] Sent hash 2e8fec7951f171fb9da736420a62741d153e13039a61aafd050dea791d5e288e to peers
+2026-11-05T15:55:44.198Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #98 (seq 98)
+No pooled deploys; injecting dummy deploy for block #99
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 99 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 99 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:46.186Z INFO  [casper.protocol.CommUtil] Sent hash 3debcc332808b253b0e42581dd8e637687cc7e7629aede6fdb9f244aac5da3d9 to peers
+2026-11-05T15:55:46.186Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #99 (seq 99)
+[deploy] deployer=04f700a417754b77 ok cost=28594 
+[pos] close_block 100 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 100 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:48.345Z INFO  [casper.protocol.CommUtil] Sent hash cb2fc901fe0ced69642b5425603d9d53bed2d9b36d7e26ccb1e50d6fc901e8e5 to peers
+2026-11-05T15:55:48.346Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #100 (seq 100)
+No pooled deploys; injecting dummy deploy for block #101
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 101 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 101 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:48.478Z INFO  [casper.protocol.CommUtil] Sent hash 1658308be989a225c5c86d7fa4efb0667cae36d4df3e3049bfaf42cca1e3b54a to peers
+2026-11-05T15:55:48.478Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #101 (seq 101)
+No pooled deploys; injecting dummy deploy for block #102
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 102 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:50.187Z WARN  [casper.interpreter.validate] merge search: 200 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [200, 0, 0, 0, 0] · cost buckets [200, 0, 0, 0, 0]
+[pos] close_block 102 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:50.284Z INFO  [casper.protocol.CommUtil] Sent hash cd33f94658b9ed8fd095515417d6083d1ef0f52bfc938dc00ad17ad512a04faa to peers
+2026-11-05T15:55:50.284Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #102 (seq 102)
+No pooled deploys; injecting dummy deploy for block #103
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 103 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 103 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:52.387Z INFO  [casper.protocol.CommUtil] Sent hash 85af07d6d237ca6f1d8689ab23d979e115a74787f928189eeede9b400126a1eb to peers
+2026-11-05T15:55:52.387Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #103 (seq 103)
+2026-11-05T15:55:52.812Z INFO  [casper.blocks.Proposer] attestation at tip 103: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5120 
+[pos] close_block 104 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 104 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:53.156Z INFO  [casper.protocol.CommUtil] Sent hash 1e549605b8154fac8f6cfad7ba64672a9d91ab989c1977acb36649ce05765252 to peers
+2026-11-05T15:55:53.156Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #104 (seq 104)
+2026-11-05T15:55:54.082Z INFO  [casper.blocks.Proposer] attestation at tip 104: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #105
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 105 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 105 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:54.324Z INFO  [casper.protocol.CommUtil] Sent hash e1ab929b4b9ba5ddc86401610e2a3971d0b74d7af3ac20fbc3d40e4d4612566f to peers
+2026-11-05T15:55:54.324Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #105 (seq 105)
+No pooled deploys; injecting dummy deploy for block #106
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 106 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:56.192Z WARN  [casper.interpreter.validate] merge search: 208 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [208, 0, 0, 0, 0] · cost buckets [208, 0, 0, 0, 0]
+[pos] close_block 106 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:56.292Z INFO  [casper.protocol.CommUtil] Sent hash 31002940e8a45e1e69267a98b8a2470d03c53ad7b9e27df4f3ed354ad3ffec60 to peers
+2026-11-05T15:55:56.292Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #106 (seq 106)
+No pooled deploys; injecting dummy deploy for block #107
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 107 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 107 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:55:58.322Z INFO  [casper.protocol.CommUtil] Sent hash fe7836714d3950dc3a8d4cc398dd02fd1fceddcb2a5816038e328121ac0b98c2 to peers
+2026-11-05T15:55:58.322Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #107 (seq 107)
+No pooled deploys; injecting dummy deploy for block #108
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 108 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 108 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:00.195Z INFO  [casper.protocol.CommUtil] Sent hash 486e5d042ea21c24cf44c4b29702b2c4d8cbeb93051b35e7c23a206ea63d0ff0 to peers
+2026-11-05T15:56:00.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #108 (seq 108)
+No pooled deploys; injecting dummy deploy for block #109
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 109 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:02.157Z WARN  [casper.interpreter.validate] merge search: 214 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [214, 0, 0, 0, 0] · cost buckets [214, 0, 0, 0, 0]
+[pos] close_block 109 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:02.207Z INFO  [casper.protocol.CommUtil] Sent hash f0240d83d39d88d01152b84c0a196e94b346eda78afcdc74b709a625034eb8b2 to peers
+2026-11-05T15:56:02.207Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #109 (seq 109)
+2026-11-05T15:56:02.305Z INFO  [casper.blocks.Proposer] attestation at tip 109: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=65310 
+[pos] close_block 110 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 110 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:02.721Z INFO  [casper.protocol.CommUtil] Sent hash 65c4805b403461ff5008b8428825bbd71903c9689977c1236499392b8bcb0e1e to peers
+2026-11-05T15:56:02.721Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #110 (seq 110)
+2026-11-05T15:56:04.091Z INFO  [casper.blocks.Proposer] attestation at tip 110: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #111
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 111 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 111 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:04.196Z INFO  [casper.protocol.CommUtil] Sent hash 9f9a840b2754a28cb43670df37785df70f581abd67130c45f33ffdcb722ac2ff to peers
+2026-11-05T15:56:04.196Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #111 (seq 111)
+No pooled deploys; injecting dummy deploy for block #112
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 112 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 112 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:06.204Z INFO  [casper.protocol.CommUtil] Sent hash 8a76def48d059e78c4025333ef97f6f63ba748b047490724f4e96a65311cd044 to peers
+2026-11-05T15:56:06.204Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #112 (seq 112)
+No pooled deploys; injecting dummy deploy for block #113
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 113 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:08.257Z WARN  [casper.interpreter.validate] merge search: 222 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [222, 0, 0, 0, 0] · cost buckets [222, 0, 0, 0, 0]
+[pos] close_block 113 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:08.300Z INFO  [casper.protocol.CommUtil] Sent hash 2349063fe6b33ca60204ae8c3082b68b530e972743242f14ed4aca90a142f5b0 to peers
+2026-11-05T15:56:08.300Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #113 (seq 113)
+2026-11-05T15:56:08.383Z INFO  [casper.blocks.Proposer] attestation at tip 113: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=9257 
+[pos] close_block 114 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 114 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:08.593Z INFO  [casper.protocol.CommUtil] Sent hash 1407b98db5fa128bf333e3242eb892138f8371354655dc6d490c41cf424fc72c to peers
+2026-11-05T15:56:08.593Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #114 (seq 114)
+2026-11-05T15:56:10.088Z INFO  [casper.blocks.Proposer] attestation at tip 114: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #115
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 115 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 115 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:10.195Z INFO  [casper.protocol.CommUtil] Sent hash 2ac0e6560078eddcb10c19f6c7f8e4270f7d716c6cdb4f771bf3cd9c089584a6 to peers
+2026-11-05T15:56:10.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #115 (seq 115)
+No pooled deploys; injecting dummy deploy for block #116
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 116 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 116 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:12.211Z INFO  [casper.protocol.CommUtil] Sent hash 217fd4fc98973a03cf0f00f5fe4591713be06e6d002db30a30f214350a8a3927 to peers
+2026-11-05T15:56:12.211Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #116 (seq 116)
+No pooled deploys; injecting dummy deploy for block #117
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 117 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:14.144Z WARN  [casper.interpreter.validate] merge search: 230 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [230, 0, 0, 0, 0] · cost buckets [230, 0, 0, 0, 0]
+[pos] close_block 117 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:14.189Z INFO  [casper.protocol.CommUtil] Sent hash 8b347b4cb0e816e388733a2934935cdc9e7430bfa889b7bae3c8d506e07ebdf0 to peers
+2026-11-05T15:56:14.189Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #117 (seq 117)
+No pooled deploys; injecting dummy deploy for block #118
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 118 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 118 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:16.190Z INFO  [casper.protocol.CommUtil] Sent hash befff12c167595917e378043cb36f12b79f293c165a9be0f209326ebc9abd20a to peers
+2026-11-05T15:56:16.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #118 (seq 118)
+No pooled deploys; injecting dummy deploy for block #119
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 119 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 119 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:18.196Z INFO  [casper.protocol.CommUtil] Sent hash a678f9d733ebee6bd531fc004a901d05ff8e2fc186c4b0f0518b6b84a0057050 to peers
+2026-11-05T15:56:18.196Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #119 (seq 119)
+2026-11-05T15:56:19.738Z INFO  [casper.blocks.Proposer] attestation at tip 119: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=22653 
+[pos] close_block 120 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:19.856Z WARN  [casper.interpreter.validate] merge search: 236 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [236, 0, 0, 0, 0] · cost buckets [236, 0, 0, 0, 0]
+[pos] close_block 120 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:19.966Z INFO  [casper.protocol.CommUtil] Sent hash ece94de36ac18b247b0e7f2c50396492c419df60aa775c944d84de05aa51bbba to peers
+2026-11-05T15:56:19.966Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #120 (seq 120)
+2026-11-05T15:56:20.081Z INFO  [casper.blocks.Proposer] attestation at tip 120: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #121
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 121 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 121 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:20.194Z INFO  [casper.protocol.CommUtil] Sent hash 3be0fba0988549a772222356b584408c92267236b489a7bc56d066217f732b53 to peers
+2026-11-05T15:56:20.194Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #121 (seq 121)
+No pooled deploys; injecting dummy deploy for block #122
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 122 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 122 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:22.192Z INFO  [casper.protocol.CommUtil] Sent hash d6b0aa21c81d396d1b5eacd9c4645fd31893a04979dc2d25bc01aa7d5c40f6c9 to peers
+2026-11-05T15:56:22.192Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #122 (seq 122)
+No pooled deploys; injecting dummy deploy for block #123
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 123 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 123 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:24.239Z INFO  [casper.protocol.CommUtil] Sent hash 5b5cf1bf752636975b491dac552762a4f9ca710128fefe55f3e8101c14ba067c to peers
+2026-11-05T15:56:24.239Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #123 (seq 123)
+2026-11-05T15:56:25.160Z INFO  [casper.blocks.Proposer] attestation at tip 123: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5151 
+[pos] close_block 124 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:25.257Z WARN  [casper.interpreter.validate] merge search: 244 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [244, 0, 0, 0, 0] · cost buckets [244, 0, 0, 0, 0]
+[pos] close_block 124 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:25.343Z INFO  [casper.protocol.CommUtil] Sent hash afc3e04a83d7d55fe0502e7a31f4b0eb386727fcba6d8a12439c824060b87b99 to peers
+2026-11-05T15:56:25.343Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #124 (seq 124)
+2026-11-05T15:56:26.089Z INFO  [casper.blocks.Proposer] attestation at tip 124: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #125
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 125 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 125 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:26.197Z INFO  [casper.protocol.CommUtil] Sent hash 278ed65fcfc81b85fbfa05e022c1bad5e3f93b8cbc538f9fec2f4205803f917e to peers
+2026-11-05T15:56:26.197Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #125 (seq 125)
+No pooled deploys; injecting dummy deploy for block #126
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 126 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 126 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:28.202Z INFO  [casper.protocol.CommUtil] Sent hash 1cdc467e693658245887dc61e2c267de1dda9d0f600559d8c60bba5cc49651ee to peers
+2026-11-05T15:56:28.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #126 (seq 126)
+No pooled deploys; injecting dummy deploy for block #127
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 127 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 127 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:30.202Z INFO  [casper.protocol.CommUtil] Sent hash cd4f89d24d7a9e181c36eb8b407acbee973c8772207f188b114ccf91cfa217c7 to peers
+2026-11-05T15:56:30.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #127 (seq 127)
+2026-11-05T15:56:30.654Z INFO  [casper.blocks.Proposer] attestation at tip 127: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=40997 
+[pos] close_block 128 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:30.835Z WARN  [casper.interpreter.validate] merge search: 252 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [252, 0, 0, 0, 0] · cost buckets [252, 0, 0, 0, 0]
+[pos] close_block 128 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:31.014Z INFO  [casper.protocol.CommUtil] Sent hash 1963ed3f7ee66b10206ba311572074354a0683656569878136f58e30f458a7a0 to peers
+2026-11-05T15:56:31.014Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #128 (seq 128)
+2026-11-05T15:56:32.089Z INFO  [casper.blocks.Proposer] attestation at tip 128: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #129
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 129 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 129 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:32.202Z INFO  [casper.protocol.CommUtil] Sent hash ef3701c16481e0df9fc6c628d92a338e643ff632bcb531242fcda1652f89ae90 to peers
+2026-11-05T15:56:32.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #129 (seq 129)
+No pooled deploys; injecting dummy deploy for block #130
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 130 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 130 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:34.202Z INFO  [casper.protocol.CommUtil] Sent hash 8b23da66dc0569c31f163cfe5643d61222ceb51b57ddc54ea7dd44dc74b8b04f to peers
+2026-11-05T15:56:34.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #130 (seq 130)
+No pooled deploys; injecting dummy deploy for block #131
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 131 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:36.211Z WARN  [casper.interpreter.validate] merge search: 258 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [258, 0, 0, 0, 0] · cost buckets [258, 0, 0, 0, 0]
+[pos] close_block 131 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:36.258Z INFO  [casper.protocol.CommUtil] Sent hash c3b22175f3f33e01eebb29504f7dd480471f8f4fafb2c92e04153a7806be858b to peers
+2026-11-05T15:56:36.258Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #131 (seq 131)
+2026-11-05T15:56:36.886Z INFO  [casper.blocks.Proposer] attestation at tip 131: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5148 
+[pos] close_block 132 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 132 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:37.035Z INFO  [casper.protocol.CommUtil] Sent hash b1a7cba7adab57d4495c304b68a58c807897b50d2d5b5e3df64e1afa24de48c2 to peers
+2026-11-05T15:56:37.035Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #132 (seq 132)
+2026-11-05T15:56:38.088Z INFO  [casper.blocks.Proposer] attestation at tip 132: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #133
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 133 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 133 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:38.204Z INFO  [casper.protocol.CommUtil] Sent hash 91732ed45c81819c036d440150079315f08a86730d4f5bded41d93b3557c68d6 to peers
+2026-11-05T15:56:38.204Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #133 (seq 133)
+No pooled deploys; injecting dummy deploy for block #134
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 134 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 134 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:40.195Z INFO  [casper.protocol.CommUtil] Sent hash 07dd4ff15dfb2a4f8c152c33fca3c68ac294b27e733af532b4eab7e332a91910 to peers
+2026-11-05T15:56:40.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #134 (seq 134)
+No pooled deploys; injecting dummy deploy for block #135
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 135 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:42.156Z WARN  [casper.interpreter.validate] merge search: 266 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [266, 0, 0, 0, 0] · cost buckets [266, 0, 0, 0, 0]
+[pos] close_block 135 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:42.201Z INFO  [casper.protocol.CommUtil] Sent hash 1b89b39bfb85674acb9cf590c5217c620fb0a3ddae9b5c6eccfc543af1da523f to peers
+2026-11-05T15:56:42.201Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #135 (seq 135)
+No pooled deploys; injecting dummy deploy for block #136
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 136 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 136 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:44.186Z INFO  [casper.protocol.CommUtil] Sent hash 11b08c722ea792a3e3c6ad9c2b0165c12f576afea44ee7edc4b29699d22ea1e9 to peers
+2026-11-05T15:56:44.186Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #136 (seq 136)
+2026-11-05T15:56:45.508Z INFO  [casper.blocks.Proposer] attestation at tip 136: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #137
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 137 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 137 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:45.612Z INFO  [casper.protocol.CommUtil] Sent hash f3e5abe89bdb49787b9b2b0d867839a76580fd6a105df8dd0f59312517e951e6 to peers
+2026-11-05T15:56:45.612Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #137 (seq 137)
+2026-11-05T15:56:45.623Z INFO  [casper.blocks.Proposer] attestation at tip 137: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=4522 
+[pos] close_block 138 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 138 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:45.807Z INFO  [casper.protocol.CommUtil] Sent hash 6af94085830d593db633829db18e02368080ca99af5580181516781b84d8410e to peers
+2026-11-05T15:56:45.807Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #138 (seq 138)
+No pooled deploys; injecting dummy deploy for block #139
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 139 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 139 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:46.191Z INFO  [casper.protocol.CommUtil] Sent hash 6a75f956395d21002c81cd28267b61d55ac97e850163e25e01e37431e22c0fdd to peers
+2026-11-05T15:56:46.191Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #139 (seq 139)
+No pooled deploys; injecting dummy deploy for block #140
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 140 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:48.142Z WARN  [casper.interpreter.validate] merge search: 276 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [276, 0, 0, 0, 0] · cost buckets [276, 0, 0, 0, 0]
+[pos] close_block 140 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:48.188Z INFO  [casper.protocol.CommUtil] Sent hash 6545ec54209057ddc9d6624d8db9161d429248bc3d5e2527f89cb90c153754a3 to peers
+2026-11-05T15:56:48.188Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #140 (seq 140)
+No pooled deploys; injecting dummy deploy for block #141
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 141 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 141 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:50.204Z INFO  [casper.protocol.CommUtil] Sent hash 446b63ef534c5d3ce30bb14f8522d4217685fc72261e62d7e13f22aede5f8cb6 to peers
+2026-11-05T15:56:50.204Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #141 (seq 141)
+2026-11-05T15:56:50.829Z INFO  [casper.blocks.Proposer] attestation at tip 141: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #142
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 142 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 142 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:50.940Z INFO  [casper.protocol.CommUtil] Sent hash b37051175d929f8d410434ca447eefbf797a5998f3de0f42c17f69ae885d3c83 to peers
+2026-11-05T15:56:50.940Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #142 (seq 142)
+2026-11-05T15:56:50.951Z INFO  [casper.blocks.Proposer] attestation at tip 142: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=4518 
+[pos] close_block 143 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 143 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:51.122Z INFO  [casper.protocol.CommUtil] Sent hash 3e703c85a35657919a4a3f572b973f1b49a4e7660d23dfff21a2b0188f21192a to peers
+2026-11-05T15:56:51.122Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #143 (seq 143)
+No pooled deploys; injecting dummy deploy for block #144
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 144 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 144 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:52.201Z INFO  [casper.protocol.CommUtil] Sent hash beeb647591ee2ba3812962a6e9fb1879dd75611e3693ebd8754f0605dcc0e043 to peers
+2026-11-05T15:56:52.202Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #144 (seq 144)
+No pooled deploys; injecting dummy deploy for block #145
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 145 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:54.153Z WARN  [casper.interpreter.validate] merge search: 286 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [286, 0, 0, 0, 0] · cost buckets [286, 0, 0, 0, 0]
+[pos] close_block 145 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:54.201Z INFO  [casper.protocol.CommUtil] Sent hash bb08385993a0ba05905e139743f37005981d82f30d70a88d347122a7b08d75eb to peers
+2026-11-05T15:56:54.201Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #145 (seq 145)
+No pooled deploys; injecting dummy deploy for block #146
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 146 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 146 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:56.218Z INFO  [casper.protocol.CommUtil] Sent hash b107195b924e5bea9aa6319433240f32d965d684e293455f77df1c744e1e6b91 to peers
+2026-11-05T15:56:56.218Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #146 (seq 146)
+No pooled deploys; injecting dummy deploy for block #147
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 147 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 147 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:56:58.204Z INFO  [casper.protocol.CommUtil] Sent hash 97239fc8459cdf49a9ab6e12204ada06f3eac2c7c63bec69bd79d534d7d9c4d3 to peers
+2026-11-05T15:56:58.205Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #147 (seq 147)
+No pooled deploys; injecting dummy deploy for block #148
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 148 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:00.148Z WARN  [casper.interpreter.validate] merge search: 292 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [292, 0, 0, 0, 0] · cost buckets [292, 0, 0, 0, 0]
+[pos] close_block 148 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:00.199Z INFO  [casper.protocol.CommUtil] Sent hash 511af88121ff9a310598dc8710398a19624d0384c809fb47a930b8a634971f9e to peers
+2026-11-05T15:57:00.199Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #148 (seq 148)
+2026-11-05T15:57:01.432Z INFO  [casper.blocks.Proposer] attestation at tip 148: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #149
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 149 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 149 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:01.548Z INFO  [casper.protocol.CommUtil] Sent hash 39d8ff0032f5aeb1a9fd0ffcbdd50ef2aa3458d379157f165ebcb8b8dcc359da to peers
+2026-11-05T15:57:01.549Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #149 (seq 149)
+2026-11-05T15:57:01.563Z INFO  [casper.blocks.Proposer] attestation at tip 149: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=4518 
+[pos] close_block 150 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 150 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:01.752Z INFO  [casper.protocol.CommUtil] Sent hash ef91f22eb1c87e01506b12416f7de01165345a834e488affb4512d863f0641f8 to peers
+2026-11-05T15:57:01.752Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #150 (seq 150)
+No pooled deploys; injecting dummy deploy for block #151
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 151 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 151 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:02.200Z INFO  [casper.protocol.CommUtil] Sent hash 196f1cad441bff89038f8867c15054caaf756183efc1119eb72fa87bc569e30f to peers
+2026-11-05T15:57:02.200Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #151 (seq 151)
+No pooled deploys; injecting dummy deploy for block #152
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 152 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 152 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:04.212Z INFO  [casper.protocol.CommUtil] Sent hash 639682cfa9535317b278a8e1a4f4e78250e66bc61745c1930d01aff82fb821a0 to peers
+2026-11-05T15:57:04.212Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #152 (seq 152)
+No pooled deploys; injecting dummy deploy for block #153
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 153 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:06.145Z WARN  [casper.interpreter.validate] merge search: 302 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [302, 0, 0, 0, 0] · cost buckets [302, 0, 0, 0, 0]
+[pos] close_block 153 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:06.196Z INFO  [casper.protocol.CommUtil] Sent hash 4ee3f724e3933cd625c4875f3d7bb1320baa8796ad78f4e68e6019ae8ffe996b to peers
+2026-11-05T15:57:06.196Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #153 (seq 153)
+2026-11-05T15:57:06.691Z INFO  [casper.blocks.Proposer] attestation at tip 153: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=4530 
+[pos] close_block 154 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 154 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:06.891Z INFO  [casper.protocol.CommUtil] Sent hash 3337cacf2394ef613d2bac29d98c3ace2c31f65544469fd2b33df17162fe95cf to peers
+2026-11-05T15:57:06.891Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #154 (seq 154)
+2026-11-05T15:57:08.082Z INFO  [casper.blocks.Proposer] attestation at tip 154: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #155
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 155 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 155 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:08.197Z INFO  [casper.protocol.CommUtil] Sent hash 8863a48f0eef6b630d2643de7e5c95a5acf349a0ca4df2b5956e4cb75a009994 to peers
+2026-11-05T15:57:08.197Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #155 (seq 155)
+No pooled deploys; injecting dummy deploy for block #156
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 156 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 156 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:10.253Z INFO  [casper.protocol.CommUtil] Sent hash e32afdb6a780a61c0d700bba56649135ea07c39be4845db9af5e44498d6c16bc to peers
+2026-11-05T15:57:10.253Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #156 (seq 156)
+No pooled deploys; injecting dummy deploy for block #157
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 157 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:12.167Z WARN  [casper.interpreter.validate] merge search: 310 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [310, 0, 0, 0, 0] · cost buckets [310, 0, 0, 0, 0]
+[pos] close_block 157 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:12.262Z INFO  [casper.protocol.CommUtil] Sent hash 3ff58d7a20b3e488c754911373f5ee198d357171351a150b7e09c9b8b5038397 to peers
+2026-11-05T15:57:12.262Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #157 (seq 157)
+No pooled deploys; injecting dummy deploy for block #158
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 158 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 158 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:14.255Z INFO  [casper.protocol.CommUtil] Sent hash a46165ceeda84846f4fe85a21d1b65954e658f4f91bd6c4a00ec00cd97424721 to peers
+2026-11-05T15:57:14.255Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #158 (seq 158)
+No pooled deploys; injecting dummy deploy for block #159
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 159 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 159 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:16.249Z INFO  [casper.protocol.CommUtil] Sent hash bc8e35000ae8c38a19e33471b0747636be7df98b614c43a8312b600d33ae978e to peers
+2026-11-05T15:57:16.249Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #159 (seq 159)
+2026-11-05T15:57:17.563Z INFO  [casper.blocks.Proposer] attestation at tip 159: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=4530 
+[pos] close_block 160 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:17.690Z WARN  [casper.interpreter.validate] merge search: 316 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [316, 0, 0, 0, 0] · cost buckets [316, 0, 0, 0, 0]
+[pos] close_block 160 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:17.807Z INFO  [casper.protocol.CommUtil] Sent hash b1bc49db20aeb40697f716ff0b067c48a31a0961db14fe4da262fc196a0a2980 to peers
+2026-11-05T15:57:17.807Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #160 (seq 160)
+2026-11-05T15:57:18.081Z INFO  [casper.blocks.Proposer] attestation at tip 160: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #161
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 161 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 161 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:18.251Z INFO  [casper.protocol.CommUtil] Sent hash 209fccc14317c16dfd3a18df1c62ad34bcb94ccecd19884395d0cb28548de9b2 to peers
+2026-11-05T15:57:18.251Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #161 (seq 161)
+No pooled deploys; injecting dummy deploy for block #162
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 162 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 162 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:20.306Z INFO  [casper.protocol.CommUtil] Sent hash d9908e674eb31db9b1c7dc8ea93e148048c75aae0cc9ac25ee2066f62e9f70ea to peers
+2026-11-05T15:57:20.306Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #162 (seq 162)
+No pooled deploys; injecting dummy deploy for block #163
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 163 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 163 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:22.382Z INFO  [casper.protocol.CommUtil] Sent hash efa5e464cf046e99aefe3434ab419faf87b9f2325881edd36330e22038542624 to peers
+2026-11-05T15:57:22.382Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #163 (seq 163)
+2026-11-05T15:57:23.147Z INFO  [casper.blocks.Proposer] attestation at tip 163: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=65652 
+[pos] close_block 164 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:23.445Z WARN  [casper.interpreter.validate] merge search: 324 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [324, 0, 0, 0, 0] · cost buckets [324, 0, 0, 0, 0]
+[pos] close_block 164 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:23.720Z INFO  [casper.protocol.CommUtil] Sent hash fac67ba95b6cd085e29bd7312df17a91d817120fb2cdc580f637480693b87a8b to peers
+2026-11-05T15:57:23.720Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #164 (seq 164)
+2026-11-05T15:57:24.091Z INFO  [casper.blocks.Proposer] attestation at tip 164: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #165
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 165 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 165 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:24.331Z INFO  [casper.protocol.CommUtil] Sent hash 4048ee377d5b5f4749e506cb3a6d1cd52ba928c0d544fe2262059252d2df1650 to peers
+2026-11-05T15:57:24.331Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #165 (seq 165)
+No pooled deploys; injecting dummy deploy for block #166
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 166 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 166 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:26.297Z INFO  [casper.protocol.CommUtil] Sent hash 17336c9537cc300c6999757e4870dbf6569b97cbfc66a8f917d32a93dc03b596 to peers
+2026-11-05T15:57:26.297Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #166 (seq 166)
+No pooled deploys; injecting dummy deploy for block #167
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 167 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 167 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:28.446Z INFO  [casper.protocol.CommUtil] Sent hash c6ae3336967132554d3cb611d0833f32a4a8c43f69f855b9377febf6f069f720 to peers
+2026-11-05T15:57:28.446Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #167 (seq 167)
+No pooled deploys; injecting dummy deploy for block #168
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 168 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:30.147Z WARN  [casper.interpreter.validate] merge search: 332 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [332, 0, 0, 0, 0] · cost buckets [332, 0, 0, 0, 0]
+[pos] close_block 168 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:30.193Z INFO  [casper.protocol.CommUtil] Sent hash 7df626358e8134528540bb81fa3f67de69ec2a04edfd869f46b8145750fefe90 to peers
+2026-11-05T15:57:30.193Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #168 (seq 168)
+No pooled deploys; injecting dummy deploy for block #169
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 169 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 169 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:32.190Z INFO  [casper.protocol.CommUtil] Sent hash 95de21f2b078f403f61f4ac0bd207b97c085ccd6fff8c97aaabdb58220807eb5 to peers
+2026-11-05T15:57:32.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #169 (seq 169)
+2026-11-05T15:57:32.608Z INFO  [casper.blocks.Proposer] attestation at tip 169: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=5156 
+[pos] close_block 170 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 170 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:32.801Z INFO  [casper.protocol.CommUtil] Sent hash c470bddaeb6be45d2402dbbc6caf81693794d385b8023ad2a82ae7394b2626d2 to peers
+2026-11-05T15:57:32.801Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #170 (seq 170)
+2026-11-05T15:57:34.081Z INFO  [casper.blocks.Proposer] attestation at tip 170: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #171
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 171 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 171 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:34.190Z INFO  [casper.protocol.CommUtil] Sent hash 90a46b3d9d4ee02f0ffd1ae7c9c5a133fb18de62a0eb49ef7095fea63101f49f to peers
+2026-11-05T15:57:34.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #171 (seq 171)
+No pooled deploys; injecting dummy deploy for block #172
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 172 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:36.142Z WARN  [casper.interpreter.validate] merge search: 340 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [340, 0, 0, 0, 0] · cost buckets [340, 0, 0, 0, 0]
+[pos] close_block 172 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:36.186Z INFO  [casper.protocol.CommUtil] Sent hash 64900641ad2bd1e6a3c4efe4f579c649039d86043425e37f3e12e8f1576af691 to peers
+2026-11-05T15:57:36.186Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #172 (seq 172)
+No pooled deploys; injecting dummy deploy for block #173
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 173 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 173 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:38.212Z INFO  [casper.protocol.CommUtil] Sent hash dac19fe3fe659a6854225308477ea393f1418d36393873cd46682bb65263baa1 to peers
+2026-11-05T15:57:38.212Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #173 (seq 173)
+No pooled deploys; injecting dummy deploy for block #174
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 174 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 174 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:40.193Z INFO  [casper.protocol.CommUtil] Sent hash de80ae3fd795f70db1e1c08cb833209862917ed7127ccd4bace67f2dcdae8854 to peers
+2026-11-05T15:57:40.193Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #174 (seq 174)
+No pooled deploys; injecting dummy deploy for block #175
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 175 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:42.152Z WARN  [casper.interpreter.validate] merge search: 346 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [346, 0, 0, 0, 0] · cost buckets [346, 0, 0, 0, 0]
+[pos] close_block 175 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:42.197Z INFO  [casper.protocol.CommUtil] Sent hash 673ce9293c24237e513029c2e30e426eacee87ea70ebdd872d3d8696eb8b9694 to peers
+2026-11-05T15:57:42.197Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #175 (seq 175)
+2026-11-05T15:57:42.249Z INFO  [casper.blocks.Proposer] attestation at tip 175: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=9191 
+[pos] close_block 176 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 176 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:42.464Z INFO  [casper.protocol.CommUtil] Sent hash 55feb3d2288aa5e0c74789f3d47a8ade7eabdaeab05258eb3e45db7b86cae471 to peers
+2026-11-05T15:57:42.464Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #176 (seq 176)
+2026-11-05T15:57:44.085Z INFO  [casper.blocks.Proposer] attestation at tip 176: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #177
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 177 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 177 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:44.198Z INFO  [casper.protocol.CommUtil] Sent hash bc8a9d585e67055e0529a615a171f693db175b19be2e8164bad08233b078d705 to peers
+2026-11-05T15:57:44.198Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #177 (seq 177)
+No pooled deploys; injecting dummy deploy for block #178
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 178 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 178 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:46.190Z INFO  [casper.protocol.CommUtil] Sent hash e9e69455dd3d9b8df5d92cfbdc328bfd2b7972b76bc6c1122664ba357eb0b6ef to peers
+2026-11-05T15:57:46.190Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #178 (seq 178)
+No pooled deploys; injecting dummy deploy for block #179
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 179 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:48.153Z WARN  [casper.interpreter.validate] merge search: 354 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [354, 0, 0, 0, 0] · cost buckets [354, 0, 0, 0, 0]
+[pos] close_block 179 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:48.200Z INFO  [casper.protocol.CommUtil] Sent hash f8083c7234c104d590e335a09b653e0639a5ed586bb513062ca6b3d5400ccfc9 to peers
+2026-11-05T15:57:48.200Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #179 (seq 179)
+No pooled deploys; injecting dummy deploy for block #180
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 180 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 180 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:50.208Z INFO  [casper.protocol.CommUtil] Sent hash dd2e8fd97db888557d05225846f3a251457dc3d17bd52e8b63a9c2693c98ff59 to peers
+2026-11-05T15:57:50.209Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #180 (seq 180)
+No pooled deploys; injecting dummy deploy for block #181
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 181 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 181 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:52.214Z INFO  [casper.protocol.CommUtil] Sent hash be59302dfe89d701251ae25c46b63e67536c87f11494066e8508d2f4168581c7 to peers
+2026-11-05T15:57:52.214Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #181 (seq 181)
+2026-11-05T15:57:52.444Z INFO  [casper.blocks.Proposer] attestation at tip 181: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=64024 
+[pos] close_block 182 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 182 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:52.722Z INFO  [casper.protocol.CommUtil] Sent hash c09052e04c533e64a96adf02f3e3f53b8f785396d6874c2b6052908184d52b6e to peers
+2026-11-05T15:57:52.722Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #182 (seq 182)
+2026-11-05T15:57:52.737Z INFO  [casper.blocks.Proposer] attestation at tip 182: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #183
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 183 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 183 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:52.854Z INFO  [casper.protocol.CommUtil] Sent hash c7bdb4a6b74cf6d480613784690cf663cec89ae96df43a8d62b6ad30f29d9a30 to peers
+2026-11-05T15:57:52.854Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #183 (seq 183)
+2026-11-05T15:57:53.219Z INFO  [casper.blocks.Proposer] attestation at tip 183: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=59717 
+[pos] close_block 184 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:53.357Z WARN  [casper.interpreter.validate] merge search: 364 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [364, 0, 0, 0, 0] · cost buckets [364, 0, 0, 0, 0]
+[pos] close_block 184 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:53.486Z INFO  [casper.protocol.CommUtil] Sent hash 6f1269e0dbf317a670a35a7d9f36af2de1dbc8d0dbeb86f9522683be68ba21a1 to peers
+2026-11-05T15:57:53.486Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #184 (seq 184)
+2026-11-05T15:57:53.639Z INFO  [casper.blocks.Proposer] attestation at tip 184: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #185
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 185 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 185 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:53.762Z INFO  [casper.protocol.CommUtil] Sent hash 74e7baad9047a560d39a8ab08e3971035e4e2e9aa104f5454338f9090f4fb8f4 to peers
+2026-11-05T15:57:53.762Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #185 (seq 185)
+2026-11-05T15:57:53.948Z INFO  [casper.blocks.Proposer] attestation at tip 185: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=65152 
+[pos] close_block 186 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 186 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:54.265Z INFO  [casper.protocol.CommUtil] Sent hash 6becb6282763cc8ef52e5fcb5e5c0e8acec99f9b9f94c5cf83ab28d1812b27d2 to peers
+2026-11-05T15:57:54.265Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #186 (seq 186)
+2026-11-05T15:57:54.302Z INFO  [casper.blocks.Proposer] attestation at tip 186: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #187
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 187 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 187 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:54.423Z INFO  [casper.protocol.CommUtil] Sent hash 4086a206329bfd7288939f991d5493eb5f86535b280f2e9c454932af7db6fc4a to peers
+2026-11-05T15:57:54.423Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #187 (seq 187)
+2026-11-05T15:57:54.677Z INFO  [casper.blocks.Proposer] attestation at tip 187: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=45684 
+[pos] close_block 188 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 188 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:54.970Z INFO  [casper.protocol.CommUtil] Sent hash 5b97c759ec42535df072264eeb43a2b1a289abb17208e12983ded5783c0ad937 to peers
+2026-11-05T15:57:54.970Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #188 (seq 188)
+2026-11-05T15:57:55.021Z INFO  [casper.blocks.Proposer] attestation at tip 188: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #189
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 189 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 189 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:55.146Z INFO  [casper.protocol.CommUtil] Sent hash 32927391cbf5ae2ce879d7852884d9febbe9cd975fef5e01ad4ff920bfa4f68f to peers
+2026-11-05T15:57:55.146Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #189 (seq 189)
+2026-11-05T15:57:55.406Z INFO  [casper.blocks.Proposer] attestation at tip 189: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=44475 
+[pos] close_block 190 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 190 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:55.671Z INFO  [casper.protocol.CommUtil] Sent hash cf522cf8b98d2c02b9e366906f983fd5396670f7aba14f8c827e0c8e7d392330 to peers
+2026-11-05T15:57:55.671Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #190 (seq 190)
+2026-11-05T15:57:55.734Z INFO  [casper.blocks.Proposer] attestation at tip 190: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #191
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 191 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 191 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:55.859Z INFO  [casper.protocol.CommUtil] Sent hash ce80f9f0f854d3ca49c038faa7ed210346fc0790e702c987dd447e0fd8a421f5 to peers
+2026-11-05T15:57:55.859Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #191 (seq 191)
+No pooled deploys; injecting dummy deploy for block #192
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 192 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 192 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:56.195Z INFO  [casper.protocol.CommUtil] Sent hash c7656b6f0e79b8df6a4f29f7eaaf8870e3a4fe5a03f737858f4b9d3e95d752c8 to peers
+2026-11-05T15:57:56.195Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #192 (seq 192)
+[deploy] deployer=04f700a417754b77 ok cost=57821 
+[pos] close_block 193 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 193 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:56.613Z INFO  [casper.protocol.CommUtil] Sent hash f68b24a258f50c343cd98823f61dace1d073dfd8667f7d3519b72f7e05e47732 to peers
+2026-11-05T15:57:56.613Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #193 (seq 193)
+2026-11-05T15:57:57.063Z INFO  [casper.blocks.Proposer] attestation at tip 193: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=59273 
+[pos] close_block 194 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 194 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:57.383Z INFO  [casper.protocol.CommUtil] Sent hash d843d24abeeae65a951520156c21dc9b666a7e8ff10a778263f92a5f9a2d7962 to peers
+2026-11-05T15:57:57.383Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #194 (seq 194)
+2026-11-05T15:57:57.394Z INFO  [casper.blocks.Proposer] attestation at tip 194: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #195
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 195 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 195 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:57.506Z INFO  [casper.protocol.CommUtil] Sent hash ba853726301114eafba1ed0a596affcb6aaf2211c1942513fe3e54a1cea421a2 to peers
+2026-11-05T15:57:57.506Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #195 (seq 195)
+2026-11-05T15:57:57.860Z INFO  [casper.blocks.Proposer] attestation at tip 195: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=117401 
+[pos] close_block 196 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 196 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:58.468Z INFO  [casper.protocol.CommUtil] Sent hash 10736ae2d3203e9987e003bfa6c2989760786befe68e76e03ebcaf59909f9641 to peers
+2026-11-05T15:57:58.468Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #196 (seq 196)
+2026-11-05T15:57:58.566Z INFO  [casper.blocks.Proposer] attestation at tip 196: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #197
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 197 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:58.640Z WARN  [casper.interpreter.validate] merge search: 390 merges · widest scope 0 chains / 0 conflict pairs / 0 asymmetric · most states expanded on one merge 0 · width buckets [390, 0, 0, 0, 0] · cost buckets [390, 0, 0, 0, 0]
+[pos] close_block 197 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:58.687Z INFO  [casper.protocol.CommUtil] Sent hash 19a391b346660997fb04537f43b578080fa77b16a6ee481220e43f7b60ad8319 to peers
+2026-11-05T15:57:58.687Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #197 (seq 197)
+2026-11-05T15:57:59.106Z INFO  [casper.blocks.Proposer] attestation at tip 197: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=72563 
+[pos] close_block 198 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 198 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:59.457Z INFO  [casper.protocol.CommUtil] Sent hash a61927890b4766c161ddb7dca42b05f5e2f15733139f43731a9951fe5c68fa3e to peers
+2026-11-05T15:57:59.457Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #198 (seq 198)
+2026-11-05T15:57:59.555Z INFO  [casper.blocks.Proposer] attestation at tip 198: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #199
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 199 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 199 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:57:59.666Z INFO  [casper.protocol.CommUtil] Sent hash 9dd53e6423cc102efb3b85ccf43cb1d5c76a300655c77b1be1ce6453f7a60165 to peers
+2026-11-05T15:57:59.666Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #199 (seq 199)
+2026-11-05T15:57:59.851Z INFO  [casper.blocks.Proposer] attestation at tip 199: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=160873 
+[pos] close_block 200 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 200 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:58:00.609Z INFO  [casper.protocol.CommUtil] Sent hash 473a70935762d48f6e53926de4c42b2fa384d0b3db512d4d8d23f02155c18e9d to peers
+2026-11-05T15:58:00.609Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #200 (seq 200)
+2026-11-05T15:58:00.677Z INFO  [casper.blocks.Proposer] attestation at tip 200: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #201
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 201 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 201 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:58:00.791Z INFO  [casper.protocol.CommUtil] Sent hash b498bb42d457e952a0aa7fa82e66222facf526cf1c5abeb941365a9f2dd0be26 to peers
+2026-11-05T15:58:00.791Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #201 (seq 201)
+2026-11-05T15:58:01.216Z INFO  [casper.blocks.Proposer] attestation at tip 201: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=false round=[04f700a4] blocked_attempts=0 escape=false
+[deploy] deployer=04f700a417754b77 ok cost=159941 
+[pos] close_block 202 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 202 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:58:02.015Z INFO  [casper.protocol.CommUtil] Sent hash fee52e8251e7d2a7bca771a73c3aa8c6810c25675a2e0014627897c10200db8a to peers
+2026-11-05T15:58:02.015Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #202 (seq 202)
+2026-11-05T15:58:02.199Z INFO  [casper.blocks.Proposer] attestation at tip 202: licensed — nothing_to_finalize=false new_state_transition=true quorum_reachable=true cadence_due=false paced=true round=[04f700a4] blocked_attempts=0 escape=false
+No pooled deploys; injecting dummy deploy for block #203
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 203 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 203 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:58:02.337Z INFO  [casper.protocol.CommUtil] Sent hash 7dcaa6430d0bfaac59c710528c06e4c583b69f1624e699823743f79be1d580aa to peers
+2026-11-05T15:58:02.337Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #203 (seq 203)
+No pooled deploys; injecting dummy deploy for block #204
+[deploy] deployer=04f700a417754b77 ok cost=3 
+[pos] close_block 204 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+[pos] close_block 204 boundary=false epoch_length=10000 max_active=100 bond=[1, 9223372036854775807]
+2026-11-05T15:58:02.459Z INFO  [casper.protocol.CommUtil] Sent hash 153785e7e08bf07ea11d786a24c96e8e28e7bc7797194d068f2a840be5f7a06d to peers
+2026-11-05T15:58:02.459Z INFO  [coop.rchain.node.instances.ProposerInstance] proposed and added block #204 (seq 204)
+2026-11-05T15:58:02.588Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:02.627Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:04.109Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:06.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:08.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:10.109Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:12.105Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:14.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:16.117Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:18.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:20.105Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:22.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:24.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:26.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:28.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:30.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:32.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:34.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:36.105Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:38.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:40.105Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:42.109Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:44.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:46.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:48.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:50.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:52.107Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:54.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:56.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:58:58.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:00.102Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:02.104Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:04.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:06.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:08.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:10.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:12.109Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:14.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:16.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:18.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:20.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:22.116Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:24.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:26.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:28.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:30.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:32.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:34.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:36.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:38.117Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:40.109Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:42.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:44.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:46.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:48.099Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:50.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:52.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:54.102Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:56.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T15:59:58.106Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:00.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:02.117Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:04.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:06.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:08.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:10.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:12.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:14.116Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:16.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:18.115Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:20.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:22.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:24.119Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:26.116Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:28.118Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:30.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:32.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:34.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:36.107Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:38.116Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:40.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:42.105Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:44.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:46.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:48.111Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:50.106Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:52.108Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:54.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:56.114Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:00:58.107Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:01:00.112Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:01:02.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:01:04.113Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed
+2026-11-05T16:01:06.110Z ERROR [coop.rchain.node.instances.ProposerInstance] propose failed with an internal error: decode continuation failed — no block was produced, so the chain will not advance until this is fixed

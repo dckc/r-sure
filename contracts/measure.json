@@ -7,7 +7,7 @@
   },
   "terms": {
     "00_root.rho": {
-      "bytes": 8731,
+      "bytes": 8740,
       "depth": 21,
       "contracts": 8
     },
@@ -37,7 +37,7 @@
       "contracts": 5
     },
     "10_syndicate.rho": {
-      "bytes": 22565,
+      "bytes": 22582,
       "depth": 40,
       "contracts": 23
     },
@@ -52,7 +52,7 @@
       "contracts": 11
     },
     "13_slip.rho": {
-      "bytes": 16510,
+      "bytes": 16640,
       "depth": 39,
       "contracts": 19
     },
@@ -72,9 +72,9 @@
       "contracts": 7
     },
     "17_policy.rho": {
-      "bytes": 12173,
+      "bytes": 12375,
       "depth": 42,
-      "contracts": 11
+      "contracts": 12
     },
     "18_claim.rho": {
       "bytes": 12152,

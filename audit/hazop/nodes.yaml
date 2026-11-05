@@ -37,6 +37,16 @@ parameters: &id002
 - purse
 - asset
 - admin set
+install_parameters: &id003
+- term
+- continuation
+- deploy result
+- block height
+- node image
+- bundle binding
+- parser depth
+- propose mode
+- evidence scope
 nodes:
 - id: N01
   name: Install / SureRoot
@@ -175,3 +185,51 @@ nodes:
     reads must not leak capabilities.
   guide_words: *id001
   parameters: *id002
+- id: N16
+  name: Install / deploy pipeline
+  components:
+  - SureRoot
+  - harness/install.py
+  - harness/deploy.py
+  - RNodeRust
+  design_intent: Each of the 17 deploy terms is accepted, parses, deploys and is
+    processed in order; the proposer advances the chain after every deploy; a failed
+    deploy stops the pipeline with the node's real error, not a generic timeout.
+  guide_words: *id001
+  parameters: *id003
+- id: N17
+  name: Capability binding / bundle closure
+  components:
+  - Risk
+  - Slip
+  - SlipFactory
+  - Syndicate
+  - LineGrant
+  design_intent: Every name used by a bundled body is bound in the enclosing term;
+    wildcard receives do not leave the bundle body open; a deploy either closes the
+    bundle or fails with a parse/binding error before publication.
+  guide_words: *id001
+  parameters: *id003
+- id: N18
+  name: External rails
+  components:
+  - RNodeRust
+  - r-cash
+  - r-gen
+  design_intent: The node codec, parser and proposer accept every term the contracts
+    and the r-cash rail produce; an external rail failure is reported as an external
+    failure and does not get mistaken for an r-sure contract defect.
+  guide_words: *id001
+  parameters: *id003
+- id: N19
+  name: Test harness truthfulness
+  components:
+  - harness/deploy.py
+  - harness/run_suites.py
+  - audit/evidence
+  design_intent: A deploy result is the node's result, not a harness timeout; the
+    harness calls manual propose only when the node advertises it; evidence labels
+    E2 install separately from behavioural suite coverage, which stays not_run until
+    the suites execute.
+  guide_words: *id001
+  parameters: *id003

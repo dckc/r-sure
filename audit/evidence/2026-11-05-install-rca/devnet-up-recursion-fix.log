@@ -1,0 +1,26 @@
+make -C /home/patrick/Rholphin down RHOLO_DIR=/home/patrick/RNodeRust
+make[1]: Entering directory '/home/patrick/Rholphin'
+cd /home/patrick/RNodeRust && tools/devnet.sh down -v
+make[1]: Leaving directory '/home/patrick/Rholphin'
+make -C /home/patrick/Rholphin devnet RHOLO_DIR=/home/patrick/RNodeRust
+make[1]: Entering directory '/home/patrick/Rholphin'
+cd /home/patrick/RNodeRust && tools/devnet.sh up --validators 1
+==> devnet: 1 validator(s) + 0 observer(s)
+    autopropose=true propose-on-deploy=true admin=true deployer=true
+==> starting devnet-bootstrap (validator 0, standalone, creates genesis)
+9dd42da30e8eb296199a689f0cca3cf48a7b6b3d11cec3ce5a7be5971130297d
+==> bootstrap id: 6c3d949d524339ee8ace63aa1f628cefe04e1e42
+==> devnet-bootstrap has committed genesis (latestBlockNumber=1); starting the network
+==> devnet-bootstrap serving /api/v1/status (latestBlockNumber=1)
+
+==> up. Interact with:
+    tools/devnet.sh deploy <contract.rho>   # signed deploy to devnet-bootstrap
+    tools/devnet.sh query <name>            # listen for data at a public name
+    tools/devnet.sh propose [--admin]       # force a block
+    tools/devnet.sh status | logs <node> | diagnose | down
+
+    Public HTTP API:  http://localhost:40403/api/v1/status
+    Admin HTTP API:   http://localhost:40405/api/v1/propose
+make[1]: Leaving directory '/home/patrick/Rholphin'
+.venv/bin/python harness/preflight.py --wait 300
+preflight: devnet ready at http://localhost:40403

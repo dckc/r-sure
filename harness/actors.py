@@ -1,20 +1,40 @@
 #!/usr/bin/env python3
-"""Actors, balances and slot probes for the conservation and race suites.
+"""Actors, REV accounts, payments and insurance-payout helpers.
 
 The devnet bakes in one funded deployer. Every other key needs a faucet drip before it can
 sign a deploy; r-cash's keygen funds them during setup, and this module repairs a stale key
-set by dripping on demand.
+set by dripping on demand.  ``pay`` moves REV from an actor's r-cash account into a
+contract arm (premiums and capital); ``balance`` reads the account the contracts pay out
+to.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 
-from assertions import one, root_call, root_uri
+# RSURE_* is the canonical prefix.  Bridge it onto the RSHARE_* names read by
+# `deploy.py` before that module is imported, so older CI environments keep working.
+_ENV_NAMES = ("NODE", "ADMIN", "CONTAINER", "SHARD", "PHLO_LIMIT", "PHLO_PRICE", "KEYS")
+for _name in _ENV_NAMES:
+    _value = os.environ.get(f"RSURE_{_name}")
+    if _value is not None:
+        os.environ[f"RSHARE_{_name}"] = _value
 
-import deploy as node
+
+def env(name: str, default: str | None = None) -> str | None:
+    """Read ``RSURE_<name>``, falling back to the legacy ``RSHARE_<name>``."""
+    value = os.environ.get(f"RSURE_{name}")
+    if value is not None:
+        return value
+    return os.environ.get(f"RSHARE_{name}", default)
+
+
+from assertions import one, root_call, root_uri  # noqa: E402
+
+import deploy as node  # noqa: E402
 
 PING = 'new deployId(`rho:rchain:deployId`) in { deployId!(1) }'
 
@@ -70,7 +90,7 @@ new rl(`rho:registry:lookup`), ch, ret,
 
 
 def invoke(uri: str, binding: str, args: str | None = None, key: str = "deployer",
-           phlo_limit: int = 2_000_000):
+           phlo_limit: int = 10_000_000):
     return one(call_term(uri, binding, args), key=key, phlo_limit=phlo_limit)
 
 
@@ -81,32 +101,42 @@ def resolve(component: str, key: str = "deployer"):
     return reply[1]
 
 
+def _ping(name: str, min_phlo: int) -> tuple[bool, object]:
+    """Return ``(precharged, detail)`` for a deploy that emits ``1``.
+
+    A precharge failure is reported by some node versions as a deploy result tuple
+    rather than a ``DevnetError``.  Treat anything other than the literal ``1`` as a
+    failure so the caller drips the faucet instead of trusting a false reply.
+    """
+    try:
+        reply = one(PING, key=name, phlo_limit=min_phlo)
+    except node.DevnetError as error:
+        if "insufficient funds" not in str(error):
+            raise
+        return False, error
+    return reply == 1, reply
+
+
 def ensure_vault(name: str, min_phlo: int = 6_000_000) -> None:
     """Prove the key can precharge a race-sized deploy; drip the faucet if it cannot."""
     if name == "deployer":
         return
-    try:
-        one(PING, key=name, phlo_limit=min_phlo)
+    ready, detail = _ping(name, min_phlo)
+    if ready:
         return
-    except node.DevnetError as error:
-        if "insufficient funds" not in str(error):
-            raise
 
-    last: Exception | None = None
+    last: object = detail
     for _ in range(6):
         try:
             node.faucet(address(name))
         except Exception as error:  # rate limited or already queued
             last = error
         time.sleep(2)
-        try:
-            one(PING, key=name, phlo_limit=min_phlo)
+        ready, detail = _ping(name, min_phlo)
+        if ready:
             return
-        except node.DevnetError as error:
-            if "insufficient funds" not in str(error):
-                raise
-            last = error
-    raise AssertionError(f"actor {name} has no phlo: {last}")
+        last = detail
+    raise AssertionError(f"actor {name} has no phlo: {last!r}")
 
 
 def block_height() -> int:
@@ -237,25 +267,87 @@ new rl(`rho:registry:lookup`), rootCh, afCh, ac, oCh, bCh,
     return reply[1]
 
 
-def bond_balance(uri: str) -> int:
-    reply = invoke(uri, "balance")
-    if not (isinstance(reply, tuple) and reply[0] is True and isinstance(reply[1], int)):
-        raise AssertionError(f"bond balance: {reply!r}")
-    return reply[1]
+def ensure_funds(name: str, amount: int, chunk: int = 100_000) -> int:
+    """Ensure an actor's r-cash account holds at least ``amount`` REV."""
+    if amount < 0:
+        raise ValueError("amount must be non-negative")
+    balance_now = balance(name)
+    while balance_now < amount:
+        balance_now = fund(name, min(amount - balance_now, chunk))
+    return balance_now
 
 
-def bond_info(uri: str) -> dict:
-    reply = invoke(uri, "info")
-    if not (isinstance(reply, tuple) and reply[0] is True and isinstance(reply[1], dict)):
-        raise AssertionError(f"bond info: {reply!r}")
-    return reply[1]
+def payment_term(uri: str, binding: str, args: list[str], amount: int,
+                 key: str = "deployer", asset_id: str = "REV") -> str:
+    """Withdraw ``amount`` from ``key``'s r-cash account and call a contract with it.
+
+    ``args`` is a list of Rholang expressions.  The token ``"$payment"`` is replaced by
+    the locally bound ``payment`` name; every other entry is emitted verbatim.  This is
+    how a premium payment reaches ``Slip("fundPremium")`` and a capital contribution
+    reaches ``Syndicate("contribute")`` without exposing the payment as a deploy result.
+    """
+    if amount < 1:
+        raise ValueError("payment amount must be positive")
+    rendered = ", ".join(
+        "payment" if item == "$payment" else item for item in args)
+    head = json.dumps(binding)
+    if rendered:
+        head += f", {rendered}"
+    return f"""
+new rl(`rho:registry:lookup`), rootCh, afCh, ac, oCh, wdCh, cCh, ret,
+    dId(`rho:rchain:deployerId`), deployId(`rho:rchain:deployId`) in {{
+  rl!(`{rcash_root_uri()}`, *rootCh) |
+  for (Root <- rootCh) {{
+    Root!("resolve", "component:account-factory", 1, *afCh) |
+    for (@(true, afUri, _) <- afCh) {{
+      rl!(afUri, *ac) |
+      for (AccountFactory <- ac) {{
+        AccountFactory!("getOrCreate", "{public(key)}".hexToBytes(), *oCh) |
+        for (@(true, account, _) <- oCh) {{
+          @account!("withdraw", *dId, "{asset_id}", {int(amount)}, *wdCh) |
+          for (@w <- wdCh) {{
+            match w {{
+              (true, payment) => {{
+                rl!(`{uri}`, *cCh) |
+                for (C <- cCh) {{
+                  C!({head}, *ret) |
+                  for (@r <- ret) {{ deployId!(r) }}
+                }}
+              }}
+              _ => {{ deployId!(w) }}
+            }}
+          }}
+        }}
+      }}
+    }}
+  }}
+}}
+"""
 
 
-def probe_slots(unit_uri: str, slot_ids: list[str], key: str = "deployer") -> dict:
-    reply = invoke(unit_uri, "probe", json.dumps(slot_ids), key=key)
-    if not (isinstance(reply, tuple) and reply[0] is True and isinstance(reply[1], dict)):
-        raise AssertionError(f"probe {unit_uri}: {reply!r}")
-    return reply[1]
+def pay(uri: str, binding: str, args: list[str], amount: int,
+        key: str = "deployer", asset_id: str = "REV", phlo_limit: int = 5_000_000):
+    """Pay a contract arm from an actor's REV account and return its reply."""
+    return one(
+        payment_term(uri, binding, args, amount, key=key, asset_id=asset_id),
+        key=key, phlo_limit=phlo_limit)
+
+
+def pay_premium(slip_uri: str, amount: int, key: str = "business"):
+    """Fund a slip's premium purse from the insured's REV account."""
+    return pay(slip_uri, "fundPremium", ["*dId", "$payment"], amount, key=key)
+
+
+def contribute_syndicate(syndicate_uri: str, amount: int, key: str = "business"):
+    """Contribute underwriting capital from the syndicate owner's REV account."""
+    return pay(syndicate_uri, "contribute", ["*dId", "$payment"], amount, key=key)
+
+
+def contribute_fund(fund_uri: str, amount: int, policy_id: str,
+                    key: str = "business"):
+    """Pay a central-fund contribution for one policy."""
+    return pay(fund_uri, "contribute", ["$payment", json.dumps(policy_id)],
+               amount, key=key)
 
 
 def rcash_root_uri() -> str:

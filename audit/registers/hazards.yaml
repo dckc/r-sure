@@ -657,3 +657,285 @@ hazards:
   evidence:
   - spec/lean/RSure/Model/Claim.lean
   arm: Claim@"agree"
+- id: HZ-028
+  node: N16
+  guide_word: LOST
+  parameter: continuation
+  deviation: The proposer cannot decode the RSpace continuation of the next block, so
+    no block is produced and the deploy stays Pooled.
+  causes:
+  - kind: root
+    cause: RNodeRust used prost's default decode recursion limit (100) for the Par wire
+      codec; the default is lower than the normalized Par depth the contracts produce.
+    evidence: ../RNodeRust/models/Cargo.toml; ../RNodeRust/models/src/wire.rs
+  - kind: contributing
+    cause: 10_syndicate normalizes to a Par nested deeper than 100, so encoding succeeds
+      while decoding the continuation fails.
+    evidence: audit/evidence/2026-11-05-install-rca/node.log
+  - kind: contributing
+    cause: No regression test decoded a deeply nested Par, so the codec limit was never
+      exercised on the RSpace path.
+    evidence: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  - kind: direct
+    cause: The harness timed out the Pooled deploy and called manual propose, which raced
+      the node proposer and hid the internal decode error.
+    evidence: audit/evidence/2026-11-05-install-rca/install-baseline.log
+  consequences:
+  - the chain does not advance; install stops at 12_risk
+  - every later deploy remains Pooled until timeout
+  severity: high
+  likelihood: high
+  risk: critical
+  controls:
+  - prost no-recursion-limit in RNodeRust models
+  - rholang/tests/deep_par_codec.rs 130-deep round-trip
+  - pinned node image digest audit/evidence/2026-11-05-install-rca/node-image.txt
+  - autopropose-aware harness
+  findings:
+  - F-022
+  - F-025
+  tests:
+  - T-037
+  - T-038
+  disposition: mitigate
+  owner: platform-node
+  evidence:
+  - audit/evidence/2026-11-05-install-rca/node.log
+  - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  arm: install@"pipeline"
+- id: HZ-029
+  node: N16
+  guide_word: UNAVAILABLE
+  parameter: deploy result
+  deviation: A deploy whose proposal failed is reported to the operator as a 180-second
+    Pooled timeout, not as the node's internal proposer error.
+  causes:
+  - kind: direct
+    cause: wait_processed only distinguishes NotProcessed/unknown and has no branch for a
+      proposer internal error.
+    evidence: harness/deploy.py
+  - kind: contributing
+    cause: The harness called the manual propose endpoint even when the node advertised
+      autopropose true and manualPropose false.
+    evidence: harness/deploy.py
+  consequences:
+  - install failures are misattributed to the contract being deployed
+  - operators cannot tell a codec/platform failure from a contract refusal
+  severity: medium
+  likelihood: high
+  risk: high
+  controls:
+  - propose only when configured or RSURE_FORCE_PROPOSE=1
+  - RSURE_STRICT_PROPOSE=1 for diagnosis
+  - evidence v2 results require the node status and node log
+  findings:
+  - F-025
+  tests:
+  - T-037
+  - T-039
+  disposition: mitigate
+  owner: harness
+  evidence:
+  - harness/deploy.py
+  - audit/evidence/2026-11-05-install-rca/install-no-manual-propose.log
+  arm: install@"pipeline"
+- id: HZ-030
+  node: N17
+  guide_word: PART OF
+  parameter: bundle binding
+  deviation: The bundled Risk body uses a wildcard receive for the auth reply, leaving
+    the bundle body open under the wildcard-binder class; 12_risk is rejected.
+  causes:
+  - kind: direct
+    cause: Risk arms received the auth reply as `for (@(true, _) <- aCh)` instead of a
+      named binder.
+    evidence: contracts/src/deploy/12_risk.rho
+  - kind: contributing
+    cause: The static bundle scanner modelled free names but not the wildcard-binder
+      bundle class.
+    evidence: tools/check_bundle_closedness.py
+  consequences:
+  - 12_risk deploy is rejected; install stops before Slip and Line
+  - Risk submission is unavailable
+  severity: high
+  likelihood: high
+  risk: high
+  controls:
+  - named auth binder in Risk arms
+  - install E2 over all 17 terms
+  - tools/check_bundle_closedness.py
+  findings:
+  - F-023
+  tests:
+  - T-037
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - contracts/src/deploy/12_risk.rho
+  - audit/evidence/2026-11-05-install-rca/install-baseline.log
+  - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  arm: Risk@"addEvidence"
+- id: HZ-031
+  node: N17
+  guide_word: LOST
+  parameter: term binding
+  deviation: The Slip term references authIsOwner without binding it in the top-level
+    `new`, leaving a helper name unbound in the deploy term.
+  causes:
+  - kind: direct
+    cause: 13_slip.rho's top-level `new` sequence omitted authIsOwner.
+    evidence: contracts/src/deploy/13_slip.rho
+  - kind: contributing
+    cause: There is no static gate that compares every helper name used in a term with
+      its top-level binding set.
+    evidence: tools/parse_check.sh
+  consequences:
+  - 13_slip deploy fails; SlipFactory and Slip arms are not published
+  - subscription and bind paths are unreachable
+  severity: high
+  likelihood: high
+  risk: high
+  controls:
+  - authIsOwner added to the top-level new sequence
+  - install E2 over all 17 terms
+  findings:
+  - F-024
+  tests:
+  - T-037
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - contracts/src/deploy/13_slip.rho
+  - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  arm: SlipFactory@"open"
+- id: HZ-032
+  node: N18
+  guide_word: OTHER THAN
+  parameter: parser depth
+  deviation: The wire codec imposes a second, lower depth limit than the parser and
+    normalizer; the platform contract is inconsistent across layers.
+  causes:
+  - kind: root
+    cause: prost's default recursion limit applied only on decode; the encode path had no
+      matching limit.
+    evidence: ../RNodeRust/models/src/wire.rs
+  - kind: contributing
+    cause: The parser/normalizer depth contract was not documented in the codec layer.
+    evidence: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  consequences:
+  - a valid deploy term can encode but not be read back
+  - node proposer stalls on the next block
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - prost no-recursion-limit
+  - deep Par decode regression
+  findings:
+  - F-022
+  tests:
+  - T-038
+  disposition: mitigate
+  owner: platform-node
+  evidence:
+  - ../RNodeRust/models/Cargo.toml
+  - ../RNodeRust/rholang/tests/deep_par_codec.rs
+  arm: install@"codec"
+- id: HZ-033
+  node: N18
+  guide_word: OTHER THAN
+  parameter: parser depth
+  deviation: The r-cash 51_pool term exceeds the node parser depth; the r-cash bootstrap
+    stops after installing the account factory and refuses the pool.
+  causes:
+  - kind: root
+    cause: The r-cash 51_pool term is deeper than the node parser depth limit.
+    evidence: audit/evidence/2026-11-05-install-rca/rcash-bootstrap-recursion-fix.log
+  - kind: contributing
+    cause: The r-cash installer treats an upstream parse refusal as a rail bootstrap stop;
+      the r-sure install does not depend on the pool.
+    evidence: harness/rcash_bootstrap.py
+  consequences:
+  - the r-cash pool/market rail is absent from this devnet
+  - r-sure install and the 17 terms are unaffected
+  severity: medium
+  likelihood: high
+  risk: medium
+  controls:
+  - r-cash account factory bootstrap verified
+  - residual risk recorded; upstream r-cash parser-depth fix required
+  - harness refuses to claim a full r-cash rail
+  findings: []
+  tests:
+  - T-037
+  disposition: open
+  owner: external-rcash
+  evidence:
+  - audit/evidence/2026-11-05-install-rca/rcash-bootstrap-recursion-fix.log
+  arm: Payments@"health"
+- id: HZ-034
+  node: N19
+  guide_word: UNAVAILABLE
+  parameter: propose mode
+  deviation: The harness calls manual propose when the node advertises autopropose and
+    manualPropose=false, racing the node's proposer.
+  causes:
+  - kind: direct
+    cause: deploy_and_wait unconditionally called _propose_once.
+    evidence: harness/deploy.py
+  - kind: contributing
+    cause: The status document was read for retries but its autopropose/manualPropose
+      flags were not used to decide whether to propose.
+    evidence: audit/evidence/2026-11-05-install-rca/status.json
+  consequences:
+  - an extra proposal races the node proposer
+  - the real node error is replaced by a generic timeout
+  severity: medium
+  likelihood: high
+  risk: high
+  controls:
+  - _manual_propose reads config or RSURE_FORCE_PROPOSE=1 and defaults to false
+  - no-manual-propose run recorded
+  findings:
+  - F-025
+  tests:
+  - T-039
+  disposition: mitigate
+  owner: harness
+  evidence:
+  - audit/evidence/2026-11-05-install-rca/install-no-manual-propose.log
+  arm: install@"propose"
+- id: HZ-035
+  node: N19
+  guide_word: STALE
+  parameter: evidence scope
+  deviation: Install-green evidence can be read as behavioural coverage while all 36
+    suites remain not_run or unimplemented.
+  causes:
+  - kind: direct
+    cause: Evidence v1 had no scope field separating install, devnet and behavioural
+      results.
+    evidence: audit/evidence/2026-11-05-concurrency-tabletop/manifest.json
+  - kind: contributing
+    cause: The report and README described the install blocker and the suite status in
+      prose that could drift from the registers.
+    evidence: audit/report.md
+  consequences:
+  - audit readers may overstate what E2 proves
+  - fixed findings may be confused with behavioural regression coverage
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - evidence schema rsure.evidence/v2 with explicit scope and results
+  - tools/check_evidence.py, tools/check_rca.py, tools/check_experiments.py
+  - report and README state install-only E2 and not_run suites
+  findings: []
+  tests:
+  - T-037
+  disposition: mitigate
+  owner: audit
+  evidence:
+  - audit/evidence/2026-11-05-install-rca/manifest.json
+  - tools/check_evidence.py
+  arm: audit@"evidence"

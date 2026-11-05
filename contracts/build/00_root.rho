@@ -166,7 +166,7 @@ contract adminsValid(@admins, @threshold, @i, @seen, ret) = {
 
   contract SureRoot(@"keys", ret) = {
     for (@s <<- rootState) {
-      ret!((true, s.get("entries").keys()))
+      ret!((true, s.get("entries").keys().toList()))
     }
   } |
 

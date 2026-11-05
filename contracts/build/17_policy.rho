@@ -9,7 +9,7 @@ new
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
   policyResolve, nowHeight, policyMake, lineEntries, payLinePlan, releaseLinePlan,
-  policyReqOk, authOwner, authIsOwner
+  policyReqOk, policyLineFind, authOwner, authIsOwner
 in {
 // Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
 
@@ -81,6 +81,19 @@ contract authIsOwner(dId, @ownerId, ret) = {
           if (lines.length() < 1 || lines.length() > 8) {
             ret!((false, "lines"))
           } else { ret!((true, Nil)) }
+        }
+      }
+    }
+  } |
+
+  contract policyLineFind(@lines, @i, @lineId, ret) = {
+    if (i >= lines.length()) {
+      ret!((false, "unknown line"))
+    } else {
+      match lines.nth(i) {
+        l => {
+          if (l.get("lineId") == lineId) { ret!((true, l)) }
+          else { policyLineFind!(lines, i + 1, lineId, *ret) }
         }
       }
     }
@@ -204,10 +217,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
 
       contract Policy(@"line", @lineId, ret2) = {
         for (@s <<- policyState) {
-          match s.get("lines").get(lineId) {
-            Nil => { ret2!((false, "unknown line")) }
-            l => { ret2!((true, l)) }
-          }
+          policyLineFind!(s.get("lines"), 0, lineId, *ret2)
         }
       } |
 
@@ -347,15 +357,20 @@ contract authIsOwner(dId, @ownerId, ret) = {
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
-            for (@s <- policyState) {
+            // Peek, do not consume: ClaimFactory.create calls claimWindowOk, which reads
+            // this policy through Policy("info") and peeks policyState. Consuming the
+            // only datum before that call deadlocks openClaim against itself. The
+            // snapshot is advisory; the claim id is committed by the single consume
+            // below once the factory has replied.
+            for (@s <<- policyState) {
               if (who != s.get("insured") && who != s.get("broker")) {
-                policyState!(s) | ret2!((false, "not insured"))
+                ret2!((false, "not insured"))
               } else {
                 if (s.get("status") != "active") {
-                  policyState!(s) | ret2!((false, "not active"))
+                  ret2!((false, "not active"))
                 } else {
                   if (s.get("aggregateRemaining") < 1) {
-                    policyState!(s) | ret2!((false, "exhausted"))
+                    ret2!((false, "exhausted"))
                   } else {
                     new cCh in {
                       policyResolve!("component:claim-factory", *cCh) |
@@ -369,12 +384,14 @@ contract authIsOwner(dId, @ownerId, ret) = {
                               for (@cr <- cfCh) {
                                 match cr {
                                   (true, claimId, claimUri) => {
-                                    policyState!(s.set("claims",
-                                        s.get("claims").set(claimId, {
-                                          "uri": claimUri, "status": "notified",
-                                          "agreed": 0, "paid": 0}))
-                                      .set("nonce", s.get("nonce") + 1)) |
-                                    ret2!((true, claimId, claimUri))
+                                    for (@s2 <- policyState) {
+                                      policyState!(s2.set("claims",
+                                          s2.get("claims").set(claimId, {
+                                            "uri": claimUri, "status": "notified",
+                                            "agreed": 0, "paid": 0}))
+                                        .set("nonce", s2.get("nonce") + 1)) |
+                                      ret2!((true, claimId, claimUri))
+                                    }
                                   }
                                   _ => { ret2!(cr) }
                                 }

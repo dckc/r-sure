@@ -23,6 +23,33 @@ deferred|accepted`), `confidence`, `components`, `arms`, `hazards`, `invariants`
 ## Test
 
 `id`, `name`, `file`, `status` (`planned|implemented|passing|failing|not_run`), `focus`.
+`implemented` means source plus static/parser gates, never behavioural verification.
+
+## Evidence manifest (`rsure.evidence/v2`)
+
+`schema` (exactly `rsure.evidence/v2`), `id` (must match the directory name), `date`,
+`kind`, `commit`, `scope` (`audit: internal|independent`, `production: false`, `dynamic`),
+`artifacts` (`path`, `role`, `sha256`, `bytes`, `description`), `commands`, `results`,
+`reasons` (required for any `not_run`, `partial`, `blocked` or `fail` result),
+`limitations`. The checker verifies every artifact hash and byte size, rejects a missing
+limitation, and refuses a production claim.
+
+## RCA record (`rsure.rca/v1`)
+
+`id`, `title`, `date`, `owner`, `severity`, `status` (`open|closed|monitoring`), `template`,
+`nodes`, `findings`, `hazards`, `experiments`, `incident`, `fault_tree` (`top_event`,
+`gate`, `evidence`, `children` recursively), `five_whys` (at least five
+`{question, answer}` rows), `hypotheses` (`id`, `statement`, `status`), `root_cause`,
+`escape_analysis`, `corrective_actions`, `verification`, `residual_risk`, `evidence`.
+Every new P0/P1 finding (F-022+) and new install hazard (HZ-028+) must link to a record.
+
+## Experiment (`rsure.experiments/v1`)
+
+`id`, `rca`, `question`, `method`, `command`, `artifact`, `result`
+(`pass|fail|inconclusive|blocked`), `observed`, `status`
+(`planned|running|completed|abandoned`), `tests_hypotheses`, `conclusion`
+(`supports|rejects|inconclusive|partial`). Every artifact exists; artifacts under
+`audit/evidence/` must appear in a v2 manifest.
 
 ## Concurrency row
 

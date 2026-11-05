@@ -1,0 +1,303 @@
+schema: rsure.rca/v1
+records:
+- id: RCA-001
+  title: Install blocked by RSpace continuation decode and open contract bindings
+  date: '2026-11-05'
+  owner: audit
+  severity: P0
+  status: closed
+  template: audit/rca/template.md
+  nodes:
+  - N16
+  - N17
+  - N18
+  - N19
+  findings:
+  - F-022
+  - F-023
+  - F-024
+  - F-025
+  hazards:
+  - HZ-028
+  - HZ-029
+  - HZ-030
+  - HZ-031
+  - HZ-032
+  - HZ-033
+  - HZ-034
+  - HZ-035
+  experiments:
+  - X-001
+  - X-002
+  - X-003
+  - X-004
+  - X-005
+  - X-006
+  - X-007
+  - X-008
+  - X-009
+  - X-010
+  incident: The 17-term install stopped at 12_risk. The deploy stayed Pooled until the
+    180-second client timeout and the chain stopped advancing. The node log showed
+    repeated `decode continuation failed` proposer errors. A second contract-level
+    defect was present in 12_risk (wildcard auth binder) and a third in 13_slip
+    (authIsOwner missing from the top-level new); the harness also raced the node
+    proposer by calling manual propose on an autopropose node.
+  fault_tree:
+    top_event: The install cannot complete and the chain cannot advance
+    gate: OR
+    evidence:
+    - audit/evidence/2026-11-05-install-rca/install-baseline.log
+    - audit/evidence/2026-11-05-install-rca/node.log
+    children:
+    - event: RSpace continuation decode fails on the next proposal
+      gate: AND
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/node.log
+      children:
+      - event: prost's default decode recursion limit is 100
+        gate: LEAF
+        evidence:
+        - ../RNodeRust/models/Cargo.toml
+      - event: a normalized Par from 10_syndicate is deeper than 100
+        gate: LEAF
+        evidence:
+        - audit/evidence/2026-11-05-install-rca/node.log
+      - event: no regression decoded a deep Par on the RSpace path
+        gate: LEAF
+        evidence:
+        - ../RNodeRust/rholang/tests/deep_par_codec.rs
+    - event: the 12_risk deploy is rejected
+      gate: AND
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/install-baseline.log
+      children:
+      - event: the bundled Risk body uses a wildcard auth receive
+        gate: LEAF
+        evidence:
+        - contracts/src/deploy/12_risk.rho
+      - event: the static bundle scanner did not model the wildcard-binder class
+        gate: LEAF
+        evidence:
+        - tools/check_bundle_closedness.py
+    - event: the 13_slip deploy is rejected
+      gate: AND
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+      children:
+      - event: authIsOwner is absent from the Slip term's top-level new
+        gate: LEAF
+        evidence:
+        - contracts/src/deploy/13_slip.rho
+      - event: no gate compares helper names with top-level bindings
+        gate: LEAF
+        evidence:
+        - tools/parse_check.sh
+    - event: the harness masks the node internal error
+      gate: AND
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/install-baseline.log
+      children:
+      - event: the deploy stays Pooled until the 180-second timeout
+        gate: LEAF
+        evidence:
+        - harness/deploy.py
+      - event: the harness calls manual propose while the node advertises autopropose
+        gate: LEAF
+        evidence:
+        - audit/evidence/2026-11-05-install-rca/status.json
+  five_whys:
+  - question: Why did the install stop?
+    answer: The 12_risk deploy never reached a processed state; it stayed Pooled until
+      the client timeout.
+  - question: Why did the deploy stay Pooled?
+    answer: The proposer produced no block, so no deploy could be included or processed.
+  - question: Why did the proposer produce no block?
+    answer: The proposer failed to decode the RSpace continuation and logged `decode
+      continuation failed` on every attempt.
+  - question: Why did the decode fail?
+    answer: RNodeRust's Par wire codec used prost's default decode recursion limit of
+      100, while the normalized Par from 10_syndicate was deeper than 100.
+  - question: Why was the mismatch not caught earlier?
+    answer: The codec tests covered encode and shallow round-trips, not a deep decode;
+      the harness timeout hid the proposer error; and install was the only E2 path, so
+      no static gate exercised the node codec. The same pass also found two contract
+      binding defects and an autopropose race that made the failure harder to read.
+  hypotheses:
+  - id: H-001
+    statement: A contract-logic defect in 12_risk alone causes the install stall.
+    status: partial
+    note: 12_risk did have a wildcard-binder defect, but the chain stall was the node
+      codec. Fixing the contract alone would not advance the chain.
+  - id: H-002
+    statement: RNodeRust's Par decoder rejects the normalized RSpace continuation because
+      prost's default recursion limit (100) is below the normalized Par depth.
+    status: supported
+    note: X-002, X-003, X-004 and X-005 support this; X-005 verifies the rebuilt node.
+  - id: H-003
+    statement: The harness calling manual propose on an autopropose node is the root
+      cause of the stall.
+    status: rejected
+    note: X-006 removes the extra propose and the install still fails; it is a masking
+      and race factor, not the root cause.
+  - id: H-004
+    statement: The bundled Risk body's wildcard auth receive causes the 12_risk deploy
+      to be rejected.
+    status: supported
+    note: X-007 and the 17-term install support this.
+  - id: H-005
+    statement: authIsOwner missing from the Slip term's top-level new causes the 13_slip
+      deploy to be rejected.
+    status: supported
+    note: X-008 and the 17-term install support this.
+  - id: H-006
+    statement: The same fix fully bootstraps the r-cash rail.
+    status: rejected
+    note: X-009 shows 51_pool refused with parse depth exceeded; only the account factory
+      is installed.
+  - id: H-007
+    statement: A green 17-term install verifies contract behaviour.
+    status: rejected
+    note: X-010 shows that install does not verify behaviour. The suite run records the
+      root suite passing; the other registered suites remain not_run or unimplemented.
+  root_cause: 'Root cause (F-022): RNodeRust built its Par wire codec with prost''s default
+    decode recursion limit of 100. The parser/normalizer accept and normalize deploy
+    terms deeper than that, so a valid term encodes but the RSpace continuation cannot
+    be decoded on the next proposal; the proposer builds no block and the chain stops.
+    Contributing defects in the same install: the 12_risk wildcard auth binder (F-023)
+    and the missing 13_slip top-level authIsOwner binding (F-024) block their terms.
+    The harness manual-propose race (F-025) masks the node error as a generic timeout
+    but is not the root cause.'
+  escape_analysis:
+  - The static gates (build, measure, architecture, captures, select, placeholders,
+    money, suites) never execute the node codec or the RSpace continuation path.
+  - parse-check parses the terms with the target parser but does not encode, normalize
+    and decode a continuation at the depth the parser accepts.
+  - The codec tests covered encode and shallow round-trips; no test decoded a Par deeper
+    than prost's default limit.
+  - The harness converted the node's internal proposer error into a 180-second Pooled
+    timeout, so the contract under deploy looked responsible.
+  - Evidence schema v1 had no scope field, so install evidence and behavioural coverage
+    could be conflated in prose.
+  - The bundle scanner modelled free names but not the wildcard-binder bundle class, and
+    no gate compared helper names with a term's top-level binding set.
+  corrective_actions:
+  - id: CA-01
+    action: Enable prost no-recursion-limit and add the 130-deep Par round-trip test.
+    owner: platform-node
+    status: done
+    findings:
+    - F-022
+    improvements:
+    - R-022
+  - id: CA-02
+    action: Replace the wildcard auth receive with a named binder in the Risk arms.
+    owner: contracts
+    status: done
+    findings:
+    - F-023
+    improvements:
+    - R-023
+  - id: CA-03
+    action: Add authIsOwner to the Slip term's top-level new sequence.
+    owner: contracts
+    status: done
+    findings:
+    - F-024
+    improvements:
+    - R-024
+  - id: CA-04
+    action: Make the deploy harness autopropose-aware and keep strict propose for
+      diagnosis.
+    owner: harness
+    status: done
+    findings:
+    - F-025
+    improvements:
+    - R-025
+  - id: CA-05
+    action: Add evidence schema v2 and the evidence, RCA and experiment checkers.
+    owner: audit
+    status: done
+    findings:
+    - F-025
+    improvements:
+    - R-025
+  - id: CA-06
+    action: Complete the behavioural campaign and record honest pass/fail/not_run; the
+      root suite already passes.
+    owner: audit-contracts
+    status: open
+    findings: []
+    improvements: []
+  - id: CA-07
+    action: Resolve the r-cash 51_pool parser-depth refusal with the r-cash owner; the
+      r-sure install does not depend on the pool.
+    owner: external-rcash
+    status: open
+    findings: []
+    improvements: []
+  - id: CA-08
+    action: Wire check_evidence.py, check_rca.py and check_experiments.py into
+      `make audit-check`; the Makefile is owned by the lead.
+    owner: lead
+    status: open
+    findings: []
+    improvements: []
+  verification:
+    install:
+      result: pass
+      detail: 17/17 terms installed, including 12_risk and 13_slip.
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+    devnet:
+      result: pass
+      detail: fresh single-validator devnet reached preflight readiness.
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/devnet-up-recursion-fix.log
+      - audit/evidence/2026-11-05-install-rca/status-after-fix.json
+    node_codec:
+      result: implemented-not-executed
+      detail: the no-recursion-limit feature and the 130-deep regression are in the
+        RNodeRust tree; this evidence set has no test execution log.
+      evidence:
+      - ../RNodeRust/models/Cargo.toml
+      - ../RNodeRust/rholang/tests/deep_par_codec.rs
+    rcash_rail:
+      result: partial
+      detail: account factory installed; 51_pool refused with parse depth exceeded.
+      evidence:
+      - audit/evidence/2026-11-05-install-rca/rcash-bootstrap-recursion-fix.log
+    behavioural_suites:
+      result: partial
+      detail: The root suite passes with 11 assertions; the other registered suites are
+        not_run or unimplemented. Install E2 is not behavioural coverage.
+      evidence:
+      - deployments/suite-results.json
+  residual_risk:
+  - The behavioural campaign is incomplete. The root suite passes, but the install
+    proves deployment and block progress, not capacity, subscription, premium, claim or
+    settlement behaviour.
+  - The deep Par regression is 130 levels. A future term deeper than that may hit a new
+    limit or cost bound; the node image is pinned by digest for this evidence only.
+  - The r-cash pool and market rail are absent on this devnet after the 51_pool parse
+    depth refusal; any r-sure suite that needs the pool is blocked until r-cash fixes it.
+  - The manual-propose override remains available (RSURE_FORCE_PROPOSE=1); misuse on an
+    autopropose node can reintroduce the race.
+  - The audit remains internal and is not an independent review; no production-safety
+    claim is made.
+  evidence:
+  - audit/evidence/2026-11-05-install-rca/manifest.json
+  - audit/evidence/2026-11-05-install-rca/rca.md
+  - audit/evidence/2026-11-05-install-rca/install-baseline.log
+  - audit/evidence/2026-11-05-install-rca/node.log
+  - audit/evidence/2026-11-05-install-rca/install-recursion-fix.log
+  - audit/evidence/2026-11-05-install-rca/devnet-up-recursion-fix.log
+  - audit/evidence/2026-11-05-install-rca/rcash-bootstrap-recursion-fix.log
+  - audit/evidence/2026-11-05-install-rca/status-after-fix.json
+  - harness/deploy.py
+  - contracts/src/deploy/12_risk.rho
+  - contracts/src/deploy/13_slip.rho
+  - ../RNodeRust/models/Cargo.toml
+  - ../RNodeRust/models/src/wire.rs
+  - ../RNodeRust/rholang/tests/deep_par_codec.rs

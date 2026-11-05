@@ -30,13 +30,31 @@ def load(path: Path):
     return yaml.safe_load(path.read_text()) if path.is_file() else {}
 
 
+def _int(value) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
 def measured() -> dict:
     results = load(RESULTS).get("results", []) if RESULTS.is_file() else []
-    passing = [row for row in results if row.get("status") == "pass"]
+    passing = [
+        row for row in results
+        if row.get("status") == "pass"
+        and _int(row.get("assertions", 0)) > 0
+        and _int(row.get("failed", 0)) == 0
+    ]
     covered: set[str] = set()
+    covered_by: dict[str, set[str]] = {}
     for row in passing:
-        covered.update(row.get("covered_arms", []))
-    return {"results": results, "passing": passing, "covered": covered}
+        for arm in row.get("covered_arms") or []:
+            if not isinstance(arm, str):
+                continue
+            covered.add(arm)
+            covered_by.setdefault(arm, set()).add(row.get("suite"))
+    return {"results": results, "passing": passing, "covered": covered,
+            "covered_by": covered_by}
 
 
 def build() -> dict:
@@ -55,17 +73,42 @@ def build() -> dict:
         invariants = re.findall(r"^\|\s*(INV-\d+)\s*\|", INVARIANTS.read_text(), re.M)
     data = measured()
     covered = data["covered"]
+    covered_by = data["covered_by"]
+    tests = load(TESTS).get("tests", [])
+    registered = {row.get("name") for row in tests if isinstance(row, dict)}
+    passing = [row for row in data["passing"]
+               if not registered or row.get("suite") in registered]
+
+    # A fixed finding counts only when a passing suite with assertions asserted one of
+    # the finding's linked arms.  Nothing has run => nothing is verified.
+    verified = []
+    regression_suites: dict[str, list[str]] = {}
+    for finding in fixed:
+        linked = [arm for arm in finding.get("arms", []) if arm in covered]
+        if linked:
+            verified.append(finding["id"])
+            suites: set[str] = set()
+            for arm in linked:
+                suites.update(covered_by.get(arm, set()))
+            regression_suites[finding["id"]] = sorted(suites)
+    verified_ids = {finding["id"] for finding in fixed
+                    if finding["id"] in verified}
+
     payload = {
-        "passing_suites": len(data["passing"]),
-        "total_suites": len(data["results"]),
+        "passing_suites": len(passing),
+        "total_suites": len(tests) if tests else len(data["results"]),
         "public_arms_asserted": sorted(public & covered),
         "public_arms_total": len(public),
         "all_arms_asserted": sorted(all_arms & covered),
         "all_arms_total": len(all_arms),
         "core_flows_asserted": sorted(core & covered),
         "core_flows_total": len(core),
-        "fixed_findings": [f["id"] for f in fixed],
+        "fixed_findings": verified,
         "fixed_findings_total": len(fixed),
+        "fixed_findings_unverified": sorted(
+            finding["id"] for finding in fixed
+            if finding["id"] not in verified_ids),
+        "fixed_findings_regression_suites": regression_suites,
         "invariants": invariants,
     }
     return payload
@@ -89,12 +132,14 @@ def render(payload: dict) -> str:
         f"{pct(len(payload['all_arms_asserted']), payload['all_arms_total'])} |",
         f"| Core flow arms asserted | "
         f"{pct(len(payload['core_flows_asserted']), payload['core_flows_total'])} |",
-        f"| Fixed findings with a regression run | "
+        f"| Fixed findings with a passing regression suite asserting a linked arm | "
         f"{len(payload['fixed_findings'])}/{payload['fixed_findings_total']} |",
         f"| Invariants tracked | {len(payload['invariants'])}/12 |",
         "",
-        "A suite contributes only when it is `pass` and emits `covered_arms` in its",
-        "`RSURE_RESULT` trailer. Stubs and zero-assertion suites contribute nothing.",
+        "A suite contributes only when it is `pass`, has at least one assertion and",
+        "emits `covered_arms` in its `RSURE_RESULT` trailer. Stubs and zero-assertion",
+        "suites contribute nothing. A fixed finding is counted only when a linking arm",
+        "appears in that asserted set, so the metric is zero before any suite runs.",
         "",
     ]
     return "\n".join(lines)

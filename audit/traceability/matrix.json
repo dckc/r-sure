@@ -3,11 +3,11 @@
   "summary": {
     "arms": 162,
     "arms_with_flow_rule": 11,
-    "arms_with_hazard": 22,
-    "hazards": 27,
-    "findings": 21,
-    "improvements": 21,
-    "tests": 36
+    "arms_with_hazard": 24,
+    "hazards": 35,
+    "findings": 25,
+    "improvements": 25,
+    "tests": 39
   },
   "arms": [
     {
@@ -1116,10 +1116,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-030"
+      ],
+      "findings": [
+        "F-023"
+      ],
+      "improvements": [
+        "R-023"
+      ],
+      "tests": [
+        "T-037"
+      ]
     },
     {
       "component": "Risk",
@@ -1413,10 +1421,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-031"
+      ],
+      "findings": [
+        "F-024"
+      ],
+      "improvements": [
+        "R-024"
+      ],
+      "tests": [
+        "T-037"
+      ]
     },
     {
       "component": "LineFactory",
@@ -2218,7 +2234,8 @@
       "flow_status": null,
       "lean_target": null,
       "hazards": [
-        "HZ-022"
+        "HZ-022",
+        "HZ-033"
       ],
       "findings": [
         "F-018"
@@ -2229,7 +2246,8 @@
       "tests": [
         "T-003",
         "T-034",
-        "T-035"
+        "T-035",
+        "T-037"
       ]
     },
     {

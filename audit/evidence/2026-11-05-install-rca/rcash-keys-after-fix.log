@@ -1,0 +1,2 @@
+.venv/bin/python tools/keygen.py --out .devnet/keys.json
+keygen: wrote .devnet/keys.json (22 keys)

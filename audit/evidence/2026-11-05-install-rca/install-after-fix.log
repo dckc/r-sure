@@ -1,0 +1,30 @@
+.venv/bin/python harness/install.py
+install: 00_root.rho -> 3045022100dd12aeff7c4eb62f1f8e73d30304347afe2c930ef2014b9067c9c9d6d289a89f02200959cd44793767bcc7838182a03ac7df9fc51fb82688752372f89af955662190
+install: root rho:id:46et8awpwawodibuc6zrpzxtonodougo6zn45psfzjaqkozduobo
+install: 01_kernel.rho -> 3045022100a689ccfa18710172d992de5fc2abc8efd66b673b8c47fcbe3f097cecf442207102202b04bea99b2af7d8a46a5708f6f6dffef0ea60dff42025c0ce5fc659c02e0303
+install: 02_admin.rho -> 3045022100ff2c39ab709f05468f97af9c29922098ede4bab7a530429d28424e42c786c0e90220465f50ed5e289885aef2ddf66d9c66a0b56d519e38790e32fe30750e80d9f26b
+install: 03_terms.rho -> 3044022057d2e4128235804251dcde4201262d4963d0b95c0f7c37f21c3937ef967dd377022018cdb21bf507b7c37a77fe2f692ccd5ceddf00017a20061dd3e634c6ed7477e8
+install: 04_math.rho -> 30440220487e5c2f729fd2d22d950cc9c335b2bb8452098491990a57f8e479e00539c02c022049d5f05e03827794403770e4631544335ec92955d0e4670508188fd2f9faf28f
+install: 05_rgen.rho -> 3045022100b88527c1580d026f832d3de24c40af2d6fb5ddff24c5e2189a49eaa7011b90550220513c96d1aef92f743a2945e08ec9861487157d80ba24e5c7075624a41dd83176
+install: 40_payments.rho -> 3045022100b5cb57b178de149b2671ec55b5155f20c4ba9c8466a0c7b1e76414e2d690c00e022047ce1d1768bdf13d64ac565dca010e9d2bbaef4ba8e5fb868107ab1f90bebee6
+install: platform account ensured
+install: 15_distribution.rho -> 3044022069967cc1a818977dccd0bb29e11233e891983bc4072303a09fa6f9c7dc45256102204419f8ebb897222e8b80c50897bca25d9624584b028a8ef70d20e0f99da6f4d6
+install: 16_fund.rho -> 3044022061763789fc42a59adab7514e3346e000443b348652c090aba98c1defe75a06fe022054807fdf83f217f49b4e04ad72b08c444e3a1f071a6794f560a93fdbd934c09e
+install: 10_syndicate.rho -> 304402204a2a46787e7005eec8efca9350da616393fd48668b314839fe402ba4fd27cde40220434e5a8c49f710cd59eeb5887ac10b47170dbdc4acd9fa47d3946c70ba57509d
+Traceback (most recent call last):
+  File "/home/patrick/RSure/harness/install.py", line 231, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/patrick/RSure/harness/install.py", line 193, in main
+    deploy_id, result = node.deploy_and_wait(term, secret)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 131, in deploy_and_wait
+    return deploy_id, deploy_result(deploy_id)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 115, in deploy_result
+    variant, payload = wait_processed(deploy_id, timeout)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/patrick/RSure/harness/deploy.py", line 111, in wait_processed
+    raise DevnetError(f"deploy {deploy_id} not processed within {timeout}s: {last}")
+deploy.DevnetError: deploy 3045022100a8c7747a958f720936d3c933d9e69c3cf6b1e5fe975c21b025a6330ae849ea7b02202f34f642f1ca1f5683d3ee1ee22c4170a2eed0729c9ecc1edeafa2748a317f48 not processed within 180.0s: {'NotProcessed': {'status': 'Pooled'}}
+make: *** [Makefile:129: install] Error 1
