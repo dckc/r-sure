@@ -11,7 +11,7 @@ new
   rootCh, c, ack,
   slipResolve, nowHeight, slipMake, slipShareSum, slipHasShare, slipLeadSecond,
   slipOpenLines, slipExpireQuotes, mapKeys, slipReqOk, authOwner, slipStatus,
-  slipSubscribe, slipFundDeposit, slipBindPolicy, slipRefund
+  slipSubscribe, slipFundDeposit, slipBindPolicy, slipRefund, authIsOwner
 in {
 // Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
 

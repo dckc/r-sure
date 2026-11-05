@@ -120,25 +120,44 @@ def deploy_result(deploy_id: str, timeout: float = 180.0):
     raise DevnetError(f"deploy {deploy_id}: {variant} {payload}")
 
 
+def _manual_propose() -> bool:
+    """Whether this node advertises a working manual propose endpoint.
+
+    The devnet status reports `autopropose:true` and `manualPropose:false`; calling the
+    endpoint anyway races the node's own proposer and can leave a continuation that the
+    next proposal cannot decode. Only call it when the config or an explicit override
+    asks for it.
+    """
+    configured = _CFG.get("manual_propose", _CFG.get("manualPropose"))
+    if configured is not None:
+        return bool(configured)
+    return os.environ.get("RSURE_FORCE_PROPOSE") == "1"
+
+
+def _propose_once() -> None:
+    if not _manual_propose():
+        return
+    try:
+        response = propose()
+    except Exception as error:
+        if os.environ.get("RSURE_STRICT_PROPOSE") == "1":
+            raise
+        print(f"deploy: manual propose failed: {error}", file=sys.stderr)
+        return
+    if os.environ.get("RSURE_TRACE") == "1":
+        print(f"deploy: manual propose response {response!r}", file=sys.stderr)
+
+
 def deploy_and_wait(term: str, secret: str, **kwargs):
     deploy_id = deploy(term, secret, **kwargs)
-    # The pinned devnet does not always include a fresh deploy in its next
-    # autopropose block; force one when the admin endpoint is available.
-    try:
-        propose()
-    except Exception:
-        pass
+    _propose_once()
     return deploy_id, deploy_result(deploy_id)
 
 
 def deploy_same_block(terms: list[str], secret: str) -> list[str]:
     """Submit several deploys, then force one block so they share a block number."""
     ids = [deploy(term, secret) for term in terms]
-    try:
-        propose()
-    except Exception:
-        # The pinned node runs autopropose and may disable the manual endpoint.
-        pass
+    _propose_once()
     return ids
 
 
