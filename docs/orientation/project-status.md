@@ -28,6 +28,10 @@ premium distribution, policy aggregate, the claim lifecycle and refusals, centra
 shortfalls, settlement conservation, pause scope, replay and the r-cash/r-gen/r-share
 boundaries.
 
+The local reducer installs all 17 terms in the node's own in-memory runtime, registers the
+21 components and returns correct replies from `SureRoot` and `SureMath`, with no devnet.
+See [Local reducer](../reference/local-reducer.md).
+
 The formal model proves the insurance economics over a shallow state model: capacity,
 subscription, premium allocation, payable bounds, settlement conservation, exactly-once
 guards, terminal claim states, the central fund and the linear cell. It is **not** a
@@ -88,6 +92,6 @@ The detailed gate list and honesty rule are in [Verification](../reference/verif
 
 1. Run the three `not_run` process gates as first-class campaign rows.
 2. Extend the Playwright journey through subscribe, fund, bind and the claim lifecycle.
-3. Continue the a-priori program: the client-term normalizer now checks reads, writes,
-   funding and payment terms; next are a normalizer-backed `rho-lint` over source arms and a
-   local reducer, so more defects are found before a devnet deploy.
+3. Continue the a-priori program: the client-term normalizer and the local reducer are in
+   place; next is extending the reducer from install and pure-arm calls to the placement and
+   claim flows, so more defects are found before a devnet deploy.

@@ -28,7 +28,7 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         check-concurrency-audit check-composition-audit check-invariant-guards \
         check-pause-scope check-suite-results coverage-report coverage-check audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
-        client-terms-check \
+        client-terms-check local-reducer \
         client-fixtures client-journey client-keystores web-install web-lint web-test web-build web-e2e \
         check ci clean
 
@@ -255,6 +255,9 @@ client-gates: client-lint client-test client-wasm web-install
 client-terms-check:
 	cargo run -q -p rsure-sdk --example term_preview -- .devnet/client-terms
 	tools/normalize_check.sh .devnet/client-terms/*.rho
+
+local-reducer:
+	tools/local_reducer.sh
 
 client-check: client-gates client-wasm-smoke client-terms-check
 

@@ -58,6 +58,7 @@ jobs:
       - run: make venv
       - run: make build
       - run: tools/parse_check.sh contracts/build/*.rho
+      - run: make local-reducer
 
   client:
     runs-on: ubuntu-latest

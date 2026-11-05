@@ -45,6 +45,7 @@
 - [r-gen integration](reference/rgen-integration.md)
 - [r-share reuse](reference/share-reuse.md)
 - [Verification](reference/verification.md)
+- [Local reducer](reference/local-reducer.md)
 - [Glossary](reference/glossary.md)
 
 # Appendix
