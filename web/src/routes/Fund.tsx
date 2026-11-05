@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import DeployResult from "../components/DeployResult";
 import { Json, Panel } from "../components/ui";
 import { useRead } from "../lib/chain";
 import { useWallet } from "../lib/store";
@@ -55,6 +56,7 @@ export default function Fund() {
           </button>
         </div>
         {fundUri.error && <p className="error">{String(fundUri.error)}</p>}
+        <DeployResult busy={action.busy} error={action.error} refusal={action.refusal} receipt={action.receipt} />
       </Panel>
       <Panel title={<h2>Parameters</h2>}><Json value={info.data ?? {}} /></Panel>
       <Panel title={<h2>Shortfalls</h2>}><Json value={shortfalls.data ?? {}} /></Panel>

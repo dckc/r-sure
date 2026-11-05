@@ -107,4 +107,10 @@ test("places a risk, binds a policy and settles a claim", async ({ page }) => {
   await page.getByRole("button", { name: "Close" }).click();
   await waitForReceipt(page);
   await expect(page.getByText(/closed/i).first()).toBeVisible(FINALITY);
+
+  await page.locator(".tabs").getByRole("link", { name: "Fund", exact: true }).click();
+  await page.locator('input[inputmode="numeric"]').first().fill("100");
+  await page.getByPlaceholder("policy id").fill("e2e-fund");
+  await page.getByRole("button", { name: "Contribute", exact: true }).click();
+  await waitForReceipt(page);
 });
