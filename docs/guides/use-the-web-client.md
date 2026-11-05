@@ -96,6 +96,11 @@ and admin actions are 2-of-3 gated.
 signs with saved admin profiles, and submits the 2-of-3 `SureAdmin.admin` call. Pausing is
 narrow and fail-closed: it stops new placements and payouts without freezing reads.
 
+For a local demo, `make web-admin-keystores` reads `.devnet/keys.json` and writes encrypted
+keystores for the devnet admin keys under `.demo/keystores-devnet/`. Import two of them in
+the wallet overlay, enter both passwords on the Admin page, and submit. The keystores are
+devnet-only and are never committed.
+
 ## Boundaries
 
 - Token-gated arms are not UI actions. Slip and policy tokens stay inside their contracts;

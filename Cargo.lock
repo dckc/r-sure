@@ -1440,7 +1440,9 @@ name = "rsure-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "rcash-chain",
  "rsure-core",
+ "rsure-keystore",
  "rsure-sdk",
  "serde_json",
  "tokio",

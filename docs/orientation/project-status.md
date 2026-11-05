@@ -38,10 +38,9 @@ mechanically linked to the deployed terms. See [Formal model](../reference/forma
 The web client is exercised by Playwright against the same devnet: it boots, creates and
 funds a wallet, reads the books, creates a syndicate and contributes capital, registers a
 broker, submits a risk, opens a slip, subscribes the syndicate, accepts, funds the premium,
-binds the policy, opens a claim, classifies, assesses, agrees, settles and closes it, and
-contributes to the central fund. The admin pages share the same WASM read/write surface and
-are covered by the Python campaign and the SDK tests. See
-[Use the web client](../guides/use-the-web-client.md).
+binds the policy, opens a claim, classifies, assesses, agrees, settles and closes it,
+contributes to the central fund, and pauses and resumes the market with two of three admin
+signatures. See [Use the web client](../guides/use-the-web-client.md).
 
 ## Boundaries
 

@@ -12,7 +12,9 @@ name = "rsure"
 path = "src/main.rs"
 
 [dependencies]
+rcash-chain = { workspace = true, features = ["native"] }
 rsure-core.workspace = true
+rsure-keystore.workspace = true
 rsure-sdk.workspace = true
 clap.workspace = true
 serde_json.workspace = true

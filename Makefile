@@ -274,7 +274,10 @@ web-test: web-install
 web-build: web-install
 	npm --prefix web run build
 
-web-e2e: web-build
+web-admin-keystores:
+	node web/scripts/devnet-keystores.mjs
+
+web-e2e: web-build web-admin-keystores
 	npm --prefix web run test:e2e
 
 web-seed:

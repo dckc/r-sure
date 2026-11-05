@@ -24,7 +24,11 @@ export default function Admin() {
   const build = async (): Promise<{ payload: string; signatures: string[] } | null> => {
     if (!client || !node || !manifest) return null;
     setError(null);
-    const next = Number(nonce.data ?? 0) + 1;
+    if (nonce.data === undefined) {
+      setError("Reading the admin nonce; try again in a moment.");
+      return null;
+    }
+    const next = nonce.data + 1;
     try {
       const read = parseRead<string>(
         await client.read_component_json(
@@ -63,9 +67,12 @@ export default function Admin() {
 
   const submit = async () => {
     if (!client) return;
-    const built = payload && signatures.length ? { payload, signatures } : await build();
+    // Always rebuild: the payload binds the nonce and action, and both change between
+    // submissions. Reusing a signed payload from a previous action would verify against
+    // the wrong digest.
+    const built = await build();
     if (!built) return;
-    const next = Number(nonce.data ?? 0) + 1;
+    const next = (nonce.data ?? 0) + 1;
     const sigLiteral = `[${built.signatures
       .map((signature) => `"${signature}".hexToBytes()`)
       .join(", ")}]`;
@@ -119,8 +126,12 @@ export default function Admin() {
           </div>
         ))}
         <div className="row gap">
-          <button className="button ghost" onClick={sign}>Build and sign</button>
-          <button className="button" disabled={action.busy} onClick={submit}>Submit 2-of-3</button>
+          <button className="button ghost" disabled={nonce.data === undefined || action.busy} onClick={sign}>
+            Build and sign
+          </button>
+          <button className="button" disabled={nonce.data === undefined || action.busy} onClick={submit}>
+            Submit 2-of-3
+          </button>
         </div>
         {error && <p className="error">{error}</p>}
         <DeployResult busy={action.busy} error={action.error} refusal={action.refusal} receipt={action.receipt} />
