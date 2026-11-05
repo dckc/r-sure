@@ -17,7 +17,7 @@
 
 `settle` and `dispute` take `claimState` and later take it again after external awaits without a repost (P0, HZ-C5). `classify` and `assess` hold the cell across `claimPolicyInfo`. `applyDecision` is a private closure capability and is correctly one-shot via the oracle case. `bundle+{*Claim}` is unclosed.
 
-The Lean model exposes a further P1: `agree` and `addEvidence` do not reject every terminal status, so a settled claim can be re-agreed (F-021, HZ-027). `claim_agree_terminal_gap` is the counterexample; INV-10 is `partial`, not covered.
+F-021 is fixed: `agree`, `addEvidence`, `classify`, `assess`, `dispute` and `applyDecision` reject settled/denied/closed claims. `claim_agree_terminal` and `claim_applyDecision_terminal` carry INV-10, which is now covered.
 
 ## Await / value-move notes
 

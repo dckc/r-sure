@@ -242,6 +242,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
       } |
 
       contract Policy(@"distribute", policyToken2, ret2) = {
+
         if (*policyToken2 != *policyTokenV) {
           ret2!((false, "not holder"))
         } else {
@@ -339,7 +340,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      } |
+
+} |
 
       contract Policy(@"openClaim", dId, @reqV, ret2) = {
         new aCh in {
@@ -515,7 +517,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                   }
                                 }
                               }
-                              _ => { ret2!(pay) }
+                              _ => { policyState!(s) | ret2!(pay) }
                             }
                           }
                         }
@@ -588,7 +590,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       }
     }
-  
+
     }
   }
 } |

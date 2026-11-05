@@ -57,12 +57,13 @@ theorem math_premiumSplit_levy_le (total brokerBps fundBps : Nat)
   simp only [premiumSplit]
   exact share_le_self hb
 
-/-- The contract's branch order: the agreed amount is capped by the aggregate only while it
-    is below the per-claim limit; once it reaches the per-claim limit, that limit applies. -/
+/-- The documented three-way minimum: the agreed amount, the per-claim limit and the
+    remaining aggregate. -/
 def payableBase (agreed perClaim aggregate : Nat) : Nat :=
   if agreed < perClaim then
     if agreed < aggregate then agreed else aggregate
-  else perClaim
+  else
+    if perClaim < aggregate then perClaim else aggregate
 
 /-- Payable after the deductible. `Nat` subtraction truncates at zero. -/
 def payable (agreed perClaim aggregate deductible : Nat) : Nat :=
@@ -78,7 +79,12 @@ theorem math_payable_le_agreed (agreed perClaim aggregate deductible : Nat) :
     · simp [h2]
       exact Nat.le_trans (Nat.sub_le aggregate deductible) (Nat.le_of_not_lt h2)
   · simp [h1]
-    exact Nat.le_trans (Nat.sub_le perClaim deductible) (Nat.le_of_not_lt h1)
+    by_cases h3 : perClaim < aggregate
+    · simp [h3]
+      exact Nat.le_trans (Nat.sub_le perClaim deductible) (Nat.le_of_not_lt h1)
+    · simp [h3]
+      exact Nat.le_trans (Nat.sub_le aggregate deductible)
+        (Nat.le_trans (Nat.le_of_not_lt h3) (Nat.le_of_not_lt h1))
 
 theorem math_payable_le_perClaim (agreed perClaim aggregate deductible : Nat) :
     payable agreed perClaim aggregate deductible ≤ perClaim := by
@@ -92,16 +98,25 @@ theorem math_payable_le_perClaim (agreed perClaim aggregate deductible : Nat) :
       exact Nat.le_trans (Nat.sub_le aggregate deductible)
         (Nat.le_trans (Nat.le_of_not_lt h2) (Nat.le_of_lt h1))
   · simp [h1]
+    by_cases h3 : perClaim < aggregate
+    · simp [h3]
+    · simp [h3]
+      exact Nat.le_trans (Nat.sub_le aggregate deductible) (Nat.le_of_not_lt h3)
 
-theorem math_payable_le_aggregate_of_lt (agreed perClaim aggregate deductible : Nat)
-    (h1 : agreed < perClaim) :
+theorem math_payable_le_aggregate (agreed perClaim aggregate deductible : Nat) :
     payable agreed perClaim aggregate deductible ≤ aggregate := by
   unfold payable payableBase
-  simp [h1]
-  by_cases h2 : agreed < aggregate
-  · simp [h2]
-    exact Nat.le_trans (Nat.sub_le agreed deductible) (Nat.le_of_lt h2)
-  · simp [h2]
+  by_cases h1 : agreed < perClaim
+  · simp [h1]
+    by_cases h2 : agreed < aggregate
+    · simp [h2]
+      exact Nat.le_trans (Nat.sub_le agreed deductible) (Nat.le_of_lt h2)
+    · simp [h2]
+  · simp [h1]
+    by_cases h3 : perClaim < aggregate
+    · simp [h3]
+      exact Nat.le_trans (Nat.sub_le perClaim deductible) (Nat.le_of_lt h3)
+    · simp [h3]
 
 theorem math_payable_zero_of_le_deductible (agreed perClaim aggregate deductible : Nat)
     (h : payableBase agreed perClaim aggregate ≤ deductible) :

@@ -24,7 +24,8 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         lean-build lean-check vectors check-flows check-flows-strict check-claims \
         formal-check \
         audit-check audit-trace audit-trace-check check-audit check-arm-inventory audit-dynamic \
-        check-concurrency-audit check-composition-audit audit-scan \
+        check-concurrency-audit check-composition-audit check-invariant-guards \
+        check-pause-scope audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
         client-fixtures client-journey client-keystores web-install web-test web-build web-e2e \
         check ci clean
@@ -164,13 +165,19 @@ check-claims:
 
 formal-check: lean-check vectors check-flows check-flows-strict check-claims
 
-audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit
+audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit check-invariant-guards check-pause-scope
 
 check-concurrency-audit:
 	$(PY) tools/check_concurrency_audit.py
 
 check-composition-audit:
 	$(PY) tools/check_composition_audit.py
+
+check-invariant-guards:
+	$(PY) tools/check_invariant_guards.py
+
+check-pause-scope:
+	$(PY) tools/check_pause_scope.py
 
 audit-scan:
 	$(PY) tools/check_bundle_closedness.py

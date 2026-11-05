@@ -15,7 +15,7 @@
 
 ## Review
 
-`contribute` peeks `fundState` for `assetId`, deposits, then takes the cell and updates it (P3; the asset read is not revalidated after the deposit). `cover` takes `fundState`, awaits `fundAdmin`, then reposts before the withdrawal; the cover nonce writes `nonce` while `admin` uses `govNonce`, and `cover` has no `govNonce` replay check (P1). `cover` is one-shot via `covers[claimId]`.
+`contribute` peeks `fundState` for `assetId`, deposits, then takes the cell and updates it (P3; the asset read is not revalidated after the deposit). `cover` takes `fundState`, awaits `fundAdmin`, then reposts before the withdrawal; the cover nonce writes `nonce` while `admin` uses `govNonce`, and `cover` has no `govNonce` replay check (P1). `cover` is one-shot via `covers[claimId]`. `contribute` is pause-gated; `cover` remains a settlement exemption.
 
 ## Await / value-move notes
 

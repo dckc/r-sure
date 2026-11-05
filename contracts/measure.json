@@ -27,7 +27,7 @@
       "contracts": 6
     },
     "04_math.rho": {
-      "bytes": 3690,
+      "bytes": 4100,
       "depth": 16,
       "contracts": 3
     },
@@ -37,19 +37,19 @@
       "contracts": 5
     },
     "10_syndicate.rho": {
-      "bytes": 21894,
-      "depth": 37,
-      "contracts": 22
+      "bytes": 22565,
+      "depth": 40,
+      "contracts": 23
     },
     "11_broker.rho": {
-      "bytes": 5276,
-      "depth": 16,
-      "contracts": 6
+      "bytes": 5811,
+      "depth": 19,
+      "contracts": 7
     },
     "12_risk.rho": {
-      "bytes": 8074,
-      "depth": 16,
-      "contracts": 10
+      "bytes": 8848,
+      "depth": 17,
+      "contracts": 11
     },
     "13_slip.rho": {
       "bytes": 14807,
@@ -67,17 +67,17 @@
       "contracts": 11
     },
     "16_fund.rho": {
-      "bytes": 6985,
+      "bytes": 7411,
       "depth": 31,
-      "contracts": 6
+      "contracts": 7
     },
     "17_policy.rho": {
-      "bytes": 12155,
+      "bytes": 12173,
       "depth": 42,
       "contracts": 11
     },
     "18_claim.rho": {
-      "bytes": 11504,
+      "bytes": 12152,
       "depth": 28,
       "contracts": 14
     },

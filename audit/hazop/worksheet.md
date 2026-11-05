@@ -35,7 +35,7 @@
 | HZ-005 | distribution run takes the cell twice | high | F-001 | mitigated (fixed) |
 | HZ-006 | syndicate/line-grant bundles capture free state | critical | F-002 | open (R-002) |
 | HZ-007 | line/slip/policy/claim/distribution/broker/risk bundles capture free state | critical | F-002 | open (R-002) |
-| HZ-008 | global pause is a dead switch | high | F-003 | open (R-003) |
+| HZ-008 | global pause is a dead switch | high | F-003 | fixed (R-003) |
 | HZ-009 | fund cover/admin nonce split | high | F-004 | mitigated (fixed) |
 | HZ-011 | policy expiry leaks line capacity | high | F-006 | mitigated (fixed) |
 | HZ-017 | line pays before its state update | high | F-012 | open (R-012) |

@@ -120,6 +120,10 @@ in {
   } |
 
   contract claimApplyDecision(@s, @caseId, @decision, ret) = {
+    if (s.get("status") == "settled" || s.get("status") == "denied"
+        || s.get("status") == "closed") {
+      ret!((false, "closed"))
+    } else {
     match s.get("oracleRef") {
       Nil => { ret!((false, "no dispute")) }
       ref => {
@@ -159,6 +163,7 @@ in {
           }
         }
       }
+    }
     }
   } |
 
@@ -249,7 +254,7 @@ in {
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
               if (s.get("status") == "agreed" || s.get("status") == "settled"
-                  || s.get("status") == "closed") {
+                  || s.get("status") == "denied" || s.get("status") == "closed") {
                 claimState!(s) | ret2!((false, "closed"))
               } else {
                 claimState!(s.set("evidence", s.get("evidence") ++ evidence)
@@ -276,6 +281,10 @@ in {
                         match mgr {
                           (lead, second) => {
                             for (@s <- claimState) {
+                              if (s.get("status") == "settled" || s.get("status") == "denied"
+                                  || s.get("status") == "closed") {
+                                claimState!(s) | ret2!((false, "closed"))
+                              } else {
                               if (who != lead) {
                                 claimState!(s) | ret2!((false, "not lead"))
                               } else {
@@ -290,6 +299,7 @@ in {
                                     .set("nonce", s.get("nonce") + 1)) |
                                   ret2!((true, kind))
                                 }
+                              }
                               }
                             }
                           }
@@ -315,6 +325,10 @@ in {
                 match pi {
                   (true, p) => {
                     for (@s <- claimState) {
+                      if (s.get("status") == "settled" || s.get("status") == "denied"
+                          || s.get("status") == "closed") {
+                        claimState!(s) | ret2!((false, "closed"))
+                      } else {
                       if (who != s.get("leadManager") && who != s.get("secondManager")) {
                         claimState!(s) | ret2!((false, "not manager"))
                       } else {
@@ -323,6 +337,7 @@ in {
                                     .set("status", "assessed")
                                     .set("nonce", s.get("nonce") + 1)) |
                         ret2!((true, Nil))
+                      }
                       }
                     }
                   }
@@ -339,6 +354,10 @@ in {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
+              if (s.get("status") == "settled" || s.get("status") == "denied"
+                  || s.get("status") == "closed") {
+                claimState!(s) | ret2!((false, "closed"))
+              } else {
               match s.get("classification") {
                 Nil => { claimState!(s) | ret2!((false, "not classified")) }
                 c => {
@@ -356,6 +375,7 @@ in {
                   }
                 }
               }
+              }
             }
           }
         }
@@ -366,7 +386,8 @@ in {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
-              if (s.get("status") == "settled" || s.get("status") == "closed") {
+              if (s.get("status") == "settled" || s.get("status") == "denied"
+                  || s.get("status") == "closed") {
                 claimState!(s) | ret2!((false, "closed"))
               } else {
                 new ofCh in {
@@ -494,7 +515,7 @@ in {
         }
       }
     }
-  
+
     }
   }
 } |

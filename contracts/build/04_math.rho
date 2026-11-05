@@ -129,20 +129,48 @@ in {
     if (agreed < 0 || perClaimLimit < 0 || aggregateRemaining < 0 || deductible < 0) {
       ret!((false, "amount"))
     } else {
-      match (agreed < perClaimLimit, agreed < aggregateRemaining) {
-        (true, true) => {
+      if (agreed < perClaimLimit) {
+        if (agreed < aggregateRemaining) {
           match agreed - deductible {
-            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+            pay => {
+              if (pay < 0) { ret!((true, 0)) }
+              else {
+                if (pay > aggregateRemaining) { ret!((false, "aggregate")) }
+                else { ret!((true, pay)) }
+              }
+            }
           }
-        }
-        (true, false) => {
+        } else {
           match aggregateRemaining - deductible {
-            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+            pay => {
+              if (pay < 0) { ret!((true, 0)) }
+              else {
+                if (pay > aggregateRemaining) { ret!((false, "aggregate")) }
+                else { ret!((true, pay)) }
+              }
+            }
           }
         }
-        (false, _) => {
+      } else {
+        if (perClaimLimit < aggregateRemaining) {
           match perClaimLimit - deductible {
-            pay => { if (pay < 0) { ret!((true, 0)) } else { ret!((true, pay)) } }
+            pay => {
+              if (pay < 0) { ret!((true, 0)) }
+              else {
+                if (pay > aggregateRemaining) { ret!((false, "aggregate")) }
+                else { ret!((true, pay)) }
+              }
+            }
+          }
+        } else {
+          match aggregateRemaining - deductible {
+            pay => {
+              if (pay < 0) { ret!((true, 0)) }
+              else {
+                if (pay > aggregateRemaining) { ret!((false, "aggregate")) }
+                else { ret!((true, pay)) }
+              }
+            }
           }
         }
       }

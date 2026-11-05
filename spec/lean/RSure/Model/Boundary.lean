@@ -16,7 +16,7 @@ structure Boundary where
   arithmeticNoOverflow : Prop
   /-- No liveness or fairness claim; the model proves safety only. -/
   schedulerFairness : Prop
-  /-- The global pause gate is not a proved gate while F-003 is open. -/
+  /-- The global pause gate is a source-checked boundary; the model does not prove the query. -/
   pauseGate : Prop
   /-- Evidence quality, not merely evidence presence, is an off-chain underwriting duty. -/
   evidenceQuality : Prop

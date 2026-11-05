@@ -84,12 +84,19 @@ findings:
   title: Global pause is dead
   severity: P1
   class: composition
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - SureAdmin
   arms:
-  - SureAdmin@"admin"
+  - SyndicateBook@"create"
+  - Syndicate@"quote"
+  - Syndicate@"openLine"
+  - Broker@"addSlip"
+  - RiskBook@"submit"
+  - Risk@"accept"
+  - Risk@"decline"
+  - SureFund@"contribute"
   hazards:
   - HZ-008
   invariants:
@@ -97,8 +104,19 @@ findings:
   evidence_level: E1
   evidence:
   - kind: source
-    ref: contracts/src/deploy
-  description: pauseAll writes pausedAll but no mutating arm reads isPaused.
+    ref: contracts/src/deploy/10_syndicate.rho
+  - kind: source
+    ref: contracts/src/deploy/11_broker.rho
+  - kind: source
+    ref: contracts/src/deploy/12_risk.rho
+  - kind: source
+    ref: contracts/src/deploy/16_fund.rho
+  - kind: tool
+    ref: tools/check_pause_scope.py
+  description: New-risk capacity arms consult component:admin isPaused through a per-file
+    fail-closed helper. Slip binding is blocked through the gated Syndicate quote/openLine
+    path; Slip-level gates were omitted because 13_slip exceeds the parser depth limit.
+    Policy.distribute is treated as an existing-policy value-out and stays exempt.
   preconditions: A caller reaches the arm on the affected path.
   impact: Operators cannot pause the market; the pause-scope invariant is vacuous.
   proposed_fix: R-003
@@ -525,7 +543,7 @@ findings:
   title: Policy.settleClaim can pay more than the remaining aggregate
   severity: P1
   class: invariant
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Policy
@@ -537,11 +555,17 @@ findings:
   - INV-9
   evidence_level: E1
   evidence:
+  - kind: source
+    ref: contracts/src/deploy/04_math.rho
+  - kind: source
+    ref: contracts/src/deploy/17_policy.rho
   - kind: lean
     ref: spec/lean/RSure/Model/Policy.lean
-  description: The arm computes payable and subtracts it from aggregateRemaining without
-    checking payable <= aggregateRemaining. The SureMath payable branch can exceed
-    the remaining aggregate when agreed >= perClaimLimit.
+  - kind: tool
+    ref: tools/check_invariant_guards.py
+  description: SureMath@"payable" now computes the documented three-way minimum, and
+    Policy@"settleClaim" reposts state and propagates any math refusal before value
+    moves.
   preconditions: A claim is settled after the aggregate has been partly exhausted
     and the agreed amount reaches the per-claim limit.
   impact: aggregateRemaining underflows in Rholang or is clamped in the model; INV-9
@@ -553,7 +577,7 @@ findings:
   title: Claim.agree re-opens a settled claim
   severity: P1
   class: invariant
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Claim
@@ -565,11 +589,14 @@ findings:
   - INV-10
   evidence_level: E1
   evidence:
+  - kind: source
+    ref: contracts/src/deploy/18_claim.rho
   - kind: lean
     ref: spec/lean/RSure/Model/Claim.lean
-  description: Claim.agree checks that the claim is classified but not that it is
-    terminal. A settled claim can be moved back to agreed, and addEvidence has a similar
-    partial guard.
+  - kind: tool
+    ref: tools/check_invariant_guards.py
+  description: Terminal guards now reject settled, denied and closed claims in agree,
+    addEvidence, classify, assess, dispute and applyDecision.
   preconditions: A claim has settled and the lead manager calls agree again with a
     standard classification.
   impact: 'INV-10 does not hold: a settled claim can be re-opened and potentially

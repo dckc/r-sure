@@ -9,7 +9,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  adminGuard, fundResolve, fundPurse, fundAdmin, fundMake, porch
+  adminGuard, fundResolve, fundPurse, fundAdmin, fundMake, porch, isPaused
 in {
 contract adminGuard(@domain, @nonce, @action, @args, @sigs,
                     @admins, @threshold, ret) = {
@@ -48,6 +48,28 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
             }
             _ => { ret!((false, "unavailable", key)) }
           }
+        }
+      }
+    }
+  } |
+
+  contract isPaused(ret) = {
+    new aCh in {
+      fundResolve!("component:admin", *aCh) |
+      for (@a <- aCh) {
+        match a {
+          (true, SureAdmin) => {
+            new pCh in {
+              @SureAdmin!("isPaused", *pCh) |
+              for (@p <- pCh) {
+                match p {
+                  (true, paused) => { ret!(paused) }
+                  _ => { ret!(true) }
+                }
+              }
+            }
+          }
+          _ => { ret!(true) }
         }
       }
     }
@@ -138,6 +160,11 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
   } |
 
   contract SureFund(@"contribute", @payment, @policyId, ret) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret!((false, "paused")) }
+        else {
     new iCh in {
       for (@s0 <<- fundState) {
         new pCh in {
@@ -200,7 +227,11 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
         }
       }
     }
-  } |
+
+        }
+      }
+    }
+    } |
 
   contract SureFund(@"cover", @nonce, @claimId, @claimUri, @toOwner, @amount,
                     @policyId, @sigs, ret) = {

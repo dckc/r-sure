@@ -17,6 +17,8 @@
 
 `quote` is the correct pattern: take, repost before `rs!`, then a second take and repost. `openLine` takes `syndicateState`, awaits LineGrant/LineFactory, then takes the same cell again without a repost (P0 take-await-take, HZ-C1). `contribute` deposits before the state update; a failed update can hang (P3 concern). `withdrawCapital` updates state before the value move and uses `1/0` on failure. `expireQuote` takes the cell then awaits Clock.
 
+The pause gate covers `SyndicateBook.create`, the 8-arg `quote` and `openLine`; `revokeQuote`, `expireQuote`, `suspend/resume` and capital flows remain exempt.
+
 ## Await / value-move notes
 
 - Awaits while holding state: openLine: LineGrant, LineFactory, quote: rs grant publication after repost, withdrawCapital: Payments, expireQuote: Clock

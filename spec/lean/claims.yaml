@@ -46,8 +46,9 @@ assumptions:
   pause.contract:
     status: assumed
     note: >-
-      The global pause gate is dead in the deployed contracts (F-003). Pause is
-      a boundary flag, not a proved gate; INV-12 is deferred.
+      F-003 is closed in the contracts: new-risk arms consult SureAdmin isPaused
+      and fail closed. The Lean model does not prove the Rholang wiring; INV-12
+      is enforced by tools/check_pause_scope.py.
   evidence.quality:
     status: out_of_scope
     note: >-
@@ -100,17 +101,14 @@ invariants:
       - {name: RSure.Model.Policy.policy_distribute_once, strength: substantive, kind: preservation}
 
   INV-5:
-    statement: The payable is capped by the agreed amount, the per-claim limit and the aggregate branch.
+    statement: The payable is max(0, min(agreed, perClaimLimit, aggregateRemaining) - deductible).
     predicate: RSure.Model.Math.payable
     status: covered
-    note: >-
-      The contract's branch order differs from the prose three-way min when
-      agreed >= perClaimLimit and aggregateRemaining < perClaimLimit; the
-      aggregate bound is proved only for agreed < perClaimLimit.
+    note: F-020 corrected SureMath@"payable" to the documented three-way minimum.
     theorems:
       - {name: RSure.Model.Math.math_payable_le_agreed, strength: substantive, kind: bound}
       - {name: RSure.Model.Math.math_payable_le_perClaim, strength: substantive, kind: bound}
-      - {name: RSure.Model.Math.math_payable_le_aggregate_of_lt, strength: substantive, kind: bound}
+      - {name: RSure.Model.Math.math_payable_le_aggregate, strength: substantive, kind: bound}
       - {name: RSure.Model.Math.math_payable_zero_of_le_deductible, strength: substantive, kind: bound}
 
   INV-6:
@@ -148,29 +146,28 @@ invariants:
   INV-9:
     statement: aggregateRemaining decreases by the payable and never goes negative.
     predicate: RSure.Model.Policy.settleClaim
-    status: partial
+    status: covered
     note: >-
-      The deployed settleClaim does not guard payable <= aggregateRemaining. The
-      model proves the remaining-amount update and the non-negativity only under
-      the missing guard, which is recorded as finding F-020. This is not a
-      proved property of the deployed contract.
+      F-020 corrected the payable minimum and added the settleClaim guard; the
+      aggregate update is now unconditional.
     theorems:
       - {name: RSure.Model.Policy.policy_settle_remaining, strength: substantive, kind: preservation}
-      - {name: RSure.Model.Policy.policy_settle_aggregate, strength: substantive, kind: conditional}
+      - {name: RSure.Model.Policy.policy_settle_aggregate, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_settle_guard, strength: substantive, kind: bound}
 
   INV-10:
     statement: settled/denied claims and expired policies cannot be re-opened.
     predicate: terminal guards
-    status: partial
+    status: covered
     note: >-
-      Settlement and policy expiry are terminal, but Claim.agree does not reject
-      a settled claim. claim_agree_terminal_gap is a counterexample against the
-      deployed arm; the terminal guard is finding F-021, not a proved property.
+      F-021 added the terminal guard to Claim.agree and applyDecision; the
+      contract also guards addEvidence, classify, assess and dispute.
     theorems:
       - {name: RSure.Model.Claim.claim_settle_once, strength: substantive, kind: rejection}
       - {name: RSure.Model.Claim.claim_terminal_sticky, strength: substantive, kind: rejection}
       - {name: RSure.Model.Policy.policy_terminal, strength: substantive, kind: rejection}
-      - {name: RSure.Model.Claim.claim_agree_terminal_gap, strength: substantive, kind: counterexample}
+      - {name: RSure.Model.Claim.claim_agree_terminal, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_applyDecision_terminal, strength: substantive, kind: rejection}
 
   INV-11:
     statement: no partial value move survives a failed deploy.
@@ -187,12 +184,13 @@ invariants:
       - {name: RSure.commit_keeps_held, strength: substantive, kind: preservation}
 
   INV-12:
-    statement: global pause does not block settlement, close, expiry or refunds.
+    statement: global pause blocks new risk without blocking settlement, close, expiry or refunds.
     predicate: pause boundary
-    status: deferred
-    deferral:
-      phase: 5
-      reason: F-003 is open; no mutating arm consults isPaused, so the invariant is vacuous.
+    status: tool
+    tool: tools/check_pause_scope.py
+    note: >-
+      F-003 is closed by the source gate: new-risk arms consult isPaused and
+      fail closed, while claims, settlement, expiry and refunds stay exempt.
     theorems: []
 
 primitives:

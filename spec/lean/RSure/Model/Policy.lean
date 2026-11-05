@@ -81,11 +81,13 @@ def settleClaim (s : PolicyState) (claimId agreed : Nat) : Option PolicyState :=
   else if contains claimId s.settledClaims then none
   else
     let p := payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
-    some { s with
-      aggregatePaid := s.aggregatePaid + p
-      aggregateRemaining := s.aggregateRemaining - p
-      settledClaims := claimId :: s.settledClaims
-      nonce := s.nonce + 1 }
+    if p ≤ s.aggregateRemaining then
+      some { s with
+        aggregatePaid := s.aggregatePaid + p
+        aggregateRemaining := s.aggregateRemaining - p
+        settledClaims := claimId :: s.settledClaims
+        nonce := s.nonce + 1 }
+    else none
 
 theorem policy_settle_fields (s s' : PolicyState) (claimId agreed : Nat)
     (h : settleClaim s claimId agreed = some s') :
@@ -98,9 +100,12 @@ theorem policy_settle_fields (s s' : PolicyState) (claimId agreed : Nat)
   · simp [settleClaim, he] at h
   · by_cases hc : contains claimId s.settledClaims
     · simp [settleClaim, he, hc] at h
-    · simp [settleClaim, he, hc] at h
-      subst s'
-      exact ⟨rfl, rfl, rfl⟩
+    · by_cases hg : payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
+          ≤ s.aggregateRemaining
+      · simp [settleClaim, he, hc, hg] at h
+        subst s'
+        exact ⟨rfl, rfl, rfl⟩
+      · simp [settleClaim, he, hc, hg] at h
 
 theorem policy_settle_once (s s' : PolicyState) (claimId agreed agreed2 : Nat)
     (h : settleClaim s claimId agreed = some s') :
@@ -110,9 +115,12 @@ theorem policy_settle_once (s s' : PolicyState) (claimId agreed agreed2 : Nat)
   · simp [settleClaim, he] at h
   · by_cases hc : contains claimId s.settledClaims
     · simp [settleClaim, he, hc] at h
-    · simp [settleClaim, he, hc] at h
-      subst s'
-      simp [settleClaim, he, contains]
+    · by_cases hg : payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
+          ≤ s.aggregateRemaining
+      · simp [settleClaim, he, hc, hg] at h
+        subst s'
+        simp [settleClaim, he, contains]
+      · simp [settleClaim, he, hc, hg] at h
 
 theorem policy_settle_remaining (s s' : PolicyState) (claimId agreed : Nat)
     (h : settleClaim s claimId agreed = some s') :
@@ -120,13 +128,25 @@ theorem policy_settle_remaining (s s' : PolicyState) (claimId agreed : Nat)
       - payable agreed s.perClaimLimit s.aggregateRemaining s.deductible :=
   (policy_settle_fields s s' claimId agreed h).2.1
 
+theorem policy_settle_guard (s s' : PolicyState) (claimId agreed : Nat)
+    (h : settleClaim s claimId agreed = some s') :
+    payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
+      ≤ s.aggregateRemaining := by
+  by_cases he : s.status = PolicyStatus.expired
+  · simp [settleClaim, he] at h
+  · by_cases hc : contains claimId s.settledClaims
+    · simp [settleClaim, he, hc] at h
+    · by_cases hg : payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
+          ≤ s.aggregateRemaining
+      · exact hg
+      · simp [settleClaim, he, hc, hg] at h
+
 theorem policy_settle_aggregate (s s' : PolicyState) (claimId agreed : Nat)
-    (h : settleClaim s claimId agreed = some s')
-    (hle : payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
-            ≤ s.aggregateRemaining) :
+    (h : settleClaim s claimId agreed = some s') :
     s'.aggregateRemaining
       + payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
       = s.aggregateRemaining := by
+  have hle := policy_settle_guard s s' claimId agreed h
   rw [policy_settle_remaining s s' claimId agreed h]
   omega
 

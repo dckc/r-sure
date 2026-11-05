@@ -11,14 +11,14 @@
 | INV-2 | `Slip.bind` | `slip_bind_requires_subscription`, `slip_bind_moves` | F-003 | covered |
 | INV-3 | `Math.alloc` | `math_alloc_sums`, `distribution_plan_sums` | F-003, F-007 | covered (guard-conditional) |
 | INV-4 | `Policy.distribute` | `math_premiumSplit_conserves`, `policy_distribute_conserves`, `policy_distribute_once` | F-003, F-004 | covered (guard-conditional) |
-| INV-5 | `Math.payable` | `math_payable_le_agreed`, `math_payable_le_perClaim`, `math_payable_le_aggregate_of_lt`, `math_payable_zero_of_le_deductible` | F-006 | covered |
+| INV-5 | `Math.payable` | `math_payable_le_agreed`, `math_payable_le_perClaim`, `math_payable_le_aggregate`, `math_payable_zero_of_le_deductible` | F-006 | covered |
 | INV-6 | `System.system_settlement_conserves` | `system_settlement_conserves`, `policy_settle_conserves`, `fund_conserves` | F-006, F-007, F-008 | covered |
 | INV-7 | `Line.LineWF` | `line_pay_bounded`, `synd_written_le_capital` | F-001, F-002, F-009 | covered |
 | INV-8 | once-per-claim guards | `line_pay_once`, `line_pay_once_per_claim`, `policy_settle_once`, `fund_cover_once`, `claim_settle_once`, `oracle_execute_once` | F-005, F-008, F-009, F-011 | covered |
-| INV-9 | `Policy.settleClaim` | `policy_settle_remaining`, `policy_settle_aggregate` | F-006 | partial (F-020) |
-| INV-10 | terminal guards | `claim_settle_once`, `claim_terminal_sticky`, `policy_terminal`, `claim_agree_terminal_gap` | F-005, F-010 | partial (F-021) |
+| INV-9 | `Policy.settleClaim` | `policy_settle_remaining`, `policy_settle_aggregate`, `policy_settle_guard` | F-006 | covered |
+| INV-10 | terminal guards | `claim_settle_once`, `claim_terminal_sticky`, `policy_terminal`, `claim_agree_terminal`, `claim_applyDecision_terminal` | F-005, F-010 | covered |
 | INV-11 | `System.transfer`, `Linear.Cell.commit` | `system_step_atomic`, `system_step_refuses`, `commit_all_or_none`, `commit_keeps_held` | none | partial (ERTP assumed) |
-| INV-12 | pause boundary | none | none | deferred (F-003) |
+| INV-12 | pause boundary | `tools/check_pause_scope.py` | none | tool |
 
 ## Cornerstone flows
 
@@ -29,7 +29,7 @@
 | F-003 | `Slip@"bind"` | `Slip.slip_bind_requires_subscription` | INV-2, INV-3, INV-4 |
 | F-004 | `Policy@"distribute"` | `Policy.policy_distribute_conserves` | INV-4 |
 | F-005 | `Claim@"settle"` | `Claim.claim_settle_once` | INV-8, INV-10 |
-| F-006 | `Policy@"settleClaim"` | `Policy.policy_settle_remaining` | INV-6, INV-8, INV-9 |
+| F-006 | `Policy@"settleClaim"` | `Policy.policy_settle_aggregate` | INV-6, INV-8, INV-9 |
 | F-007 | `Distribution@"run"` | `Distribution.distribution_run_sums` | INV-4, INV-6 |
 | F-008 | `SureFund@"cover"` | `Fund.fund_cover_once` | INV-6, INV-8 |
 | F-009 | `Line@"pay"` | `Line.line_pay_once` | INV-7, INV-8 |
@@ -45,7 +45,7 @@
 | `Verifier` | hash/signature interface is opaque | cryptography is assumed |
 | `Codec` | terms are ids and lists | canonical hashing is assumed |
 | `AdminGuard` | none | threshold and distinct-key semantics are assumed |
-| `SureAdmin` | pause is a boundary flag | F-003: no mutating arm consults the flag |
+| `SureAdmin` | pause is a boundary flag | F-003 fixed; new-risk arms consult `isPaused` and fail closed |
 | `CoverTerms` | `terms_validate_sound` extracts limits, deductible, bps and period bounds | class strings, evidence URIs and licence quality are off-chain |
 | `SureMath` | premium split, payable, allocation, exposure sum | signed integer and overflow bounds are assumed |
 | `RgenAdapter` | none | r-gen availability, credential truth and OracleCase binding are assumed |

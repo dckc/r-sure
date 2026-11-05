@@ -30,7 +30,7 @@ import RSure.Linear.Protocol
 #print axioms RSure.Model.Math.math_premiumSplit_levy_le
 #print axioms RSure.Model.Math.math_payable_le_agreed
 #print axioms RSure.Model.Math.math_payable_le_perClaim
-#print axioms RSure.Model.Math.math_payable_le_aggregate_of_lt
+#print axioms RSure.Model.Math.math_payable_le_aggregate
 #print axioms RSure.Model.Math.math_payable_zero_of_le_deductible
 #print axioms RSure.Model.Math.math_allocAux_sums
 #print axioms RSure.Model.Math.math_alloc_sums
@@ -75,6 +75,7 @@ import RSure.Linear.Protocol
 #print axioms RSure.Model.Policy.policy_settle_fields
 #print axioms RSure.Model.Policy.policy_settle_once
 #print axioms RSure.Model.Policy.policy_settle_remaining
+#print axioms RSure.Model.Policy.policy_settle_guard
 #print axioms RSure.Model.Policy.policy_settle_aggregate
 #print axioms RSure.Model.Policy.policy_settle_conserves
 #print axioms RSure.Model.Policy.policy_terminal
@@ -90,7 +91,8 @@ import RSure.Linear.Protocol
 #print axioms RSure.Model.Claim.claim_apply_uphold
 #print axioms RSure.Model.Claim.claim_apply_partial
 #print axioms RSure.Model.Claim.claim_apply_revoke
-#print axioms RSure.Model.Claim.claim_agree_terminal_gap
+#print axioms RSure.Model.Claim.claim_agree_terminal
+#print axioms RSure.Model.Claim.claim_applyDecision_terminal
 #print axioms RSure.Model.Oracle.oracle_decide_requires_credential
 #print axioms RSure.Model.Oracle.oracle_execute_once
 #print axioms RSure.Model.Oracle.oracle_execute_subject_bound

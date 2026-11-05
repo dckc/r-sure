@@ -6,7 +6,7 @@
 
 ## What is proved
 
-The Lean project at `spec/lean` contains 106 kernel-checked theorems over the insurance
+The Lean project at `spec/lean` contains 108 kernel-checked theorems over the insurance
 economics. They answer four questions:
 
 1. **Can the promise be backed?** Capacity, quote reservation, open-line and loss payment
@@ -46,7 +46,7 @@ The assumptions are recorded in `claims.yaml` and repeated here:
 | `deploy.atomicity` | assumed | a failed deploy rolls back all state and value effects |
 | `arithmetic.no_overflow` | assumed | Lean `Nat` is unbounded; contract integer bounds hold |
 | `scheduler.fairness` | out of scope | safety only; no liveness claim |
-| `pause.contract` | assumed | F-003 is open; pause is a boundary flag, not a proved gate |
+| `pause.contract` | assumed | F-003 is closed in the contracts; INV-12 is enforced by the pause-scope source gate |
 | `evidence.quality` | out of scope | evidence presence is checked, not loss quality |
 
 ## Module tree
@@ -87,24 +87,20 @@ spec/lean/
 | INV-2 | Full subscription | covered | `slip_bind_requires_subscription` |
 | INV-3 | Exposure plan sums to aggregate | covered | `math_alloc_sums` |
 | INV-4 | Premium conservation | covered | `policy_distribute_conserves` |
-| INV-5 | Payable bounds | covered | `math_payable_le_agreed`, `math_payable_le_perClaim` |
+| INV-5 | Payable bounds | covered | `math_payable_le_agreed`, `math_payable_le_perClaim`, `math_payable_le_aggregate` |
 | INV-6 | Settlement conservation | covered | `system_settlement_conserves` |
 | INV-7 | Line payout bounded | covered | `line_pay_bounded` |
 | INV-8 | Exactly once | covered | `line_pay_once`, `policy_settle_once`, `fund_cover_once` |
-| INV-9 | Aggregate non-negative | partial | `policy_settle_aggregate` (conditional on a guard the contract lacks) |
-| INV-10 | Terminal states | partial | `claim_settle_once`; `claim_agree_terminal_gap` is a counterexample |
+| INV-9 | Aggregate non-negative | covered | `policy_settle_aggregate`, `policy_settle_guard` |
+| INV-10 | Terminal states | covered | `claim_agree_terminal`, `claim_applyDecision_terminal` |
 | INV-11 | Atomicity | partial | `system_step_atomic`; native ERTP is assumed |
-| INV-12 | Pause does not block settlement | deferred | none while F-003 is open |
+| INV-12 | Pause does not block settlement | tool | `tools/check_pause_scope.py` |
 
-`INV-9` and `INV-10` are deliberately not marked covered. The Lean work found:
-
-- **F-020**: `Policy@"settleClaim"` does not reject `payable > aggregateRemaining`. The
-  theorem `policy_settle_aggregate` proves the update only under the missing guard.
-- **F-021**: `Claim@"agree"` does not reject a settled claim. The model proves the deployed
-  behaviour and records the counterexample `claim_agree_terminal_gap`.
-
-`INV-12` stays deferred because the global pause is dead (F-003). `INV-11` is partial
-because native ERTP and node rollback are outside the model.
+F-020 and F-021 are fixed: the payable is the documented three-way minimum, the
+aggregate guard propagates through Policy settlement, and terminal claim states are
+rejected by agreement and adjudication. INV-9 and INV-10 are covered. INV-12 remains a
+source-gated tool check because the Lean model does not prove the Rholang pause query.
+INV-11 is partial because native ERTP and node rollback are outside the model.
 
 ## Reproduction
 

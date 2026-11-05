@@ -23,7 +23,7 @@ invariants:
     lean_status: proved-model
   INV-5:
     statement: payable bounds
-    lean: RSure.Model.Math.math_payable_le_perClaim
+    lean: RSure.Model.Math.math_payable_le_aggregate
     lean_status: proved-model
   INV-6:
     statement: settlement conservation
@@ -40,17 +40,17 @@ invariants:
   INV-9:
     statement: aggregate decreases and stays non-negative
     lean: RSure.Model.Policy.policy_settle_aggregate
-    lean_status: proved-model-bounded
+    lean_status: proved-model
   INV-10:
     statement: terminal states cannot re-open
-    lean: RSure.Model.Claim.claim_settle_once
-    lean_status: proved-model-bounded
+    lean: RSure.Model.Claim.claim_agree_terminal
+    lean_status: proved-model
   INV-11:
     statement: an atomic step commits wholly or is refused
     lean: RSure.Model.System.system_step_atomic
     lean_status: proved-model-bounded
   INV-12:
-    statement: pause does not block settlement, close, expiry or refunds
+    statement: pause blocks new risk without blocking settlement, close, expiry or refunds
     lean_status: assumption
 
 rules:
@@ -92,7 +92,7 @@ rules:
   - id: F-006
     arm: 'Policy@"settleClaim"'
     source: contracts/src/deploy/17_policy.rho
-    lean: RSure.Model.Policy.policy_settle_remaining
+    lean: RSure.Model.Policy.policy_settle_aggregate
     lean_status: proved-model
     invariants: [INV-6, INV-8, INV-9]
     note: aggregate update and line conservation

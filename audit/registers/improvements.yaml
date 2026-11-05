@@ -44,16 +44,22 @@ improvements:
   - F-003
   hazards:
   - HZ-008
-  change: Wire isPaused into mutating arms, exempting settlement/close/expiry/refund.
+  change: Wire component:admin isPaused into the capacity-creating arms (SyndicateBook.create,
+    Syndicate.quote/openLine, Broker.addSlip, RiskBook.submit, Risk.accept/decline,
+    SureFund.contribute) with fail-closed behaviour; claims and value-out arms stay
+    exempt. Slip binding is blocked through Syndicate.openLine because Slip-level
+    gates exceed the parser depth.
   type: design
   breaking: false
   migration: fresh devnet install
   compatibility_window: v1 only
   tests:
+  - T-016
+  - T-017
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-004
   priority: P1
   findings:
@@ -318,13 +324,15 @@ improvements:
   compatibility_window: v1 only
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
   id: R-020
   findings:
   - F-020
   hazards:
   - HZ-026
-  change: Reject settleClaim when payable > aggregateRemaining before any value move.
+  change: Correct SureMath payable to max(0, min(agreed, perClaimLimit, aggregateRemaining)
+    - deductible) and propagate math refusals from Policy.settleClaim without losing
+    state.
   tests:
   - T-011
 - priority: P1
@@ -334,12 +342,13 @@ improvements:
   compatibility_window: v1 only
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
   id: R-021
   findings:
   - F-021
   hazards:
   - HZ-027
-  change: Reject agree and addEvidence on settled, denied or closed claims.
+  change: Reject agree, addEvidence, classify, assess, dispute and applyDecision on
+    settled, denied or closed claims.
   tests:
   - T-027

@@ -42,7 +42,8 @@ structure AgreeArgs where
   deriving DecidableEq, Repr
 
 def agree (s : ClaimState) (a : AgreeArgs) : Option ClaimState :=
-  match s.kind with
+  if ClaimStatus.terminal s.status then none
+  else match s.kind with
   | none => none
   | some ClaimKind.standard =>
       if a.caller = s.leadManager then
@@ -67,33 +68,37 @@ theorem claim_agree_standard_lead (s s' : ClaimState) (a : AgreeArgs)
     (h : agree s a = some s') (hk : s.kind = some ClaimKind.standard) :
     a.caller = s.leadManager ∧ s'.status = ClaimStatus.agreed
       ∧ s'.agreedAmount = a.amount := by
-  by_cases hc : a.caller = s.leadManager
-  · simp [agree, hk, hc] at h
-    subst s'
-    exact ⟨hc, rfl, rfl⟩
-  · simp [agree, hk, hc] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [agree, ht] at h
+  · by_cases hc : a.caller = s.leadManager
+    · simp [agree, ht, hk, hc] at h
+      subst s'
+      exact ⟨hc, rfl, rfl⟩
+    · simp [agree, ht, hk, hc] at h
 
 theorem claim_agree_complex_quorum (s s' : ClaimState) (a : AgreeArgs)
     (h : agree s a = some s') (hk : s.kind = some ClaimKind.complex)
     (hs : s'.status = ClaimStatus.agreed) :
     a.caller = s.secondManager ∧ s.leadAgreed = true
       ∧ s'.agreedAmount = a.amount := by
-  by_cases hl : a.caller = s.leadManager
-  · simp [agree, hk, hl] at h
-    subst s'
-    simp at hs
-  · by_cases hs2 : a.caller = s.secondManager
-    · by_cases hlead : s.leadAgreed
-      · simp [agree, hk, hl] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [agree, ht] at h
+  · by_cases hl : a.caller = s.leadManager
+    · simp [agree, ht, hk, hl] at h
+      subst s'
+      simp at hs
+    · by_cases hs2 : a.caller = s.secondManager
+      · by_cases hlead : s.leadAgreed
+        · simp [agree, ht, hk, hl] at h
+          simp [hs2] at h
+          simp [hlead] at h
+          subst s'
+          exact ⟨hs2, hlead, rfl⟩
+        · simp [agree, ht, hk, hl] at h
+          simp [hs2] at h
+          simp [hlead] at h
+      · simp [agree, ht, hk, hl] at h
         simp [hs2] at h
-        simp [hlead] at h
-        subst s'
-        exact ⟨hs2, hlead, rfl⟩
-      · simp [agree, hk, hl] at h
-        simp [hs2] at h
-        simp [hlead] at h
-    · simp [agree, hk, hl] at h
-      simp [hs2] at h
 
 theorem claim_agree_complex_requires_lead (s s' : ClaimState) (a : AgreeArgs)
     (h : agree s a = some s') (hk : s.kind = some ClaimKind.complex)
@@ -131,7 +136,8 @@ theorem claim_terminal_sticky (s : ClaimState) (h : s.status = ClaimStatus.settl
 
 def applyDecision (s : ClaimState) (caseId : Nat) (outcome : DecisionOutcome)
     (amount : Nat) : Option ClaimState :=
-  if s.oracleCase ≠ some caseId then none
+  if ClaimStatus.terminal s.status then none
+  else if s.oracleCase ≠ some caseId then none
   else if outcome = DecisionOutcome.uphold then
     if s.assessmentPresent then
       some { s with
@@ -157,53 +163,61 @@ theorem claim_apply_case_bound (s s' : ClaimState) (caseId : Nat)
     (outcome : DecisionOutcome) (amount : Nat)
     (h : applyDecision s caseId outcome amount = some s') :
     s.oracleCase = some caseId := by
-  cases hcase : s.oracleCase with
-  | none => simp [applyDecision, hcase] at h
-  | some cid =>
-      by_cases hcid : cid = caseId
-      · simp [hcid]
-      · simp [applyDecision, hcase, hcid] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [applyDecision, ht] at h
+  · cases hcase : s.oracleCase with
+    | none => simp [applyDecision, ht, hcase] at h
+    | some cid =>
+        by_cases hcid : cid = caseId
+        · simp [hcid]
+        · simp [applyDecision, ht, hcase, hcid] at h
 
 theorem claim_apply_uphold (s s' : ClaimState) (caseId amount : Nat)
     (h : applyDecision s caseId DecisionOutcome.uphold amount = some s') :
     s'.status = ClaimStatus.upheld ∧ s'.agreedAmount = s.assessmentAmount := by
-  cases hcase : s.oracleCase with
-  | none => simp [applyDecision, hcase] at h
-  | some cid =>
-      by_cases hcid : cid = caseId
-      · by_cases ha : s.assessmentPresent
-        · simp [applyDecision, hcase, hcid, ha] at h
-          subst s'
-          exact ⟨rfl, rfl⟩
-        · simp [applyDecision, hcase, hcid, ha] at h
-      · simp [applyDecision, hcase, hcid] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [applyDecision, ht] at h
+  · cases hcase : s.oracleCase with
+    | none => simp [applyDecision, ht, hcase] at h
+    | some cid =>
+        by_cases hcid : cid = caseId
+        · by_cases ha : s.assessmentPresent
+          · simp [applyDecision, ht, hcase, hcid, ha] at h
+            subst s'
+            exact ⟨rfl, rfl⟩
+          · simp [applyDecision, ht, hcase, hcid, ha] at h
+        · simp [applyDecision, ht, hcase, hcid] at h
 
 theorem claim_apply_partial (s s' : ClaimState) (caseId amount : Nat)
     (h : applyDecision s caseId DecisionOutcome.partiallyUpheld amount = some s') :
     amount ≤ s.claimedAmount ∧ s'.status = ClaimStatus.partiallyUpheld
       ∧ s'.agreedAmount = amount := by
-  cases hcase : s.oracleCase with
-  | none => simp [applyDecision, hcase] at h
-  | some cid =>
-      by_cases hcid : cid = caseId
-      · by_cases ha : amount ≤ s.claimedAmount
-        · simp [applyDecision, hcase, hcid, ha] at h
-          subst s'
-          exact ⟨ha, rfl, rfl⟩
-        · simp [applyDecision, hcase, hcid, ha] at h
-      · simp [applyDecision, hcase, hcid] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [applyDecision, ht] at h
+  · cases hcase : s.oracleCase with
+    | none => simp [applyDecision, ht, hcase] at h
+    | some cid =>
+        by_cases hcid : cid = caseId
+        · by_cases ha : amount ≤ s.claimedAmount
+          · simp [applyDecision, ht, hcase, hcid, ha] at h
+            subst s'
+            exact ⟨ha, rfl, rfl⟩
+          · simp [applyDecision, ht, hcase, hcid, ha] at h
+        · simp [applyDecision, ht, hcase, hcid] at h
 
 theorem claim_apply_revoke (s s' : ClaimState) (caseId amount : Nat)
     (h : applyDecision s caseId DecisionOutcome.revoke amount = some s') :
     s'.status = ClaimStatus.denied ∧ s'.agreedAmount = 0 := by
-  cases hcase : s.oracleCase with
-  | none => simp [applyDecision, hcase] at h
-  | some cid =>
-      by_cases hcid : cid = caseId
-      · simp [applyDecision, hcase, hcid] at h
-        subst s'
-        exact ⟨rfl, rfl⟩
-      · simp [applyDecision, hcase, hcid] at h
+  by_cases ht : ClaimStatus.terminal s.status
+  · simp [applyDecision, ht] at h
+  · cases hcase : s.oracleCase with
+    | none => simp [applyDecision, ht, hcase] at h
+    | some cid =>
+        by_cases hcid : cid = caseId
+        · simp [applyDecision, ht, hcase, hcid] at h
+          subst s'
+          exact ⟨rfl, rfl⟩
+        · simp [applyDecision, ht, hcase, hcid] at h
 
 def settledStandardClaim : ClaimState where
   kind := some ClaimKind.standard
@@ -220,17 +234,16 @@ def settledStandardClaim : ClaimState where
   appliedCase := none
   paid := 10
 
-/-- The deployed `agree` arm does not reject a settled claim. This counterexample records
-    INV-10 as a gap, not as a proved terminal property. -/
-theorem claim_agree_terminal_gap :
-    ∃ s', agree settledStandardClaim { caller := 1, amount := 999, basisHash := 0 } = some s'
-      ∧ s'.status = ClaimStatus.agreed := by
-  have h : agree settledStandardClaim { caller := 1, amount := 999, basisHash := 0 } =
-      some ({ settledStandardClaim with
-        status := ClaimStatus.agreed
-        agreedAmount := 999
-        leadAgreed := true }) := by
-    simp [agree, settledStandardClaim]
-  exact ⟨_, h, rfl⟩
+/-- A terminal claim cannot be re-agreed. -/
+theorem claim_agree_terminal (s : ClaimState) (a : AgreeArgs)
+    (h : ClaimStatus.terminal s.status = true) : agree s a = none := by
+  simp [agree, h]
+
+/-- A terminal claim cannot be re-adjudicated. -/
+theorem claim_applyDecision_terminal (s : ClaimState) (caseId : Nat)
+    (outcome : DecisionOutcome) (amount : Nat)
+    (h : ClaimStatus.terminal s.status = true) :
+    applyDecision s caseId outcome amount = none := by
+  simp [applyDecision, h]
 
 end RSure.Model.Claim

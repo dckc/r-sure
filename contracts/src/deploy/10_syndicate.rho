@@ -13,7 +13,7 @@ new
   rootCh, c, ack,
   authOwner, authIsOwner, resolveComponent, syndicateResolve,
   bookAddClasses, bookByClass, classAllowed, profileOk, bookHasUri,
-  nowHeight, makePurse, lineFactoryCreate, lineIdFor, syndicateMake,
+  nowHeight, isPaused, makePurse, lineFactoryCreate, lineIdFor, syndicateMake,
   lineCreditCap, lineSettleCap, lineReleaseCap
 in {
   // @@INLINE:lib/Resolve.rho@@
@@ -21,6 +21,28 @@ in {
 
   contract syndicateResolve(@key, ret) = {
     resolveComponent!(key, *ret)
+  } |
+
+  contract isPaused(ret) = {
+    new aCh in {
+      syndicateResolve!("component:admin", *aCh) |
+      for (@a <- aCh) {
+        match a {
+          (true, SureAdmin) => {
+            new pCh in {
+              @SureAdmin!("isPaused", *pCh) |
+              for (@p <- pCh) {
+                match p {
+                  (true, paused) => { ret!(paused) }
+                  _ => { ret!(true) }
+                }
+              }
+            }
+          }
+          _ => { ret!(true) }
+        }
+      }
+    }
   } |
 
   contract nowHeight(ret) = {
@@ -133,6 +155,11 @@ in {
   // ---------- book ----------
 
   contract SyndicateBook(@"create", dId, @profile, ret) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret!((false, "paused")) }
+        else {
     new aCh, pkCh, prCh, purseCh, dupCh in {
       authOwner!(*dId, *aCh) |
       dops!("pubKeyBytes", *dId, *pkCh) |
@@ -167,7 +194,11 @@ in {
         }
       }
     }
-  } |
+
+        }
+      }
+    }
+    } |
 
   contract SyndicateBook(@"syndicateOf", @ownerId, ret) = {
     for (@b <<- syndicateBookState) {
@@ -617,6 +648,11 @@ in {
 
                     contract Syndicate(@"quote", dId2, @class, @slipId, @shareBps,
                                       @exposure, @expiryHeight, slipToken, ret2) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret2!((false, "paused")) }
+        else {
                       new a2Ch, hCh in {
                         authOwner!(*dId2, *a2Ch) |
                         nowHeight!(*hCh) |
@@ -763,7 +799,11 @@ in {
                           }
                         }
                       }
-                    } |
+
+        }
+      }
+    }
+    } |
 
                     contract Syndicate(@"revokeQuote", dId2, @grantId, ret2) = {
                       new a2Ch in {
@@ -835,6 +875,11 @@ in {
 
                     contract Syndicate(@"openLine", @grantId, @grantUri, @policyId,
                                       @slipId, slipToken, policyToken, ret2) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret2!((false, "paused")) }
+        else {
                       for (@s <- syndicateState) {
                         match s.get("quotes").get(grantId) {
                           Nil => { syndicateState!(s) | ret2!((false, "unknown quote")) }
@@ -952,7 +997,11 @@ in {
                           }
                         }
                       }
-                    } |
+
+        }
+      }
+    }
+    } |
 
                     contract Syndicate(@"suspend", dId2, ret2) = {
                       new a2Ch in {
@@ -1021,7 +1070,7 @@ in {
                       }
                     }
                   }
-  
+
     }
   }
 } |

@@ -17,9 +17,9 @@
       "input": "caller=1,lead=1",
       "output": "ok:agreed,500"
     },
-    "claim.terminal.reopen": {
+    "claim.terminal.refused": {
       "input": "settled",
-      "output": "ok:agreed,999"
+      "output": "none"
     },
     "distribution.run.sum": {
       "input": "1000,[4000,6000]",
@@ -61,6 +61,10 @@
       "input": "1000,2000,600,0",
       "output": "600"
     },
+    "math.payable.aggregate-third": {
+      "input": "1000,800,600,0",
+      "output": "600"
+    },
     "math.payable.cap": {
       "input": "1000,800,900,100",
       "output": "700"
@@ -88,6 +92,10 @@
     "policy.settle.aggregate": {
       "input": "remaining=1000,payable=700",
       "output": "ok:300"
+    },
+    "policy.settle.aggregate-third": {
+      "input": "remaining=600,payable=500",
+      "output": "ok:100"
     },
     "slip.bind.subscribed": {
       "input": "[5000,5000]",

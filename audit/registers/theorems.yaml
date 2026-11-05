@@ -184,12 +184,12 @@ theorems:
   reviewer: internal
   audit_line: true
 - id: TH-015
-  name: math_payable_le_aggregate_of_lt
+  name: math_payable_le_aggregate
   module: RSure.Model.Math
   kind: theorem
   status: proved-model
-  statement: '(agreed perClaim aggregate deductible : Nat) (h1 : agreed < perClaim)
-    : payable agreed perClaim aggregate deductible ≤ aggregate'
+  statement: '(agreed perClaim aggregate deductible : Nat) : payable agreed perClaim
+    aggregate deductible ≤ aggregate'
   axioms:
   - propext
   scope: shallow Lean component model; not a Rholang refinement
@@ -819,14 +819,27 @@ theorems:
   reviewer: internal
   audit_line: true
 - id: TH-060
+  name: policy_settle_guard
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : PolicyState) (claimId agreed : Nat) (h : settleClaim s claimId
+    agreed = some s'') : payable agreed s.perClaimLimit s.aggregateRemaining s.deductible
+    ≤ s.aggregateRemaining'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-061
   name: policy_settle_aggregate
   module: RSure.Model.Policy
   kind: theorem
   status: proved-model
   statement: '(s s'' : PolicyState) (claimId agreed : Nat) (h : settleClaim s claimId
-    agreed = some s'') (hle : payable agreed s.perClaimLimit s.aggregateRemaining
-    s.deductible ≤ s.aggregateRemaining) : s''.aggregateRemaining + payable agreed
-    s.perClaimLimit s.aggregateRemaining s.deductible = s.aggregateRemaining'
+    agreed = some s'') : s''.aggregateRemaining + payable agreed s.perClaimLimit s.aggregateRemaining
+    s.deductible = s.aggregateRemaining'
   axioms:
   - propext
   - Quot.sound
@@ -834,7 +847,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Policy.lean
   reviewer: internal
   audit_line: true
-- id: TH-061
+- id: TH-062
   name: policy_settle_conserves
   module: RSure.Model.Policy
   kind: theorem
@@ -848,7 +861,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Policy.lean
   reviewer: internal
   audit_line: true
-- id: TH-062
+- id: TH-063
   name: policy_terminal
   module: RSure.Model.Policy
   kind: theorem
@@ -861,7 +874,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Policy.lean
   reviewer: internal
   audit_line: true
-- id: TH-063
+- id: TH-064
   name: policy_payable_le_agreed
   module: RSure.Model.Policy
   kind: theorem
@@ -874,7 +887,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Policy.lean
   reviewer: internal
   audit_line: true
-- id: TH-064
+- id: TH-065
   name: policy_payable_le_perClaim
   module: RSure.Model.Policy
   kind: theorem
@@ -887,7 +900,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Policy.lean
   reviewer: internal
   audit_line: true
-- id: TH-065
+- id: TH-066
   name: claim_agree_standard_lead
   module: RSure.Model.Claim
   kind: theorem
@@ -901,7 +914,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-066
+- id: TH-067
   name: claim_agree_complex_quorum
   module: RSure.Model.Claim
   kind: theorem
@@ -915,7 +928,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-067
+- id: TH-068
   name: claim_agree_complex_requires_lead
   module: RSure.Model.Claim
   kind: theorem
@@ -929,7 +942,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-068
+- id: TH-069
   name: claim_settle_once
   module: RSure.Model.Claim
   kind: theorem
@@ -941,7 +954,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-069
+- id: TH-070
   name: claim_paid_le_agreed
   module: RSure.Model.Claim
   kind: theorem
@@ -953,7 +966,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-070
+- id: TH-071
   name: claim_terminal_sticky
   module: RSure.Model.Claim
   kind: theorem
@@ -965,7 +978,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-071
+- id: TH-072
   name: claim_apply_case_bound
   module: RSure.Model.Claim
   kind: theorem
@@ -979,7 +992,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-072
+- id: TH-073
   name: claim_apply_uphold
   module: RSure.Model.Claim
   kind: theorem
@@ -993,7 +1006,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-073
+- id: TH-074
   name: claim_apply_partial
   module: RSure.Model.Claim
   kind: theorem
@@ -1007,7 +1020,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-074
+- id: TH-075
   name: claim_apply_revoke
   module: RSure.Model.Claim
   kind: theorem
@@ -1021,19 +1034,34 @@ theorems:
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-075
-  name: claim_agree_terminal_gap
+- id: TH-076
+  name: claim_agree_terminal
   module: RSure.Model.Claim
   kind: theorem
   status: proved-model
-  statement: ': ∃ s'', agree settledStandardClaim { caller'
+  statement: '(s : ClaimState) (a : AgreeArgs) (h : ClaimStatus.terminal s.status
+    = true) : agree s a = none'
   axioms:
   - propext
   scope: shallow Lean component model; not a Rholang refinement
   evidence: spec/lean/RSure/Model/Claim.lean
   reviewer: internal
   audit_line: true
-- id: TH-076
+- id: TH-077
+  name: claim_applyDecision_terminal
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s : ClaimState) (caseId : Nat) (outcome : DecisionOutcome) (amount
+    : Nat) (h : ClaimStatus.terminal s.status = true) : applyDecision s caseId outcome
+    amount = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-078
   name: oracle_decide_requires_credential
   module: RSure.Model.Oracle
   kind: theorem
@@ -1047,7 +1075,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-077
+- id: TH-079
   name: oracle_execute_once
   module: RSure.Model.Oracle
   kind: theorem
@@ -1060,7 +1088,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-078
+- id: TH-080
   name: oracle_execute_subject_bound
   module: RSure.Model.Oracle
   kind: theorem
@@ -1073,7 +1101,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-079
+- id: TH-081
   name: oracle_applied_matches
   module: RSure.Model.Oracle
   kind: theorem
@@ -1086,7 +1114,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-080
+- id: TH-082
   name: oracle_apply_once
   module: RSure.Model.Oracle
   kind: theorem
@@ -1099,7 +1127,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-081
+- id: TH-083
   name: oracle_close_requires_finished
   module: RSure.Model.Oracle
   kind: theorem
@@ -1111,7 +1139,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Oracle.lean
   reviewer: internal
   audit_line: true
-- id: TH-082
+- id: TH-084
   name: book_register_absent
   module: RSure.Model.Books
   kind: theorem
@@ -1124,7 +1152,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Books.lean
   reviewer: internal
   audit_line: true
-- id: TH-083
+- id: TH-085
   name: book_lookup_sound
   module: RSure.Model.Books
   kind: theorem
@@ -1137,7 +1165,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Books.lean
   reviewer: internal
   audit_line: true
-- id: TH-084
+- id: TH-086
   name: book_register_unique
   module: RSure.Model.Books
   kind: theorem
@@ -1150,7 +1178,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Books.lean
   reviewer: internal
   audit_line: true
-- id: TH-085
+- id: TH-087
   name: book_lookup_preserved
   module: RSure.Model.Books
   kind: theorem
@@ -1163,7 +1191,7 @@ theorems:
   evidence: spec/lean/RSure/Model/Books.lean
   reviewer: internal
   audit_line: true
-- id: TH-086
+- id: TH-088
   name: system_step_atomic
   module: RSure.Model.System
   kind: theorem
@@ -1177,7 +1205,7 @@ theorems:
   evidence: spec/lean/RSure/Model/System.lean
   reviewer: internal
   audit_line: true
-- id: TH-087
+- id: TH-089
   name: system_step_refuses
   module: RSure.Model.System
   kind: theorem
@@ -1190,7 +1218,7 @@ theorems:
   evidence: spec/lean/RSure/Model/System.lean
   reviewer: internal
   audit_line: true
-- id: TH-088
+- id: TH-090
   name: system_settlement_conserves
   module: RSure.Model.System
   kind: theorem
@@ -1205,7 +1233,7 @@ theorems:
   evidence: spec/lean/RSure/Model/System.lean
   reviewer: internal
   audit_line: true
-- id: TH-089
+- id: TH-091
   name: system_settlement_plan
   module: RSure.Model.System
   kind: theorem
@@ -1220,7 +1248,7 @@ theorems:
   evidence: spec/lean/RSure/Model/System.lean
   reviewer: internal
   audit_line: true
-- id: TH-090
+- id: TH-092
   name: set_same
   module: RSure.Linear.Cell
   kind: theorem
@@ -1232,7 +1260,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-091
+- id: TH-093
   name: set_other
   module: RSure.Linear.Cell
   kind: theorem
@@ -1245,7 +1273,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-092
+- id: TH-094
   name: peek_then_put_rejected
   module: RSure.Linear.Cell
   kind: theorem
@@ -1259,7 +1287,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-093
+- id: TH-095
   name: put_without_take_rejected
   module: RSure.Linear.Cell
   kind: theorem
@@ -1273,7 +1301,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-094
+- id: TH-096
   name: take_without_put_not_wf
   module: RSure.Linear.Cell
   kind: theorem
@@ -1287,7 +1315,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-095
+- id: TH-097
   name: nested_call_rejected
   module: RSure.Linear.Cell
   kind: theorem
@@ -1301,7 +1329,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-096
+- id: TH-098
   name: take_put_commit
   module: RSure.Linear.Cell
   kind: theorem
@@ -1316,7 +1344,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-097
+- id: TH-099
   name: wf_quiescent
   module: RSure.Linear.Cell
   kind: theorem
@@ -1329,7 +1357,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-098
+- id: TH-100
   name: commit_keeps_held
   module: RSure.Linear.Cell
   kind: theorem
@@ -1343,7 +1371,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-099
+- id: TH-101
   name: commit_success
   module: RSure.Linear.Cell
   kind: theorem
@@ -1358,7 +1386,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-100
+- id: TH-102
   name: commit_all_or_none
   module: RSure.Linear.Cell
   kind: theorem
@@ -1373,7 +1401,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-101
+- id: TH-103
   name: commit_requires_single
   module: RSure.Linear.Cell
   kind: theorem
@@ -1388,7 +1416,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Cell.lean
   reviewer: internal
   audit_line: true
-- id: TH-102
+- id: TH-104
   name: h1_pure
   module: RSure.Linear.Protocol
   kind: theorem
@@ -1401,7 +1429,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Protocol.lean
   reviewer: internal
   audit_line: true
-- id: TH-103
+- id: TH-105
   name: h2a_caller_token
   module: RSure.Linear.Protocol
   kind: theorem
@@ -1415,7 +1443,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Protocol.lean
   reviewer: internal
   audit_line: true
-- id: TH-104
+- id: TH-106
   name: h2b_delegated
   module: RSure.Linear.Protocol
   kind: theorem
@@ -1430,7 +1458,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Protocol.lean
   reviewer: internal
   audit_line: true
-- id: TH-105
+- id: TH-107
   name: p2_await_then_commit
   module: RSure.Linear.Protocol
   kind: theorem
@@ -1444,7 +1472,7 @@ theorems:
   evidence: spec/lean/RSure/Linear/Protocol.lean
   reviewer: internal
   audit_line: true
-- id: TH-106
+- id: TH-108
   name: commit_counts
   module: RSure.Linear.Protocol
   kind: theorem

@@ -183,8 +183,9 @@ hazards:
   likelihood: medium
   risk: medium
   controls:
-  - review finding
-  - regression suite
+  - per-file isPaused gate
+  - fail-closed admin query
+  - tools/check_pause_scope.py
   findings:
   - F-003
   tests:
@@ -616,8 +617,9 @@ hazards:
   likelihood: medium
   risk: high
   controls:
-  - Lean conditional theorem
-  - audit finding
+  - SureMath true-minimum payable
+  - Policy state-safe refusal
+  - tools/check_invariant_guards.py
   findings:
   - F-020
   tests:
@@ -642,8 +644,9 @@ hazards:
   likelihood: medium
   risk: high
   controls:
-  - Lean counterexample
-  - audit finding
+  - contract terminal guard
+  - Lean rejection theorem
+  - tools/check_invariant_guards.py
   findings:
   - F-021
   tests:

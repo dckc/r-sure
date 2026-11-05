@@ -15,7 +15,7 @@
 
 ## Review
 
-`expire` consumes `riskState`, awaits Clock, then reposts. `assess` accepts an arbitrary assessment map; it does not validate the quoted premium or the credential (P2). `bundle+{*Risk}` captures `riskState` (P0 bundle).
+`expire` consumes `riskState`, awaits Clock, then reposts. `assess` accepts an arbitrary assessment map; it does not validate the quoted premium or the credential (P2). `bundle+{*Risk}` captures `riskState` (P0 bundle). `RiskBook.submit`, `accept` and `decline` are pause-gated; `addEvidence`, `assess` and `expire` stay exempt.
 
 ## Await / value-move notes
 

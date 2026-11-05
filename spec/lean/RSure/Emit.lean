@@ -126,6 +126,7 @@ def main : IO Unit := do
   IO.println s!"math.payable.cap|1000,800,900,100|{payable 1000 800 900 100}"
   IO.println s!"math.payable.deduct|1000,800,900,900|{payable 1000 800 900 900}"
   IO.println s!"math.payable.aggregate|1000,2000,600,0|{payable 1000 2000 600 0}"
+  IO.println s!"math.payable.aggregate-third|1000,800,600,0|{payable 1000 800 600 0}"
   IO.println s!"math.alloc.sum|1000,[5000,5000]|{sumNat (alloc 1000 [5000,5000])}"
   IO.println s!"math.alloc.remainder|1001,[3333,3333,3334]|{sumNat (alloc 1001 [3333,3333,3334])}"
   IO.println s!"synd.quote.free|1000,0,0,400|{showSyn (Model.Syndicate.quote (syn 1000 0 0) (args 400))}"
@@ -148,6 +149,7 @@ def main : IO Unit := do
   IO.println s!"distribution.run.sum|1000,[4000,6000]|{Model.Distribution.sumPlan (Model.Distribution.buildPlan 1000 [4000,6000])}"
   IO.println s!"distribution.run.twice|planned|{match Model.Distribution.run (dist 1000 [4000,6000]) with | none => "none" | some s' => showDist (Model.Distribution.run s')}"
   IO.println s!"policy.settle.aggregate|remaining=1000,payable=700|{showPolicy (Model.Policy.settleClaim (pol 1000 800 100) 7 1000)}"
+  IO.println s!"policy.settle.aggregate-third|remaining=600,payable=500|{showPolicy (Model.Policy.settleClaim (pol 600 800 100) 7 1000)}"
   IO.println s!"fund.cover.cap|amount=600,max=500|{showFund (Model.Fund.cover (fund 1000 500) 7 600 1 2)}"
   let cov := Model.Fund.cover (fund 1000 500) 7 100 1 2
   IO.println s!"fund.cover.once|claim=7|{match cov with | none => "none" | some (s', _) => showFund (Model.Fund.cover s' 7 100 2 2)}"
@@ -155,7 +157,7 @@ def main : IO Unit := do
   IO.println s!"claim.complex.second-first|caller=2|{showClaim (Model.Claim.agree claimComplex { caller := 2, amount := 500, basisHash := 0 })}"
   let disputed := { claimComplex with oracleCase := some 5 }
   IO.println s!"claim.apply.partial-bound|amount=1200,claimed=1000|{showClaim (Model.Claim.applyDecision disputed 5 Model.Claim.DecisionOutcome.partiallyUpheld 1200)}"
-  IO.println s!"claim.terminal.reopen|settled|{showClaim (Model.Claim.agree (Model.Claim.settledStandardClaim) { caller := 1, amount := 999, basisHash := 0 })}"
+  IO.println s!"claim.terminal.refused|settled|{showClaim (Model.Claim.agree (Model.Claim.settledStandardClaim) { caller := 1, amount := 999, basisHash := 0 })}"
   let b := Model.Books.register { entries := [] } 1 10
   IO.println s!"book.register.twice|id=1|{match b with | none => "none" | some b' => showBook (Model.Books.register b' 1 20)}"
 

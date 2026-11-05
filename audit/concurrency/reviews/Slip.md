@@ -17,6 +17,8 @@
 
 `bind` takes `slipState`, opens lines, creates the policy and distributes the premium, then takes `slipState` again without a repost (P0 take-await-take, HZ-C3). `subscribe` holds the cell across `Syndicate.quote` (P2). `fundPremium` authenticates an owner but does not check that it is the insured (P1). `expire` does not refund a funded premium (P1). `bundle+{*Slip}` is unclosed.
 
+Slip-level pause gates were omitted because `13_slip.rho` exceeds the node parser depth with any added wrapper. Binding is blocked through the gated `Syndicate.quote`/`openLine` capacity path; this is recorded in F-003 and R-003.
+
 ## Await / value-move notes
 
 - Awaits while holding state: subscribe: Syndicate.quote while state held, bind: lines/policy/distribution

@@ -145,6 +145,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
   } |
 
   contract claimApplyDecision(@s, @caseId, @decision, ret) = {
+    if (s.get("status") == "settled" || s.get("status") == "denied"
+        || s.get("status") == "closed") {
+      ret!((false, "closed"))
+    } else {
     match s.get("oracleRef") {
       Nil => { ret!((false, "no dispute")) }
       ref => {
@@ -184,6 +188,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
           }
         }
       }
+    }
     }
   } |
 
@@ -274,7 +279,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
               if (s.get("status") == "agreed" || s.get("status") == "settled"
-                  || s.get("status") == "closed") {
+                  || s.get("status") == "denied" || s.get("status") == "closed") {
                 claimState!(s) | ret2!((false, "closed"))
               } else {
                 claimState!(s.set("evidence", s.get("evidence") ++ evidence)
@@ -301,6 +306,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
                         match mgr {
                           (lead, second) => {
                             for (@s <- claimState) {
+                              if (s.get("status") == "settled" || s.get("status") == "denied"
+                                  || s.get("status") == "closed") {
+                                claimState!(s) | ret2!((false, "closed"))
+                              } else {
                               if (who != lead) {
                                 claimState!(s) | ret2!((false, "not lead"))
                               } else {
@@ -315,6 +324,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                     .set("nonce", s.get("nonce") + 1)) |
                                   ret2!((true, kind))
                                 }
+                              }
                               }
                             }
                           }
@@ -340,6 +350,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
                 match pi {
                   (true, p) => {
                     for (@s <- claimState) {
+                      if (s.get("status") == "settled" || s.get("status") == "denied"
+                          || s.get("status") == "closed") {
+                        claimState!(s) | ret2!((false, "closed"))
+                      } else {
                       if (who != s.get("leadManager") && who != s.get("secondManager")) {
                         claimState!(s) | ret2!((false, "not manager"))
                       } else {
@@ -348,6 +362,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                     .set("status", "assessed")
                                     .set("nonce", s.get("nonce") + 1)) |
                         ret2!((true, Nil))
+                      }
                       }
                     }
                   }
@@ -364,6 +379,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
+              if (s.get("status") == "settled" || s.get("status") == "denied"
+                  || s.get("status") == "closed") {
+                claimState!(s) | ret2!((false, "closed"))
+              } else {
               match s.get("classification") {
                 Nil => { claimState!(s) | ret2!((false, "not classified")) }
                 c => {
@@ -381,6 +400,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                   }
                 }
               }
+              }
             }
           }
         }
@@ -391,7 +411,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             for (@s <- claimState) {
-              if (s.get("status") == "settled" || s.get("status") == "closed") {
+              if (s.get("status") == "settled" || s.get("status") == "denied"
+                  || s.get("status") == "closed") {
                 claimState!(s) | ret2!((false, "closed"))
               } else {
                 new ofCh in {
@@ -519,7 +540,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       }
     }
-  
+
     }
   }
 } |

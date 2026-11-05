@@ -21,12 +21,12 @@ so the devnet install and every behavioural suite remain `not_run`.
 | Hazards | 27 |
 | Findings | 21 |
 | P0 findings | 2 (1 fixed, 1 open) |
-| P1 findings | 12 (9 fixed, 3 open) |
+| P1 findings | 12 (12 fixed, 0 open) |
 | P2/P3 findings | 7 (3 fixed/documented, 4 deferred) |
 | Improvements | 21 |
 | Tests registered | 36 (`not_run`) |
-| Lean theorems | 106 component-model theorems |
-| Lean invariants | 11 covered, 3 partial, 2 deferred |
+| Lean theorems | 108 component-model theorems |
+| Claims | 13 covered, 1 partial, 1 deferred, 1 tool |
 
 ## P0
 
@@ -44,7 +44,7 @@ so the devnet install and every behavioural suite remain `not_run`.
 
 | Finding | Status | Note |
 |---|---|---|
-| F-003 dead global pause | open | `isPaused` is never consulted; wiring touches most mutating arms. |
+| F-003 dead global pause | fixed | Capacity-creating arms consult `isPaused` and fail closed; claims and value-out arms stay exempt. |
 | F-004 fund nonce split | fixed | `fundAdmin` checks `govNonce`; cover writes `govNonce`. |
 | F-005 books never populated | fixed | Policy/Claim factories now register in the books. |
 | F-006 policy expiry leaks lines | fixed | `Policy.expire` now calls `Line.release`. |
@@ -54,8 +54,8 @@ so the devnet install and every behavioural suite remain `not_run`.
 | F-010 no claim period/notice check | fixed | ClaimFactory checks the policy period and notice window. |
 | F-011 no slip premium refund | fixed | Slip.expire refunds the funded premium. |
 | F-012 line capability/state ordering | fixed | Line takes state first and reposts on every reply. |
-| F-020 payable can exceed aggregate | open | `Policy.settleClaim` does not guard `payable <= aggregateRemaining`; INV-9 is partial. |
-| F-021 settled claim can be re-agreed | open | `Claim.agree` does not reject terminal status; the Lean model records the counterexample. |
+| F-020 payable can exceed aggregate | fixed | `SureMath.payable` is the documented minimum and `Policy.settleClaim` propagates refusals without losing state; INV-9 is covered. |
+| F-021 settled claim can be re-agreed | fixed | `agree`/`addEvidence`/`classify`/`assess`/`dispute`/`applyDecision` reject terminal status; INV-10 is covered. |
 
 ## P2/P3
 
@@ -76,17 +76,18 @@ F-018 external reply shapes are assumed; F-019 test register was stale and is no
 ## Known install blocker
 
 A devnet install reaches `16_fund.rho`; `10_syndicate.rho` is refused with
-`Bundle's content must not have free variables or wildcards`. The scanner finds nine affected
-instance types, not only `Syndicate`/`LineGrant`. The static/parser gates and the Rust
-core/keystore tests pass; the install and behavioural campaign are not green.
+`Bundle's content must not have free variables or wildcards`. Nine instance types were
+affected; eight are fixed and the scanner now reports the remaining `Slip` candidate. The
+static/parser gates and the Rust core/keystore tests pass; the install and behavioural
+campaign are not green.
 
 ## Next steps
 
 1. Split `Slip`'s bind/settlement logic into helper contracts, close its bundle, and complete
    `make install`.
 2. Run the 36 behavioural suites and record honest pass/fail/not_run.
-3. Wire the global pause into the market entry arms (F-003); the other P1s are fixed.
-4. Keep the Lean component model, claims register and flow manifest current; close F-020
-   and F-021 with contract guards and regression suites.
+3. Keep the Lean component model, claims register and flow manifest current; F-003, F-020
+   and F-021 are fixed and the behavioural suites remain `not_run` until the devnet install
+   clears F-002.
 5. Run an independent adversarial review and record evidence.
 6. Do not describe any primitive as audited until the above is complete.

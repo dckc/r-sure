@@ -15,7 +15,7 @@
 
 ## Review
 
-`admin` consumes `adminState`, awaits `AdminGuard.verify`, then reposts. No re-entrant path. `isPaused` is a read arm but no mutating arm consults it (dead pause, HZ-E1).
+`admin` consumes `adminState`, awaits `AdminGuard.verify`, then reposts. No re-entrant path. `isPaused` is now consulted by the new-risk arms through a per-file fail-closed helper (F-003 fixed); terminal, claims and value-out arms remain exempt.
 
 ## Await / value-move notes
 

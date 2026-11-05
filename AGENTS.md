@@ -58,7 +58,8 @@ make web-test web-build
 - A claim settles once. `Line.paidFor[claimId]`, `Policy.claimPaid[claimId]` and
   `Claim.status` are the three guards.
 - The central fund cover is capped, one-shot and requires 2-of-3 signatures.
-- Global pause must not block settlement, close, expiry or refunds.
+- Global pause must not block settlement, close, expiry or refunds. New-risk arms consult
+  `isPaused` and fail closed; `make audit-check` enforces the gate matrix.
 - Do not claim a behavioural result unless the suite actually ran. "Implemented" means
   source plus static/parser gates, never behavioural verification.
 - Do not modify r-gen, r-cash or r-share from this repository.

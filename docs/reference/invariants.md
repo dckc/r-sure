@@ -17,9 +17,9 @@ The simulator and the audit use the same numbering as `spec/invariants.md`.
 | INV-7 | Line | A line never pays more than its exposure, and exposure never exceeds the written capital behind it. | covered (model) |
 | INV-8 | Exactly once | A claim is paid at most once per line, once per policy, and the fund covers it at most once. | covered |
 | INV-9 | Aggregate | Each settlement reduces the aggregate remaining and never drives it negative. | covered |
-| INV-10 | Terminal | Settled/denied claims and expired policies cannot be re-opened or re-paid. | partial: missing guards recorded |
+| INV-10 | Terminal | Settled/denied claims and expired policies cannot be re-opened or re-paid. | covered |
 | INV-11 | Atomicity | A failed deploy leaves no partial value move. | partial: native ERTP assumed |
-| INV-12 | Pause | Global pause does not block settlement, close, expiry or refunds. | deferred: F-003 open |
+| INV-12 | Pause | New risk is blocked; settlement, close, expiry and refunds are not. | tool-checked (F-003 fixed) |
 
 ## Modelling notes
 
@@ -29,7 +29,8 @@ The simulator and the audit use the same numbering as `spec/invariants.md`.
   aggregateRemaining)` is only equivalent when `agreed < perClaimLimit` or
   `aggregateRemaining >= perClaimLimit`; the contract itself caps at the per-claim limit when
   the agreed amount reaches it.
-- INV-10 is a target. `Claim@"agree"` and `Claim@"addEvidence"` reject some terminal states
-  but not all; the model proves the intended guard and the gap is recorded in
-  `claims.yaml`.
-- INV-11 and INV-12 are boundaries, not theorems over ERTP or the node.
+- INV-10 is guarded after F-021: `Claim@"agree"`, `addEvidence`, `classify`, `assess`,
+  `dispute` and `applyDecision` reject settled/denied/closed claims.
+- INV-11 is a boundary, not a theorem over ERTP or the node.
+- INV-12 is a narrow pause: new-risk arms fail closed; claims handling and value-out paths
+  remain available. It is enforced by `tools/check_pause_scope.py`, not a Lean theorem.

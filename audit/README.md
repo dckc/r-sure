@@ -23,7 +23,7 @@ the book chapters summarise them.
 | [registers/hazards.yaml](registers/hazards.yaml) | 27 hazards |
 | [registers/improvements.yaml](registers/improvements.yaml) | 21 fixes/deferred items |
 | [registers/tests.yaml](registers/tests.yaml) | 36 suites, all `not_run` |
-| [registers/theorems.yaml](registers/theorems.yaml) | 106 Lean component-model theorems |
+| [registers/theorems.yaml](registers/theorems.yaml) | 108 Lean component-model theorems |
 | [traceability/matrix.md](traceability/matrix.md) | generated arm/hazard/finding/test matrix |
 
 ## What to read for the verdict

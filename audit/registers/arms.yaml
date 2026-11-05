@@ -677,7 +677,7 @@ arms:
   visibility: public
   flow_rule: F-006
   flow_status: proved-model
-  lean_target: RSure.Model.Policy.policy_settle_remaining
+  lean_target: RSure.Model.Policy.policy_settle_aggregate
 - component: Policy
   arm: expire
   file: 17_policy.rho

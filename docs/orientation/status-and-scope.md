@@ -20,8 +20,8 @@
 - The devnet campaigns. Most `unit_*` suites exit 2 (`not_run`) until the campaign is run.
 - The Lean model proves the economic core (capacity, subscription, premium, payable,
   settlement, exactly-once, agreement, adjudication, books and linear cells) but is a shallow
-  component model, not a refinement of the Rholang contracts. INV-9 and INV-10 are partial,
-  INV-11 is boundary-limited and INV-12 is deferred while F-003 is open. See
+  component model, not a refinement of the Rholang contracts. INV-9 and INV-10 are covered,
+  INV-11 is boundary-limited and INV-12 is a narrow pause checked by a source gate. See
   `reference/formal-model.md`.
 - The Rust client, CLI, WASM and web app are scaffolds; they are not built or tested here.
 - Endorsements, renewals, reinstatement, reinsurance, delegated underwriting, premium

@@ -15,7 +15,7 @@
 
 ## Review
 
-`addSlip`, `pause` and `resume` consume `brokerState` and repost without external awaits. `bundle+{*Broker}` captures `brokerState` (P0 bundle). No value moves.
+`addSlip`, `pause` and `resume` consume `brokerState` and repost without external awaits. `bundle+{*Broker}` captures `brokerState` (P0 bundle). No value moves. `addSlip` is pause-gated; `pause/resume` stay available.
 
 ## Await / value-move notes
 

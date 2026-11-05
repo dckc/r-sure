@@ -313,6 +313,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
       } |
 
       contract Slip(@"accept", dId, ret2) = {
+
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
@@ -331,9 +332,11 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      } |
+
+} |
 
       contract Slip(@"subscribe", dId, @syndicateUri, @shareBps, ret2) = {
+
         for (@s <- slipState) {
           if (s.get("status") != "open" && s.get("status") != "subscribed") {
             slipState!(s) | ret2!((false, "closed"))
@@ -435,9 +438,11 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      } |
+
+} |
 
       contract Slip(@"fundPremium", dId, @payment, ret2) = {
+
         new aCh, iCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
@@ -496,9 +501,11 @@ contract authIsOwner(dId, @ownerId, ret) = {
               }
           }
         }
-      } |
+
+} |
 
       contract Slip(@"bind", ret2) = {
+
         for (@s <- slipState) {
           if (s.get("insuredAccepted") != true) {
             slipState!(s) | ret2!((false, "not accepted"))
@@ -591,7 +598,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      } |
+
+} |
 
       contract Slip(@"expire", ret2) = {
         new hCh in {
@@ -680,6 +688,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
   } |
 
   contract SlipFactory(@"open", dId, @req, ret) = {
+
+
     new aCh, okCh, bCh, prCh in {
       slipResolve!("component:broker-book", *bCh) |
       slipReqOk!(req, *okCh) |
@@ -782,7 +792,9 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       }
     }
-  } |
+
+
+} |
 
   rl!(`__ROOT_URI__`, *rootCh) |
   for (Root <- rootCh) {

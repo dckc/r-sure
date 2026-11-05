@@ -8,7 +8,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  authOwner, authIsOwner, brokerProfileOk, brokerMake
+  authOwner, authIsOwner, brokerProfileOk, brokerMake, isPaused
 in {
 // Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
 
@@ -36,6 +36,34 @@ contract authIsOwner(dId, @ownerId, ret) = {
     }
   }
 } |
+
+  contract isPaused(ret) = {
+    new rCh, kCh, pCh in {
+      rl!(`__ROOT_URI__`, *rCh) |
+      for (Root <- rCh) {
+        Root!("resolve", "component:admin", 1, *kCh) |
+        for (@r <- kCh) {
+          match r {
+            (true, uri, _) => {
+              new cCh in {
+                rl!(uri, *cCh) |
+                for (SureAdmin <- cCh) {
+                  @SureAdmin!("isPaused", *pCh) |
+                  for (@p <- pCh) {
+                    match p {
+                      (true, paused) => { ret!(paused) }
+                      _ => { ret!(true) }
+                    }
+                  }
+                }
+              }
+            }
+            _ => { ret!(true) }
+          }
+        }
+      }
+    }
+  } |
 
   contract brokerProfileOk(@profile, ret) = {
     match (profile.get("name"), profile.get("licenceHash"),
@@ -104,6 +132,11 @@ contract authIsOwner(dId, @ownerId, ret) = {
       } |
 
       contract Broker(@"addSlip", dId, @slipId, @uri, ret2) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret2!((false, "paused")) }
+        else {
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
@@ -127,7 +160,11 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      } |
+
+        }
+      }
+    }
+    } |
 
       contract Broker(@"pause", dId, ret2) = {
         new aCh in {
@@ -181,7 +218,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       }
     }
-  
+
     }
   }
 } |

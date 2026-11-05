@@ -288,7 +288,9 @@
         "R-003"
       ],
       "tests": [
-        "T-003"
+        "T-003",
+        "T-016",
+        "T-017"
       ]
     },
     {
@@ -1837,7 +1839,7 @@
       "visibility": "public",
       "flow_rule": "F-006",
       "flow_status": "proved-model",
-      "lean_target": "RSure.Model.Policy.policy_settle_remaining",
+      "lean_target": "RSure.Model.Policy.policy_settle_aggregate",
       "hazards": [
         "HZ-026"
       ],

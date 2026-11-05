@@ -9,7 +9,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  authOwner, authIsOwner, nowHeight, riskClassOk, evidenceOk, triOk, riskReqOk, riskMake
+  authOwner, authIsOwner, nowHeight, isPaused, riskClassOk, evidenceOk, triOk, riskReqOk, riskMake
 in {
   // @@INLINE:lib/Auth.rho@@
 
@@ -29,6 +29,34 @@ in {
               }
               _ => { ret!((false, "clock unavailable")) }
             }
+          }
+        }
+      }
+    }
+  } |
+
+  contract isPaused(ret) = {
+    new rCh, kCh, pCh in {
+      rl!(`__ROOT_URI__`, *rCh) |
+      for (Root <- rCh) {
+        Root!("resolve", "component:admin", 1, *kCh) |
+        for (@r <- kCh) {
+          match r {
+            (true, uri, _) => {
+              new cCh in {
+                rl!(uri, *cCh) |
+                for (SureAdmin <- cCh) {
+                  @SureAdmin!("isPaused", *pCh) |
+                  for (@p <- pCh) {
+                    match p {
+                      (true, paused) => { ret!(paused) }
+                      _ => { ret!(true) }
+                    }
+                  }
+                }
+              }
+            }
+            _ => { ret!(true) }
           }
         }
       }
@@ -192,6 +220,11 @@ in {
       } |
 
       contract Risk(@"accept", dId, ret2) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret2!((false, "paused")) }
+        else {
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
@@ -210,9 +243,18 @@ in {
             }
           }
         }
-      } |
+
+        }
+      }
+    }
+    } |
 
       contract Risk(@"decline", dId, @reasonHash, ret2) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret2!((false, "paused")) }
+        else {
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, _) <- aCh) {
@@ -224,7 +266,11 @@ in {
             }
           }
         }
-      } |
+
+        }
+      }
+    }
+    } |
 
       contract Risk(@"expire", ret2) = {
         new hCh in {
@@ -281,12 +327,17 @@ in {
         }
       }
     }
-  
+
     }
   }
 } |
 
   contract RiskBook(@"submit", dId, @req, ret) = {
+    new pauseCh in {
+      isPaused!(*pauseCh) |
+      for (@paused <- pauseCh) {
+        if (paused) { ret!((false, "paused")) }
+        else {
     new aCh, okCh in {
       authOwner!(*dId, *aCh) |
       riskReqOk!(req, *okCh) |
@@ -297,7 +348,11 @@ in {
         }
       }
     }
-  } |
+
+        }
+      }
+    }
+    } |
 
   contract RiskBook(@"risk", @riskId, ret) = {
     for (@b <<- riskBookState) {

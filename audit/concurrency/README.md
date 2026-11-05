@@ -52,7 +52,8 @@ Adapted from the Rholphin primitive review:
 - Nine per-object instance types were published with a bundle that captures a state cell or
   capability outside the contract body (F-002). Eight now use the rebind wrapper; `Slip`
   remains open because its wrapper exceeds the parser depth limit.
-- The global pause was dead (F-003); `SureFund` mixed `nonce`/`govNonce` (F-004, fixed).
+- The global pause was dead (F-003, fixed: new-risk arms fail closed; claims and value-out
+  arms stay exempt). `SureFund` mixed `nonce`/`govNonce` (F-004, fixed).
 - The books were never populated (F-005, fixed); `Policy.expire` did not release lines
   (F-006, fixed).
 
