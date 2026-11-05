@@ -22,7 +22,7 @@ in {
             (true, uri, _) => {
               new cCh in {
                 rl!(uri, *cCh) |
-                for (@C <- cCh) { ret!((true, *C)) }
+                for (C <- cCh) { ret!((true, *C)) }
               }
             }
             _ => { ret!((false, "unavailable", key)) }
@@ -159,11 +159,11 @@ in {
           match p.get("kind") {
             "account" => {
               new nCh in {
-                payAccount!(p, *purse, brand, assetId, *nCh) |
+                payAccount!(p, purse, brand, assetId, *nCh) |
                 for (@r <- nCh) {
                   match r {
                     (true, Nil) => {
-                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                      payPlan!(plan, i + 1, purse, brand, assetId, policyId,
                                *policyToken, *ret)
                     }
                     _ => { 1/0 }
@@ -173,11 +173,11 @@ in {
             }
             "fund" => {
               new nCh in {
-                payFund!(p, *purse, brand, assetId, policyId, *nCh) |
+                payFund!(p, purse, brand, assetId, policyId, *nCh) |
                 for (@r <- nCh) {
                   match r {
                     (true, Nil) => {
-                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                      payPlan!(plan, i + 1, purse, brand, assetId, policyId,
                                *policyToken, *ret)
                     }
                     _ => { 1/0 }
@@ -187,11 +187,11 @@ in {
             }
             "line" => {
               new nCh in {
-                payLine!(p, *purse, brand, *policyToken, *nCh) |
+                payLine!(p, purse, brand, *policyToken, *nCh) |
                 for (@r <- nCh) {
                   match r {
                     (true, _) => {
-                      payPlan!(plan, i + 1, *purse, brand, assetId, policyId,
+                      payPlan!(plan, i + 1, purse, brand, assetId, policyId,
                                *policyToken, *ret)
                     }
                     _ => { 1/0 }
@@ -206,7 +206,7 @@ in {
     }
   } |
 
-  contract payAccount(@p, purse, brand, assetId, ret) = {
+  contract payAccount(@p, @purse, @brand, @assetId, ret) = {
     new fCh in {
       distResolve!("component:payments", *fCh) |
       for (@pay <- fCh) {
@@ -248,7 +248,7 @@ in {
     }
   } |
 
-  contract payFund(@p, purse, brand, assetId, policyId, ret) = {
+  contract payFund(@p, @purse, @brand, @assetId, @policyId, ret) = {
     new fCh in {
       distResolve!("component:fund", *fCh) |
       for (@f <- fCh) {
@@ -280,7 +280,7 @@ in {
     }
   } |
 
-  contract payLine(@p, purse, brand, policyToken, ret) = {
+  contract payLine(@p, @purse, @brand, policyToken, ret) = {
     new lCh in {
       rl!(p.get("uri"), *lCh) |
       for (Line <- lCh) {
@@ -290,7 +290,7 @@ in {
             match w {
               (true, payment) => {
                 new dCh in {
-                  @Line!("credit", *policyToken, payment, *dCh) |
+                  Line!("credit", *policyToken, payment, *dCh) |
                   for (@d <- dCh) {
                     match d {
                       (true, _) => { ret!((true, Nil)) }
@@ -307,7 +307,7 @@ in {
     }
   } |
 
-  contract DistributionFactory(@"create", purse, brand, @assetId, @policyId,
+  contract DistributionFactory(@"create", @purse, @brand, @assetId, @policyId,
                                @base, @plan, policyToken, ret) = {
     new okCh in {
       planOk!(plan, 0, *okCh) |
@@ -338,7 +338,7 @@ in {
                 for (@s <<- distState) { ret2!((true, s.get("paid"))) }
               } |
 
-              contract Distribution(@"run", @runToken, ret2) = {
+              contract Distribution(@"run", runToken, ret2) = {
                 if (*runToken != *policyToken) {
                   ret2!((false, "not holder"))
                 } else {
@@ -352,7 +352,7 @@ in {
                           match alloc {
                             (true, payments) => {
                               new pCh in {
-                                payPlan!(payments, 0, *purse, brand, assetId,
+                                payPlan!(payments, 0, purse, brand, assetId,
                                          policyId, *policyToken, *pCh) |
                                 for (@pr <- pCh) {
                                   match pr {

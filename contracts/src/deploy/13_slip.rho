@@ -113,7 +113,7 @@ in {
                 rl!(s.get("syndicate"), *synCh) |
                 for (Syndicate <- synCh) {
                   new olCh in {
-                    @Syndicate!("openLine", s.get("grantId"), s.get("grantUri"),
+                    Syndicate!("openLine", s.get("grantId"), s.get("grantUri"),
                                 policyId, slipId, *slipToken, *policyToken, *olCh) |
                     for (@ol <- olCh) {
                       match ol {
@@ -151,7 +151,7 @@ in {
                 rl!(s.get("syndicate"), *synCh) |
                 for (Syndicate <- synCh) {
                   new eCh in {
-                    @Syndicate!("expireQuote", s.get("grantId"), *eCh) |
+                    Syndicate!("expireQuote", s.get("grantId"), *eCh) |
                     for (@e <- eCh) {
                       match e {
                         (true, _) => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
@@ -274,7 +274,7 @@ in {
                 rl!(syndicateUri, *synCh) |
                 for (Syndicate <- synCh) {
                   new iCh in {
-                    @Syndicate!("info", *iCh) |
+                    Syndicate!("info", *iCh) |
                     for (@ir <- iCh) {
                       match ir {
                         (true, syn) => {
@@ -287,7 +287,7 @@ in {
                                 match s.get("terms").get("aggregateLimit") * shareBps / 10000 + 8 {
                                   exposureCap => {
                                     new qCh in {
-                                      @Syndicate!("quote", *dId, s.get("class"),
+                                      Syndicate!("quote", *dId, s.get("class"),
                                                   s.get("id"), shareBps, exposureCap,
                                                   s.get("expiryHeight"), *slipToken, *qCh) |
                                       for (@q <- qCh) {
@@ -366,7 +366,7 @@ in {
         }
       } |
 
-      contract Slip(@"fundPremium", dId, payment, ret2) = {
+      contract Slip(@"fundPremium", dId, @payment, ret2) = {
         new aCh, iCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, _) <- aCh) {
@@ -476,7 +476,7 @@ in {
                                                     rl!(policyUri, *polCh) |
                                                     for (Policy <- polCh) {
                                                       new distCh in {
-                                                        @Policy!("distribute", *policyToken,
+                                                        Policy!("distribute", *policyToken,
                                                                  *distCh) |
                                                         for (@d <- distCh) {
                                                           match d {
@@ -574,7 +574,7 @@ in {
                             rl!(bUri, *bCh) |
                             for (Broker <- bCh) {
                               new aCh in {
-                                @Broker!("addSlip", *deployerId, s2.get("id"), uri, *aCh) |
+                                Broker!("addSlip", *deployerId, s2.get("id"), uri, *aCh) |
                                 for (@a <- aCh) {
                                   ret!((true, s2.get("id"), uri))
                                 }

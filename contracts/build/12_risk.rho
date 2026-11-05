@@ -49,7 +49,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
               (true, uri, _) => {
                 new cCh in {
                   rl!(uri, *cCh) |
-                  for (@Clock <- cCh) { @Clock!("now", *ret) }
+                  for (Clock <- cCh) { Clock!("now", *ret) }
                 }
               }
               _ => { ret!((false, "clock unavailable")) }

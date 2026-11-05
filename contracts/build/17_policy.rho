@@ -108,7 +108,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
             rl!(l.get("uri"), *lCh) |
             for (Line <- lCh) {
               new pCh in {
-                @Line!("pay", *policyToken, claimId, l.get("amount"), insured, *pCh) |
+                Line!("pay", *policyToken, claimId, l.get("amount"), insured, *pCh) |
                 for (@pr <- pCh) {
                   match pr {
                     (true, _) => {
@@ -209,7 +209,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       } |
 
-      contract Policy(@"distribute", @policyToken2, ret2) = {
+      contract Policy(@"distribute", policyToken2, ret2) = {
         if (*policyToken2 != *policyToken) {
           ret2!((false, "not holder"))
         } else {
@@ -249,7 +249,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                                   match d {
                                                     (true, DistributionFactory) => {
                                                       new cCh in {
-                                                        @DistributionFactory!("create", *purse,
+                                                        @DistributionFactory!("create", purse,
                                                           brand, s.get("assetId"),
                                                           s.get("id"), s.get("premiumTotal"),
                                                           fullPlan, *policyToken, *cCh) |
@@ -363,7 +363,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       } |
 
-      contract Policy(@"settleClaim", @claimToken2, @claimId, @agreed,
+      contract Policy(@"settleClaim", claimToken2, @claimId, @agreed,
                        @insured, ret2) = {
         if (*claimToken2 != *claimToken) {
           ret2!((false, "not holder"))

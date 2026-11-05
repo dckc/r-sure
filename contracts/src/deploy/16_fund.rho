@@ -89,7 +89,7 @@ in {
     }
   } |
 
-  contract fundMake(purse, brand, issuer) = {
+  contract fundMake(@purse, @brand, @issuer) = {
   contract SureFund(@"info", ret) = {
     for (@s <<- fundState) { ret!((true, s)) }
   } |
@@ -111,7 +111,7 @@ in {
     for (@s <<- fundState) { ret!((true, s.get("covers"))) }
   } |
 
-  contract SureFund(@"contribute", payment, @policyId, ret) = {
+  contract SureFund(@"contribute", @payment, @policyId, ret) = {
     new iCh in {
       for (@s0 <<- fundState) {
         new pCh in {
@@ -343,7 +343,7 @@ in {
   for (@pr <- porch) {
     match pr {
       (true, purse, brand, issuer) => {
-        fundMake!(*purse, brand, *issuer)
+        fundMake!(purse, brand, issuer)
       }
       _ => { deployId!([("fund purse failed", pr)]) }
     }

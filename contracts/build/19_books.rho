@@ -28,7 +28,7 @@ in {
       rl!(uri, *pCh) |
       for (Policy <- pCh) {
         new iCh in {
-          @Policy!("info", *iCh) |
+          Policy!("info", *iCh) |
           for (@i <- iCh) {
             match i {
               (true, s) => {
@@ -109,7 +109,7 @@ in {
       rl!(uri, *cCh) |
       for (Claim <- cCh) {
         new iCh in {
-          @Claim!("info", *iCh) |
+          Claim!("info", *iCh) |
           for (@i <- iCh) {
             match i {
               (true, s) => {

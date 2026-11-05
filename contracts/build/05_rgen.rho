@@ -176,7 +176,7 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
     new cCh in {
       rl!(uri, *cCh) |
       for (Provenance <- cCh) {
-        @Provenance!("verify", hash, *ret)
+        Provenance!("verify", hash, *ret)
       }
     }
   } |

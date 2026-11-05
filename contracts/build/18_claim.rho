@@ -75,7 +75,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
       rl!(policyUri, *pCh) |
       for (Policy <- pCh) {
         new iCh in {
-          @Policy!("info", *iCh) |
+          Policy!("info", *iCh) |
           for (@i <- iCh) { ret!(i) }
         }
       }
@@ -421,7 +421,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
               rl!(policyUri, *pCh) |
               for (Policy <- pCh) {
                 new scCh in {
-                  @Policy!("settleClaim", *claimToken, s.get("id"),
+                  Policy!("settleClaim", *claimToken, s.get("id"),
                            s.get("agreedAmount"), s.get("insured"), *scCh) |
                   for (@sc <- scCh) {
                     match sc {

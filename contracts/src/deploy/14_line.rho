@@ -66,7 +66,7 @@ in {
                 }
               } |
 
-              contract Line(@"credit", @lineToken, payment, ret2) = {
+              contract Line(@"credit", lineToken, @payment, ret2) = {
                 new rCh in {
                   @creditCap!("credit", *lineToken, payment, *rCh) |
                   for (@r <- rCh) {
@@ -84,7 +84,7 @@ in {
                 }
               } |
 
-              contract Line(@"pay", @lineToken, @claimId, @amount, @targetOwner, ret2) = {
+              contract Line(@"pay", lineToken, @claimId, @amount, @targetOwner, ret2) = {
                 new rCh in {
                   @settleCap!("pay", *lineToken, claimId, amount, targetOwner, *rCh) |
                   for (@r <- rCh) {
@@ -108,7 +108,7 @@ in {
                 }
               } |
 
-              contract Line(@"release", @lineToken, ret2) = {
+              contract Line(@"release", lineToken, ret2) = {
                 new rCh in {
                   @releaseCap!("release", *lineToken, *rCh) |
                   for (@r <- rCh) {

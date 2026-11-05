@@ -184,7 +184,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
             for (@purseR <- purseCh) {
               match purseR {
                 (true, purse, brand, issuer) => {
-                  syndicateMake!(ownerId, pubKey, profile, *purse, brand, *issuer, *ret)
+                  syndicateMake!(ownerId, pubKey, profile, purse, brand, issuer, *ret)
                 }
                 _ => { ret!(purseR) }
               }
@@ -241,9 +241,9 @@ contract authIsOwner(dId, @ownerId, ret) = {
 
   // ---------- per-line capabilities ----------
 
-  contract lineCreditCap(policyToken, purse, brand, issuer, stateCell, lineId, ret) = {
+  contract lineCreditCap(policyToken, @purse, @brand, @issuer, stateCell, @lineId, ret) = {
     new LineCredit in {
-      contract LineCredit(@"credit", @lineToken, payment, ret2) = {
+      contract LineCredit(@"credit", lineToken, @payment, ret2) = {
         if (*lineToken != *policyToken) {
           ret2!((false, "not holder"))
         } else {
@@ -278,10 +278,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
     }
   } |
 
-  contract lineSettleCap(policyToken, purse, brand, issuer, stateCell,
-                         lineId, exposure, ret) = {
+  contract lineSettleCap(policyToken, @purse, @brand, @issuer, stateCell,
+                         @lineId, @exposure, ret) = {
     new LineSettle in {
-      contract LineSettle(@"pay", @lineToken, @claimId, @amount, @targetOwner, ret2) = {
+      contract LineSettle(@"pay", lineToken, @claimId, @amount, @targetOwner, ret2) = {
         if (*lineToken != *policyToken) {
           ret2!((false, "not holder"))
         } else {
@@ -374,9 +374,9 @@ contract authIsOwner(dId, @ownerId, ret) = {
     }
   } |
 
-  contract lineReleaseCap(policyToken, stateCell, lineId, exposure, ret) = {
+  contract lineReleaseCap(policyToken, stateCell, @lineId, @exposure, ret) = {
     new LineRelease in {
-      contract LineRelease(@"release", @lineToken, ret2) = {
+      contract LineRelease(@"release", lineToken, ret2) = {
         if (*lineToken != *policyToken) {
           ret2!((false, "not holder"))
         } else {
@@ -404,7 +404,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
   } |
 
 
-  contract syndicateMake(@ownerId, @pubKey, @profile, purse, brand, issuer, ret) = {
+  contract syndicateMake(@ownerId, @pubKey, @profile, @purse, @brand, @issuer, ret) = {
+  new Syndicate, syndicateState, uriCh in {
                     syndicateState!({
                       "id": "",
                       "uri": "",
@@ -501,7 +502,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                       }
                     } |
 
-                    contract Syndicate(@"contribute", dId2, payment, ret2) = {
+                    contract Syndicate(@"contribute", dId2, @payment, ret2) = {
                       new a2Ch, iCh in {
                         authOwner!(*dId2, *a2Ch) |
                         @issuer!("getAmountOf", payment, *iCh) |
@@ -871,7 +872,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                                 rl!(grantUri, *gCh) |
                                                 for (LineGrant <- gCh) {
                                                   new consCh in {
-                                                    @LineGrant!("consume", slipId,
+                                                    LineGrant!("consume", slipId,
                                                       q.get("shareBps"), q.get("exposure"),
                                                       *slipToken, *consCh) |
                                                     for (@cons <- consCh) {
@@ -879,21 +880,21 @@ contract authIsOwner(dId, @ownerId, ret) = {
                                                         (true, _) => {
                                                           new creditCh, settleCh, releaseCh in {
                                                             lineCreditCap!(
-                                                              policyToken, *purse, brand,
-                                                              *issuer, *syndicateState, lineId,
+                                                              *policyToken, purse, brand,
+                                                              issuer, *syndicateState, lineId,
                                                               *creditCh) |
                                                             lineSettleCap!(
-                                                              policyToken, *purse, brand,
-                                                              *issuer, *syndicateState,
+                                                              *policyToken, purse, brand,
+                                                              issuer, *syndicateState,
                                                               lineId, q.get("exposure"),
                                                               *settleCh) |
                                                             lineReleaseCap!(
-                                                              policyToken, *syndicateState,
+                                                              *policyToken, *syndicateState,
                                                               lineId, q.get("exposure"),
                                                               *releaseCh) |
-                                                            for (@creditCap <- creditCh;
-                                                                 @settleCap <- settleCh;
-                                                                 @releaseCap <- releaseCh) {
+                                                            for (creditCap <- creditCh;
+                                                                 settleCap <- settleCh;
+                                                                 releaseCap <- releaseCh) {
                                                             new lfRet in {
                                                               @LineFactory!("create",
                                                                 {"lineId": lineId,
@@ -1037,7 +1038,8 @@ contract authIsOwner(dId, @ownerId, ret) = {
                         }
                       }
                     }
-                  } |
+                  }
+  } |
 
   syndicateBookState!({
     "syndicates": {},

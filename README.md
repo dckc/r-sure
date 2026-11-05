@@ -61,6 +61,15 @@ harness, a Lean model, audit registers and an mdBook.
 
 "Do not use real funds." The chain is pre-testnet and the contracts are unaudited.
 
+### Known install blocker
+
+A local devnet install reaches `16_fund.rho`; `10_syndicate.rho` is refused at deploy time
+with `Bundle's content must not have free variables or wildcards`. The instance contracts
+(`Syndicate`, `LineGrant`) capture their creation parameters, so the `bundle+{*…}` publication
+needs the same refactor r-share uses for per-object contracts. Static build/measure/parse and
+the Rust core/keystore tests pass; the devnet campaign is not green yet. This is recorded in
+`audit/report.md`.
+
 ## Integrations
 
 - **r-cash**: premiums are funded from an r-cash account into a policy-owned purse; claim
