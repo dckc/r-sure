@@ -1,22 +1,29 @@
 # Local reducer
 
-> **Status:** Implemented. Installs all 17 terms and calls the registry and `SureMath`;
-> it is a development gate, not a replacement for the devnet campaign.
+> **Status:** Implemented. Installs all 17 terms and drives a placement and claim to
+> settlement; it is a development gate, not a replacement for the devnet campaign.
 
 `make local-reducer` runs the built contracts in the node's own in-memory `RhoRuntime`.
 No devnet, Docker or network is involved. The gate installs `contracts/build/*.rho` in the
-install order, then calls the root and a component arm and checks the replies.
+install order, then drives:
+
+1. `SureRoot.resolve` and `SureMath.share`;
+2. syndicate create, capital contribution and broker registration;
+3. risk submit and slip open;
+4. subscribe, accept, fund the premium and bind;
+5. claim open, classify, assess, agree, settle and close.
 
 ## What it catches
 
 - Install-time normalizer failures: free variables, name/data sort errors, wildcard or
   bundle-content errors.
 - Registry and install wiring: every component must register under its key.
-- Call-shape errors: a term that resolves a component and calls an arm must get the
-  expected reply, or the step reports the reduction error and the reply text.
+- Call-shape and lifecycle errors: every step asserts a `true` reply and the expected
+  state at the end (21 components, claim `closed`, `paid` 800).
 
 It caught the funding term's missing `wdCh` binder class of defect before any deploy, and
-it is the first place a malformed install term fails without bringing up a node.
+it is the first place a malformed install term or a deadlocked arm fails without bringing
+up a node.
 
 ## How it runs
 
@@ -35,16 +42,18 @@ The output ends with:
 ```text
 local-reducer: resolve component:clock -> (true, `rho:id:…`, 1)
 local-reducer: suremath share(1000, 250) -> (true, 25, 975)
+local-reducer: bound slp:… -> (true, `rho:id:…`)
+local-reducer: claim … settled and closed
 local-reducer: root keys -> 21 components
 ```
 
 ## Fixtures and limits
 
-- **Stub r-cash.** `16_fund.rho` creates its purse at install and resolves
-  `component:asset-resolver` through the r-cash root. The reducer registers a stub root with
-  an asset resolver, issuer and purse before the install. The stub is enough for install and
-  for arms that only create a purse; it does not model ERTP transfers, so premium, payout
-  and contribution flows still need r-cash on a devnet.
+- **Stub r-cash.** `16_fund.rho` creates its purse at install, and the placement needs an
+  asset resolver, issuer, purse, account factory and deposit facets. The reducer registers
+  a stub r-cash root with those capabilities before the install. The stub returns 6000 for
+  a capital contribution, 1000 for `"premium:1000"`, and the requested amount on
+  `withdraw`; it does not model ERTP conservation, balances or authority.
 - **No signatures.** The deployer id is a fixed public key supplied through the normalizer
   environment; 2-of-3 admin flows and anything that verifies a signature are not exercised.
 - **No finality or persistence.** Each run starts from an empty space and ends when the

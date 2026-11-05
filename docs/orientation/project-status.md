@@ -28,9 +28,10 @@ premium distribution, policy aggregate, the claim lifecycle and refusals, centra
 shortfalls, settlement conservation, pause scope, replay and the r-cash/r-gen/r-share
 boundaries.
 
-The local reducer installs all 17 terms in the node's own in-memory runtime, registers the
-21 components and returns correct replies from `SureRoot` and `SureMath`, with no devnet.
-See [Local reducer](../reference/local-reducer.md).
+The local reducer installs all 17 terms in the node's own in-memory runtime and drives a
+placement from syndicate creation through claim settlement and close, with no devnet. It
+also asserts that the root resolves all 21 components. See
+[Local reducer](../reference/local-reducer.md).
 
 The formal model proves the insurance economics over a shallow state model: capacity,
 subscription, premium allocation, payable bounds, settlement conservation, exactly-once
