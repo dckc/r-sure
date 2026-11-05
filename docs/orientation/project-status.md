@@ -30,7 +30,8 @@ boundaries.
 
 The local reducer installs all 17 terms in the node's own in-memory runtime and drives a
 placement from syndicate creation through claim settlement and close, with no devnet. It
-also asserts 22 refusal vectors with their exact reasons and that the root resolves all 21
+also asserts 22 refusal vectors with their exact reasons, signs a 2-of-3 pause and resume,
+pauses writes while reads stay available, and asserts that the root resolves all 21
 components. See [Local reducer](../reference/local-reducer.md).
 
 The formal model proves the insurance economics over a shallow state model: capacity,

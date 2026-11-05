@@ -13,8 +13,10 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use rchain_crypto::hash::blake2b256;
 use rchain_crypto::hash::blake2b512_random::Blake2b512Random;
 use rchain_crypto::public_key::PublicKey;
+use rchain_crypto::signatures::secp256k1::Secp256k1;
 use rchain_models::rholang::RhoType::{RhoDeployId, RhoDeployerId};
 use rchain_models::runtime::{BindPattern, ListParWithRandom, TaggedContinuation};
 use rchain_models::sorted::SortedProc;
@@ -48,33 +50,30 @@ const ORDER: &[&str] = &[
     "19_books.rho",
 ];
 
-// Valid 65-byte secp256k1 public keys. They are identities only: the local reducer never
-// signs anything, and no secret is involved.
-const ADMINS: [&str; 3] = [
-    "04df0092d2416c46f9e8711136f90f3c9026ed3ccf8c82ffff944e6a1215e53cc9d361ef70ab28417ebd979a92411397d5abf00ef7657029a9674e9875cb5739c2",
-    "04db11c81588f16118564d383d9f7d6ee86318d1c0d04a3bcfbb315d4110f25c7056f6c0369fc66c985d94deb9d89ed4b6e99686eb47425352eba9c50dc3368fe2",
-    "04ff68fdfc50f6ca6b71f8b0e390f756375be510e5145402cb212df23468500f3315e3667ef871bf6e8902c6ea2edd25942d17593a66f9ee3c9a451d7de3585812",
-];
-const PLATFORM: &str = "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau";
+// Deterministic local-only admin keys. The secrets live in this process, are never
+// committed and are never used against a node; they exist so the reducer can sign a real
+// 2-of-3 admin payload and exercise signature verification and pause scope.
+fn admin_secret(index: usize) -> Vec<u8> {
+    vec![(index as u8) + 1; 32]
+}
+
+fn admin_public(index: usize) -> Vec<u8> {
+    Secp256k1::to_public_bytes(&admin_secret(index)).expect("deterministic secp256k1 key")
+}
 
 fn deployer_key() -> Vec<u8> {
-    deployer_key_of(0)
+    admin_public(0)
 }
 
 fn deployer_key_of(index: usize) -> Vec<u8> {
-    fn nibble(ch: char) -> u8 {
-        match ch {
-            '0'..='9' => ch as u8 - b'0',
-            'a'..='f' => ch as u8 - b'a' + 10,
-            'A'..='F' => ch as u8 - b'A' + 10,
-            _ => 0,
-        }
-    }
-    let hex = ADMINS[index].as_bytes();
-    hex.chunks(2)
-        .map(|pair| (nibble(pair[0] as char) << 4) | nibble(pair[1] as char))
-        .collect()
+    admin_public(index)
 }
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+const PLATFORM: &str = "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau";
 
 type Error = Box<dyn std::error::Error>;
 
@@ -135,6 +134,48 @@ impl Reducer {
         Ok(self.deploy(&term).await?.join(" "))
     }
 
+    /// Build the canonical payload, sign it with two admin keys, and submit the action.
+    async fn admin_action(
+        &mut self,
+        root: &str,
+        action: &str,
+        nonce: i64,
+    ) -> Result<String, Error> {
+        let payload = self
+            .component_call(
+                root,
+                "component:codec",
+                "adminPayload",
+                &format!(r#", "admin", {nonce}, "{action}", []"#),
+            )
+            .await?;
+        let payload = first_quoted(&payload)
+            .ok_or_else(|| std::io::Error::other(format!("payload: {payload}")))?;
+        let digest = blake2b256::hash(payload.as_bytes());
+        let signatures = (0..2)
+            .map(|index| {
+                Secp256k1::sign_bytes(&digest, &admin_secret(index))
+                    .map(|signature| hex(&signature))
+                    .map_err(|error| std::io::Error::other(error.to_string()))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let literal = format!(
+            "[{}]",
+            signatures
+                .iter()
+                .map(|signature| format!("\"{signature}\".hexToBytes()"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+        self.component_call(
+            root,
+            "component:admin",
+            "admin",
+            &format!(r#", {nonce}, "{action}", [], {literal}"#),
+        )
+        .await
+    }
+
     /// Call one arm on the root by URI.
     async fn root_call(&mut self, root: &str, arm: &str, args: &str) -> Result<String, Error> {
         let term = format!(
@@ -191,9 +232,8 @@ impl Reducer {
 fn render(source: &str, root: &str, rcash: &str) -> String {
     let admins = format!(
         "[{}]",
-        ADMINS
-            .iter()
-            .map(|key| format!("\"{key}\".hexToBytes()"))
+        (0..3)
+            .map(|index| format!("\"{}\".hexToBytes()", hex(&admin_public(index))))
             .collect::<Vec<_>>()
             .join(", ")
     );
@@ -675,6 +715,54 @@ async fn run() -> Result<(), Error> {
         .component_call(&root, "component:claim-book", "claim", r#", "clm:missing""#)
         .await?;
     expect_refusal("unknown book claim", &unknown_book_claim, "unknown claim")?;
+
+    let before_pause = reducer
+        .component_call(&root, "component:admin", "isPaused", "")
+        .await?;
+    if !before_pause.contains("true, false") {
+        return Err(std::io::Error::other(format!("initial pause state: {before_pause}")).into());
+    }
+
+    let pause = reducer.admin_action(&root, "pauseAll", 1).await?;
+    if !pause.contains("true") {
+        return Err(std::io::Error::other(format!("pauseAll: {pause}")).into());
+    }
+    let paused = reducer
+        .component_call(&root, "component:admin", "isPaused", "")
+        .await?;
+    if !paused.contains("true, true") {
+        return Err(std::io::Error::other(format!("paused state: {paused}")).into());
+    }
+
+    let blocked = reducer
+        .component_call(&root, "component:syndicate-book", "create", syndicate_args)
+        .await?;
+    expect_refusal("paused syndicate create", &blocked, "paused")?;
+
+    let read_while_paused = reducer
+        .root_call(&root, "resolve", r#", "component:clock", 1"#)
+        .await?;
+    if !read_while_paused.contains("true") {
+        return Err(
+            std::io::Error::other(format!("read while paused: {read_while_paused}")).into(),
+        );
+    }
+
+    let resume = reducer.admin_action(&root, "resumeAll", 2).await?;
+    if !resume.contains("true") {
+        return Err(std::io::Error::other(format!("resumeAll: {resume}")).into());
+    }
+    let resumed = reducer
+        .component_call(&root, "component:admin", "isPaused", "")
+        .await?;
+    if !resumed.contains("true, false") {
+        return Err(std::io::Error::other(format!("resumed state: {resumed}")).into());
+    }
+    let after_resume = reducer
+        .component_call(&root, "component:syndicate-book", "create", syndicate_args)
+        .await?;
+    expect_refusal("create after resume", &after_resume, "duplicate owner")?;
+    println!("local-reducer: pause and resume with two admin signatures");
     let keys = reducer.deploy(&keys).await?.join(" ");
     let registered = keys.matches("component:").count();
     if !keys.contains("true") || registered != 21 {

@@ -20,6 +20,10 @@ non-insured claim, loss outside the window, zero claim, blank and asset-less ter
 before agreement, assess before classification, non-lead agree, and unknown policy/book
 claims.
 
+Finally it signs a canonical admin payload with two deterministic local admin keys, submits
+`pauseAll`, checks that a new syndicate is refused with `paused` while the root still
+resolves, then submits `resumeAll` and checks that the write path is open again.
+
 ## What it catches
 
 - Install-time normalizer failures: free variables, name/data sort errors, wildcard or
@@ -29,6 +33,8 @@ claims.
   state at the end (21 components, claim `closed`, `paid` 800).
 - Refusal drift: a changed guard or reason string fails the run, so the negative paths are
   checked before the devnet campaign sees them.
+- Signature and pause scope: the 2-of-3 payload is signed and verified by the deployed
+  `AdminGuard`; pause blocks writes, leaves reads available and resumes cleanly.
 
 It caught the funding term's missing `wdCh` binder class of defect before any deploy, and
 it is the first place a malformed install term or a deadlocked arm fails without bringing
@@ -55,6 +61,7 @@ local-reducer: bound slp:… -> (true, `rho:id:…`)
 local-reducer: claim … settled and closed
 local-reducer: refused bind is one-shot -> closed
 local-reducer: refused non-lead agree -> not lead
+local-reducer: pause and resume with two admin signatures
 local-reducer: root keys -> 21 components
 ```
 
@@ -65,8 +72,10 @@ local-reducer: root keys -> 21 components
   a stub r-cash root with those capabilities before the install. The stub returns 6000 for
   a capital contribution, 1000 for `"premium:1000"`, and the requested amount on
   `withdraw`; it does not model ERTP conservation, balances or authority.
-- **No signatures.** The deployer id is a fixed public key supplied through the normalizer
-  environment; 2-of-3 admin flows and anything that verifies a signature are not exercised.
+- **Local admin keys.** The three admin keys are derived from deterministic secrets held in
+  the reducer process. They are never used against a node; they exist so the 2-of-3 payload
+  can be signed and verified locally. r-gen credentials and signatures are not modelled, so
+  the disputed-claim and oracle paths stay on the devnet campaign.
 - **No finality or persistence.** Each run starts from an empty space and ends when the
   calls return. It does not prove a block can be proposed or that state survives a restart.
 - **Not a refinement.** The Lean model is separate: this runs the real terms, but it does
