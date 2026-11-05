@@ -186,6 +186,52 @@ in {
     }
   } |
 
+  contract slipRefund(@s, purse, @brand, ret) = {
+    if (s.get("funded") < 1) {
+      ret!((true, Nil))
+    } else {
+      new pCh in {
+        slipResolve!("component:payments", *pCh) |
+        for (@p <- pCh) {
+          match p {
+            (true, Payments) => {
+              new fCh in {
+                @Payments!("depositFacet", s.get("insured"), s.get("assetId"), *fCh) |
+                for (@f <- fCh) {
+                  match f {
+                    (true, facet) => {
+                      new wCh in {
+                        purse!("withdraw", (brand, s.get("funded")), *wCh) |
+                        for (@w <- wCh) {
+                          match w {
+                            (true, payment) => {
+                              new dCh in {
+                                @facet!("deposit", payment, *dCh) |
+                                for (@d <- dCh) {
+                                  match d {
+                                    (true, _) => { ret!((true, Nil)) }
+                                    _ => { 1/0 }
+                                  }
+                                }
+                              }
+                            }
+                            _ => { 1/0 }
+                          }
+                        }
+                      }
+                    }
+                    _ => { ret!(f) }
+                  }
+                }
+              }
+            }
+            _ => { ret!((false, "payments unavailable")) }
+          }
+        }
+      }
+    }
+  } |
+
   contract slipMake(@ownerId, @brokerId, @sid, @req, purse, brand, issuer,
                     slipToken, policyToken, claimToken, ret) = {
     new Slip, slipState, uriCh in {
@@ -393,7 +439,7 @@ in {
                                         slipState!(s) | ret2!((false, "amount"))
                                       } else {
                                         new dCh in {
-                                          @purse!("deposit", payment, *dCh) |
+                                          purse!("deposit", payment, *dCh) |
                                           for (@d <- dCh) {
                                             match d {
                                               (true, _) => {
@@ -472,7 +518,7 @@ in {
                                                "termsHash": s.get("termsHash"),
                                                "premiumTotal": s.get("premiumTotal"),
                                                "lines": lines},
-                                              *purse, brand, *policyToken, *claimToken, *pCh) |
+                                              *purse, *brand, *policyToken, *claimToken, *pCh) |
                                             for (@pr <- pCh) {
                                               match pr {
                                                 (true, policyUri) => {
@@ -541,9 +587,19 @@ in {
                           new eqCh in {
                             slipExpireQuotes!(keys, 0, s.get("shares"), *eqCh) |
                             for (@eq <- eqCh) {
-                              slipState!(s.set("status", "expired")
-                                          .set("nonce", s.get("nonce") + 1)) |
-                              ret2!((true, Nil))
+                              new refCh in {
+                                slipRefund!(s, purse, brand, *refCh) |
+                                for (@ref <- refCh) {
+                                  match ref {
+                                    (true, Nil) => {
+                                      slipState!(s.set("status", "expired")
+                                                  .set("nonce", s.get("nonce") + 1)) |
+                                      ret2!((true, Nil))
+                                    }
+                                    _ => { 1/0 }
+                                  }
+                                }
+                              }
                             }
                           }
                         }
@@ -651,7 +707,7 @@ in {
                                                                                 slipMake!(*dId, brokerId, sid,
                                                                                   req.set("termsHash", termsHash)
                                                                                      .set("class", req.get("class")),
-                                                                                  *purse, brand, *issuer,
+                                                                                  *purse, *brand, *issuer,
                                                                                   *slipToken, *policyToken,
                                                                                   *claimToken, *ret)
                                                                               }

@@ -74,6 +74,11 @@ def main(argv: list[str] | None = None) -> int:
             name = bundle.group(1)
             if name not in INSTANCE_BUNDLES:
                 continue
+            # A rebind wrapper (`new cfg...`) before the bundle means the instance
+            # captures for-bound aliases, not the maker parameters. The normalizer is
+            # the authority; this heuristic only reports the remaining unrebound case.
+            if 'new cfg' in text[:bundle.start()]:
+                continue
             found = contract_body(text, name)
             if not found:
                 continue

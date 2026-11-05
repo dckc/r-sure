@@ -50,9 +50,11 @@ Adapted from the Rholphin primitive review:
 - Eight cornerstone arms had a take → await → take defect before remediation (see
   `../registers/findings.yaml`, F-001).
 - Nine per-object instance types were published with a bundle that captures a state cell or
-  capability outside the contract body (F-002). The node rejects these at install.
-- The global pause was dead (F-003), and `SureFund` mixed `nonce`/`govNonce` (F-004).
-- The books were never populated (F-005); `Policy.expire` did not release lines (F-006).
+  capability outside the contract body (F-002). Eight now use the rebind wrapper; `Slip`
+  remains open because its wrapper exceeds the parser depth limit.
+- The global pause was dead (F-003); `SureFund` mixed `nonce`/`govNonce` (F-004, fixed).
+- The books were never populated (F-005, fixed); `Policy.expire` did not release lines
+  (F-006, fixed).
 
 The reviews are updated after remediation; the pre-remediation candidates are preserved in
 `../evidence/2026-11-05-concurrency-tabletop/`.

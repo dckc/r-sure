@@ -380,16 +380,25 @@ in {
 
 
   contract syndicateMake(@ownerId, @pubKey, @profile, @purse, @brand, @issuer, ret) = {
+  new cfgOwnerId, cfgPubKey, cfgProfile, cfgPurse, cfgBrand, cfgIssuer in {
+    cfgOwnerId!(ownerId) |
+    cfgPubKey!(pubKey) |
+    cfgProfile!(profile) |
+    cfgPurse!(purse) |
+    cfgBrand!(brand) |
+    cfgIssuer!(issuer) |
+    for (@ownerIdV <- cfgOwnerId; @pubKeyV <- cfgPubKey; @profileV <- cfgProfile; @purseV <- cfgPurse; @brandV <- cfgBrand; @issuerV <- cfgIssuer) {
+
   new Syndicate, syndicateState, uriCh in {
                     syndicateState!({
                       "id": "",
                       "uri": "",
-                      "ownerId": ownerId,
-                      "managerId": ownerId,
-                      "managerPubKey": pubKey,
-                      "name": profile.get("name"),
-                      "assetId": profile.get("assetId"),
-                      "treasuryId": ownerId,
+                      "ownerId": ownerIdV,
+                      "managerId": ownerIdV,
+                      "managerPubKey": pubKeyV,
+                      "name": profileV.get("name"),
+                      "assetId": profileV.get("assetId"),
+                      "treasuryId": ownerIdV,
                       "capital": 0,
                       "committed": 0,
                       "written": 0,
@@ -398,7 +407,7 @@ in {
                       "members": {},
                       "quotes": {},
                       "lines": {},
-                      "riskAppetite": profile.get("riskAppetite"),
+                      "riskAppetite": profileV.get("riskAppetite"),
                       "status": "active",
                       "nonce": 0
                     }) |
@@ -480,14 +489,14 @@ in {
                     contract Syndicate(@"contribute", dId2, @payment, ret2) = {
                       new a2Ch, iCh in {
                         authOwner!(*dId2, *a2Ch) |
-                        @issuer!("getAmountOf", payment, *iCh) |
+                        @issuerV!("getAmountOf", payment, *iCh) |
                         for (@(true, who) <- a2Ch; @amt <- iCh) {
                           match amt {
                             (true, amount) => {
                               if (amount < 1) { ret2!((false, "amount")) }
                               else {
                                 new dCh in {
-                                  @purse!("deposit", payment, *dCh) |
+                                  @purseV!("deposit", payment, *dCh) |
                                   for (@d <- dCh) {
                                     match d {
                                       (true, _) => {
@@ -563,8 +572,8 @@ in {
                                                                 m.get("withdrawn") + amount)))
                                                           .set("nonce", s.get("nonce") + 1)) |
                                                         new wCh in {
-                                                          @purse!("withdraw",
-                                                                  (brand, amount), *wCh) |
+                                                          @purseV!("withdraw",
+                                                                  (brandV, amount), *wCh) |
                                                           for (@w <- wCh) {
                                                             match w {
                                                               (true, payment) => {
@@ -855,12 +864,12 @@ in {
                                                         (true, _) => {
                                                           new creditCh, settleCh, releaseCh in {
                                                             lineCreditCap!(
-                                                              *policyToken, purse, brand,
-                                                              issuer, *syndicateState, lineId,
+                                                              *policyToken, purseV, brandV,
+                                                              issuerV, *syndicateState, lineId,
                                                               *creditCh) |
                                                             lineSettleCap!(
-                                                              *policyToken, purse, brand,
-                                                              issuer, *syndicateState,
+                                                              *policyToken, purseV, brandV,
+                                                              issuerV, *syndicateState,
                                                               lineId, q.get("exposure"),
                                                               *settleCh) |
                                                             lineReleaseCap!(
@@ -984,9 +993,9 @@ in {
                       for (@s2 <- syndicateState) {
                         syndicateState!(s2.set("uri", uri)) |
                         for (@b <- syndicateBookState) {
-                          match b.get("byOwner").get(ownerId) {
+                          match b.get("byOwner").get(ownerIdV) {
                             Nil => {
-                              match "syn:" ++ ownerId ++ ":" ++ b.get("count").toString() {
+                              match "syn:" ++ ownerIdV ++ ":" ++ b.get("count").toString() {
                                 id2 => {
                                   new cCh in {
                                     bookAddClasses!(s2.get("riskAppetite"), 0,
@@ -994,7 +1003,7 @@ in {
                                     for (@byClass <- cCh) {
                                       syndicateBookState!(b.set("syndicates",
                                           b.get("syndicates").set(id2, uri))
-                                        .set("byOwner", b.get("byOwner").set(ownerId, id2))
+                                        .set("byOwner", b.get("byOwner").set(ownerIdV, id2))
                                         .set("byClass", byClass)
                                         .set("count", b.get("count") + 1)) |
                                       for (@s3 <- syndicateState) {
@@ -1012,7 +1021,10 @@ in {
                       }
                     }
                   }
-  } |
+  
+    }
+  }
+} |
 
   syndicateBookState!({
     "syndicates": {},

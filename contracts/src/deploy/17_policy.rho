@@ -9,7 +9,7 @@ new
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
   policyResolve, nowHeight, policyMake, lineEntries, payLinePlan, releaseLinePlan,
-  policyReqOk, authOwner
+  policyReqOk, authOwner, authIsOwner
 in {
   // @@INLINE:lib/Auth.rho@@
 
@@ -126,31 +126,39 @@ in {
   } |
 
   contract policyMake(@req, purse, brand, policyToken, claimToken, ret) = {
+  new cfgReq, cfgPurse, cfgBrand, cfgPolicyToken, cfgClaimToken in {
+    cfgReq!(req) |
+    cfgPurse!(*purse) |
+    cfgBrand!(*brand) |
+    cfgPolicyToken!(*policyToken) |
+    cfgClaimToken!(*claimToken) |
+    for (@reqV <- cfgReq; purseV <- cfgPurse; brandV <- cfgBrand; policyTokenV <- cfgPolicyToken; claimTokenV <- cfgClaimToken) {
+
     new Policy, policyState, uriCh in {
       policyState!({
-        "id": req.get("policyId"),
+        "id": reqV.get("policyId"),
         "uri": "",
-        "slipId": req.get("slipId"),
-        "slipUri": req.get("slipUri"),
-        "riskId": req.get("riskId"),
-        "insured": req.get("insured"),
-        "broker": req.get("broker"),
-        "brokerOwner": req.get("brokerOwner"),
-        "class": req.get("class"),
-        "assetId": req.get("terms").get("assetId"),
-        "terms": req.get("terms"),
-        "termsHash": req.get("termsHash"),
-        "premiumTotal": req.get("premiumTotal"),
-        "lines": req.get("lines"),
+        "slipId": reqV.get("slipId"),
+        "slipUri": reqV.get("slipUri"),
+        "riskId": reqV.get("riskId"),
+        "insured": reqV.get("insured"),
+        "broker": reqV.get("broker"),
+        "brokerOwner": reqV.get("brokerOwner"),
+        "class": reqV.get("class"),
+        "assetId": reqV.get("terms").get("assetId"),
+        "terms": reqV.get("terms"),
+        "termsHash": reqV.get("termsHash"),
+        "premiumTotal": reqV.get("premiumTotal"),
+        "lines": reqV.get("lines"),
         "lead": Nil,
         "second": Nil,
         "leadManager": Nil,
         "secondManager": Nil,
-        "aggregateLimit": req.get("terms").get("aggregateLimit"),
+        "aggregateLimit": reqV.get("terms").get("aggregateLimit"),
         "aggregatePaid": 0,
-        "aggregateRemaining": req.get("terms").get("aggregateLimit"),
-        "perClaimLimit": req.get("terms").get("perClaimLimit"),
-        "deductible": req.get("terms").get("deductible"),
+        "aggregateRemaining": reqV.get("terms").get("aggregateLimit"),
+        "perClaimLimit": reqV.get("terms").get("perClaimLimit"),
+        "deductible": reqV.get("terms").get("deductible"),
         "claims": {},
         "distributed": false,
         "status": "active",
@@ -209,7 +217,7 @@ in {
       } |
 
       contract Policy(@"distribute", policyToken2, ret2) = {
-        if (*policyToken2 != *policyToken) {
+        if (*policyToken2 != *policyTokenV) {
           ret2!((false, "not holder"))
         } else {
           for (@s <- policyState) {
@@ -248,10 +256,10 @@ in {
                                                   match d {
                                                     (true, DistributionFactory) => {
                                                       new cCh in {
-                                                        @DistributionFactory!("create", purse,
-                                                          brand, s.get("assetId"),
+                                                        @DistributionFactory!("create", *purseV,
+                                                          *brandV, s.get("assetId"),
                                                           s.get("id"), s.get("premiumTotal"),
-                                                          fullPlan, *policyToken, *cCh) |
+                                                          fullPlan, *policyTokenV, *cCh) |
                                                         for (@cr <- cCh) {
                                                           match cr {
                                                             (true, distUri) => {
@@ -259,7 +267,7 @@ in {
                                                                 rl!(distUri, *runCh) |
                                                                 for (Distribution <- runCh) {
                                                                   new rrCh in {
-                                                                    @Distribution!("run", *policyToken, *rrCh) |
+                                                                    Distribution!("run", *policyTokenV, *rrCh) |
                                                                     for (@rr <- rrCh) {
                                                                       match rr {
                                                                         (true, _) => {
@@ -308,7 +316,7 @@ in {
         }
       } |
 
-      contract Policy(@"openClaim", dId, @req, ret2) = {
+      contract Policy(@"openClaim", dId, @reqV, ret2) = {
         new aCh in {
           authOwner!(*dId, *aCh) |
           for (@(true, who) <- aCh) {
@@ -330,7 +338,7 @@ in {
                             new cfCh in {
                               @ClaimFactory!("create", *dId, s.get("uri"), s.get("id"),
                                              s.get("insured"), s.get("broker"),
-                                             *claimToken, req, *cfCh) |
+                                             *claimTokenV, reqV, *cfCh) |
                               for (@cr <- cfCh) {
                                 match cr {
                                   (true, claimId, claimUri) => {
@@ -360,7 +368,7 @@ in {
 
       contract Policy(@"settleClaim", claimToken2, @claimId, @agreed,
                        @insured, ret2) = {
-        if (*claimToken2 != *claimToken) {
+        if (*claimToken2 != *claimTokenV) {
           ret2!((false, "not holder"))
         } else {
           for (@s <- policyState) {
@@ -404,7 +412,7 @@ in {
                                                             (true, lineAmounts) => {
                                                               new payCh in {
                                                                 payLinePlan!(lineAmounts, 0, claimId,
-                                                                             insured, *policyToken, *payCh) |
+                                                                             insured, *policyTokenV, *payCh) |
                                                                 for (@pr <- payCh) {
                                                                   match pr {
                                                                     (true, Nil) => {
@@ -444,7 +452,7 @@ in {
                                                           (true, lineAmounts) => {
                                                             new payCh in {
                                                               payLinePlan!(lineAmounts, 0, claimId,
-                                                                           insured, *policyToken, *payCh) |
+                                                                           insured, *policyTokenV, *payCh) |
                                                               for (@pr <- payCh) {
                                                                 match pr {
                                                                   (true, Nil) => {
@@ -510,7 +518,7 @@ in {
                         policyState!(s) | ret2!((false, "not expired"))
                       } else {
                         new relCh in {
-                          releaseLinePlan!(s.get("lines"), 0, *policyToken, *relCh) |
+                          releaseLinePlan!(s.get("lines"), 0, *policyTokenV, *relCh) |
                           for (@rel <- relCh) {
                             match rel {
                               (true, Nil) => {
@@ -537,11 +545,28 @@ in {
       for (@uri <- uriCh) {
         for (@s2 <- policyState) {
           policyState!(s2.set("uri", uri)) |
-          ret!((true, uri))
+          new pbCh in {
+            policyResolve!("component:policy-book", *pbCh) |
+            for (@pbr <- pbCh) {
+              match pbr {
+                (true, PolicyBook) => {
+                  new regCh in {
+                    @PolicyBook!("register", s2.get("id"), uri, s2.get("slipId"),
+                                s2.get("insured"), s2.get("broker"), *regCh) |
+                    for (@r <- regCh) { ret!((true, uri)) }
+                  }
+                }
+                _ => { ret!((true, uri)) }
+              }
+            }
+          }
         }
       }
     }
-  } |
+  
+    }
+  }
+} |
 
   contract PolicyFactory(@"create", @req, purse, brand, policyToken, claimToken, ret) = {
     new okCh in {
@@ -549,7 +574,7 @@ in {
       for (@ok <- okCh) {
         match ok {
           (false, reason) => { ret!((false, reason)) }
-          (true, Nil) => { policyMake!(req, *purse, brand, *policyToken, *claimToken, *ret) }
+          (true, Nil) => { policyMake!(req, *purse, *brand, *policyToken, *claimToken, *ret) }
         }
       }
     }

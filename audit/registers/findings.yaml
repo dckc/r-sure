@@ -73,9 +73,8 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: Nine per-object contracts are published with bundle+{*X} while X's
-    body references a state cell or token created outside X. The node rejects the
-    bundle.
+  description: Eight of nine instance types use the rebind pattern and normalize cleanly;
+    Slip remains open because the wrapper pushes the term past the parser depth limit.
   preconditions: A caller reaches the arm on the affected path.
   impact: Devnet install is blocked; no instance can be created.
   proposed_fix: R-002
@@ -134,7 +133,7 @@ findings:
   title: Books are never populated
   severity: P1
   class: composition
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - PolicyBook
@@ -152,7 +151,7 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: Policy and Claim creation never call the books.
+  description: PolicyFactory/Policy and ClaimFactory/Claim now register in PolicyBook/ClaimBook.
   preconditions: A caller reaches the arm on the affected path.
   impact: Discovery indexes are empty; clients cannot enumerate policies/claims on-chain.
   proposed_fix: R-005
@@ -260,7 +259,7 @@ findings:
   title: Policy.openClaim has no period/notice check
   severity: P1
   class: composition
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Policy
@@ -274,8 +273,8 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: openClaim does not compare lossHeight to the policy period or notice
-    window.
+  description: ClaimFactory now checks the loss period and notice window against Policy.info
+    and Clock.
   preconditions: A caller reaches the arm on the affected path.
   impact: Out-of-period or late claims can be accepted.
   proposed_fix: R-010
@@ -285,7 +284,7 @@ findings:
   title: Slip.expire does not refund a funded premium
   severity: P1
   class: composition
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Slip
@@ -299,7 +298,8 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: expire releases grants but leaves the premium purse untouched.
+  description: Slip.expire refunds a funded premium to the insured before marking
+    expired.
   preconditions: A caller reaches the arm on the affected path.
   impact: A funded premium is stranded on an expired slip.
   proposed_fix: R-011
@@ -309,7 +309,7 @@ findings:
   title: Line capability call precedes lineState update
   severity: P1
   class: composition
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Line
@@ -326,8 +326,8 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: The line calls the syndicate capability first and updates its own cell
-    after.
+  description: Line credit/pay/release consume lineState first and repost before or
+    on every capability reply.
   preconditions: A caller reaches the arm on the affected path.
   impact: If the update cannot complete, value has moved without a line record.
   proposed_fix: R-012

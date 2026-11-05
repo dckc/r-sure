@@ -8,8 +8,8 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  claimResolve, nowHeight, claimPolicyInfo, claimReqOk, claimMake,
-  claimAgree, claimApplyDecision, claimManagers, authOwner
+  claimResolve, nowHeight, claimPolicyInfo, claimReqOk, claimMake, claimWindowOk,
+  claimAgree, claimApplyDecision, claimManagers, authOwner, authIsOwner
 in {
   // @@INLINE:lib/Auth.rho@@
 
@@ -162,19 +162,65 @@ in {
     }
   } |
 
+  contract claimWindowOk(@policyUri, @req, ret) = {
+    new pCh, hCh in {
+      rl!(policyUri, *pCh) |
+      nowHeight!(*hCh) |
+      for (Policy <- pCh; @h <- hCh) {
+        new iCh in {
+          Policy!("info", *iCh) |
+          for (@i <- iCh) {
+            match i {
+              (true, s) => {
+                match h {
+                  (true, now) => {
+                    match (req.get("lossHeight"), s.get("terms").get("periodStartHeight"),
+                           s.get("terms").get("periodEndHeight"), s.get("terms").get("noticeBlocks")) {
+                      (loss, start, end, notice) => {
+                        if (loss == Nil || start == Nil || end == Nil || notice == Nil) {
+                          ret!((false, "fields"))
+                        } else {
+                          if (loss < start || loss > end || now > loss + notice) {
+                            ret!((false, "notice"))
+                          } else { ret!((true, Nil)) }
+                        }
+                      }
+                    }
+                  }
+                  _ => { ret!(h) }
+                }
+              }
+              _ => { ret!((false, "policy unavailable")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
   contract claimMake(@dId, @policyUri, @policyId, @insured, @broker, claimToken, @req, ret) = {
+  new cfgDId, cfgPolicyUri, cfgPolicyId, cfgInsured, cfgBroker, cfgClaimToken, cfgReq in {
+    cfgDId!(dId) |
+    cfgPolicyUri!(policyUri) |
+    cfgPolicyId!(policyId) |
+    cfgInsured!(insured) |
+    cfgBroker!(broker) |
+    cfgClaimToken!(*claimToken) |
+    cfgReq!(req) |
+    for (@dIdV <- cfgDId; @policyUriV <- cfgPolicyUri; @policyIdV <- cfgPolicyId; @insuredV <- cfgInsured; @brokerV <- cfgBroker; claimTokenV <- cfgClaimToken; @reqV <- cfgReq) {
+
     new Claim, claimState, uriCh in {
       claimState!({
-        "id": "clm:" ++ policyId ++ ":" ++ req.get("lossHeight").toString(),
+        "id": "clm:" ++ policyIdV ++ ":" ++ reqV.get("lossHeight").toString(),
         "uri": "",
-        "policyId": policyId,
-        "policyUri": policyUri,
-        "insured": insured,
-        "broker": broker,
+        "policyId": policyIdV,
+        "policyUri": policyUriV,
+        "insured": insuredV,
+        "broker": brokerV,
         "notifiedBy": "",
-        "lossHeight": req.get("lossHeight"),
-        "claimedAmount": req.get("claimedAmount"),
-        "evidence": req.get("evidence"),
+        "lossHeight": reqV.get("lossHeight"),
+        "claimedAmount": reqV.get("claimedAmount"),
+        "evidence": reqV.get("evidence"),
         "reserve": 0,
         "classification": Nil,
         "assessment": Nil,
@@ -220,7 +266,7 @@ in {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             new piCh in {
-              claimPolicyInfo!(policyUri, *piCh) |
+              claimPolicyInfo!(policyUriV, *piCh) |
               for (@pi <- piCh) {
                 match pi {
                   (true, p) => {
@@ -264,7 +310,7 @@ in {
           authOwner!(*dId2, *aCh) |
           for (@(true, who) <- aCh) {
             new piCh in {
-              claimPolicyInfo!(policyUri, *piCh) |
+              claimPolicyInfo!(policyUriV, *piCh) |
               for (@pi <- piCh) {
                 match pi {
                   (true, p) => {
@@ -391,10 +437,10 @@ in {
             claimState!(s) | ret2!((false, "not agreed"))
           } else {
             new pCh in {
-              rl!(policyUri, *pCh) |
+              rl!(policyUriV, *pCh) |
               for (Policy <- pCh) {
                 new scCh in {
-                  Policy!("settleClaim", *claimToken, s.get("id"),
+                  Policy!("settleClaim", *claimTokenV, s.get("id"),
                            s.get("agreedAmount"), s.get("insured"), *scCh) |
                   for (@sc <- scCh) {
                     match sc {
@@ -430,11 +476,28 @@ in {
       for (@uri <- uriCh) {
         for (@s2 <- claimState) {
           claimState!(s2.set("uri", uri)) |
-          ret!((true, s2.get("id"), uri))
+          new cbCh in {
+            claimResolve!("component:claim-book", *cbCh) |
+            for (@cbr <- cbCh) {
+              match cbr {
+                (true, ClaimBook) => {
+                  new regCh in {
+                    @ClaimBook!("register", s2.get("id"), uri, s2.get("policyId"),
+                               s2.get("insured"), *regCh) |
+                    for (@r <- regCh) { ret!((true, s2.get("id"), uri)) }
+                  }
+                }
+                _ => { ret!((true, s2.get("id"), uri)) }
+              }
+            }
+          }
         }
       }
     }
-  } |
+  
+    }
+  }
+} |
 
   contract ClaimFactory(@"create", dId, @policyUri, @policyId, @insured, @broker,
                         claimToken, @req, ret) = {
@@ -444,8 +507,18 @@ in {
         match ok {
           (false, reason) => { ret!((false, reason)) }
           (true, Nil) => {
-            claimMake!(*dId, policyUri, policyId, insured, broker,
-                       claimToken, req, *ret)
+            new wCh in {
+              claimWindowOk!(policyUri, req, *wCh) |
+              for (@w <- wCh) {
+                match w {
+                  (true, Nil) => {
+                    claimMake!(*dId, policyUri, policyId, insured, broker,
+                               *claimToken, req, *ret)
+                  }
+                  _ => { ret!(w) }
+                }
+              }
+            }
           }
         }
       }

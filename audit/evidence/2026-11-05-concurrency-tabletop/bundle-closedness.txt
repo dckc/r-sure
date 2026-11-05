@@ -1,9 +1,1 @@
-10_syndicate.rho:709: bundle+{*LineGrant} captures grantState not bound inside the contract
-10_syndicate.rho:966: bundle+{*Syndicate} captures syndicateState not bound inside the contract
-11_broker.rho:136: bundle+{*Broker} captures brokerState not bound inside the contract
-12_risk.rho:246: bundle+{*Risk} captures riskState not bound inside the contract
-13_slip.rho:559: bundle+{*Slip} captures slipState not bound inside the contract
-14_line.rho:129: bundle+{*Line} captures lineState not bound inside the contract
-15_distribution.rho:381: bundle+{*Distribution} captures distState not bound inside the contract
-17_policy.rho:510: bundle+{*Policy} captures policyState not bound inside the contract
-18_claim.rho:433: bundle+{*Claim} captures claimState not bound inside the contract
+13_slip.rho:617: bundle+{*Slip} captures slipState not bound inside the contract

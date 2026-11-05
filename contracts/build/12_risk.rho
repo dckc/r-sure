@@ -9,7 +9,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  authOwner, nowHeight, riskClassOk, evidenceOk, triOk, riskReqOk, riskMake
+  authOwner, authIsOwner, nowHeight, riskClassOk, evidenceOk, triOk, riskReqOk, riskMake
 in {
 // Deployer identity helpers. r-cash owns accounts; r-sure only derives the owner id.
 
@@ -142,21 +142,26 @@ contract authIsOwner(dId, @ownerId, ret) = {
   } |
 
   contract riskMake(@ownerId, @req, ret) = {
+  new cfgOwnerId, cfgReq in {
+    cfgOwnerId!(ownerId) |
+    cfgReq!(req) |
+    for (@ownerIdV <- cfgOwnerId; @reqV <- cfgReq) {
+
     new Risk, riskState, uriCh in {
       riskState!({
         "id": "",
         "uri": "",
-        "insured": ownerId,
-        "broker": req.get("broker"),
-        "class": req.get("class"),
-        "assetRef": req.get("assetRef"),
-        "declaredValue": req.get("declaredValue"),
-        "requestedLimit": req.get("requestedLimit"),
-        "requestedDeductible": req.get("requestedDeductible"),
-        "periodStart": req.get("periodStart"),
-        "periodEnd": req.get("periodEnd"),
-        "evidence": req.get("evidence"),
-        "triTest": req.get("triTest"),
+        "insured": ownerIdV,
+        "broker": reqV.get("broker"),
+        "class": reqV.get("class"),
+        "assetRef": reqV.get("assetRef"),
+        "declaredValue": reqV.get("declaredValue"),
+        "requestedLimit": reqV.get("requestedLimit"),
+        "requestedDeductible": reqV.get("requestedDeductible"),
+        "periodStart": reqV.get("periodStart"),
+        "periodEnd": reqV.get("periodEnd"),
+        "evidence": reqV.get("evidence"),
+        "triTest": reqV.get("triTest"),
         "assessment": Nil,
         "status": "submitted",
         "slipUri": Nil,
@@ -273,12 +278,12 @@ contract authIsOwner(dId, @ownerId, ret) = {
         for (@s2 <- riskState) {
           riskState!(s2.set("uri", uri)) |
           for (@b <- riskBookState) {
-            match "rsk:" ++ ownerId ++ ":" ++ b.get("count").toString() {
+            match "rsk:" ++ ownerIdV ++ ":" ++ b.get("count").toString() {
               id2 => {
-                match b.get("byInsured").get(ownerId) {
+                match b.get("byInsured").get(ownerIdV) {
                   Nil => {
                     riskBookState!(b.set("risks", b.get("risks").set(id2, uri))
-                      .set("byInsured", b.get("byInsured").set(ownerId, [id2]))
+                      .set("byInsured", b.get("byInsured").set(ownerIdV, [id2]))
                       .set("count", b.get("count") + 1)) |
                     for (@s3 <- riskState) {
                       riskState!(s3.set("id", id2)) |
@@ -287,7 +292,7 @@ contract authIsOwner(dId, @ownerId, ret) = {
                   }
                   ids => {
                     riskBookState!(b.set("risks", b.get("risks").set(id2, uri))
-                      .set("byInsured", b.get("byInsured").set(ownerId, ids ++ [id2]))
+                      .set("byInsured", b.get("byInsured").set(ownerIdV, ids ++ [id2]))
                       .set("count", b.get("count") + 1)) |
                     for (@s3 <- riskState) {
                       riskState!(s3.set("id", id2)) |
@@ -301,7 +306,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
         }
       }
     }
-  } |
+  
+    }
+  }
+} |
 
   contract RiskBook(@"submit", dId, @req, ret) = {
     new aCh, okCh in {

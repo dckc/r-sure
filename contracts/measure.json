@@ -37,33 +37,33 @@
       "contracts": 5
     },
     "10_syndicate.rho": {
-      "bytes": 21525,
-      "depth": 35,
+      "bytes": 21894,
+      "depth": 37,
       "contracts": 22
     },
     "11_broker.rho": {
-      "bytes": 5115,
-      "depth": 14,
+      "bytes": 5276,
+      "depth": 16,
       "contracts": 6
     },
     "12_risk.rho": {
-      "bytes": 7927,
-      "depth": 15,
+      "bytes": 8074,
+      "depth": 16,
       "contracts": 10
     },
     "13_slip.rho": {
-      "bytes": 13988,
+      "bytes": 14807,
       "depth": 43,
-      "contracts": 15
+      "contracts": 16
     },
     "14_line.rho": {
-      "bytes": 3009,
-      "depth": 17,
+      "bytes": 3417,
+      "depth": 19,
       "contracts": 3
     },
     "15_distribution.rho": {
-      "bytes": 6931,
-      "depth": 22,
+      "bytes": 7355,
+      "depth": 24,
       "contracts": 11
     },
     "16_fund.rho": {
@@ -72,14 +72,14 @@
       "contracts": 6
     },
     "17_policy.rho": {
-      "bytes": 11494,
-      "depth": 40,
+      "bytes": 12155,
+      "depth": 42,
       "contracts": 11
     },
     "18_claim.rho": {
-      "bytes": 9892,
-      "depth": 26,
-      "contracts": 13
+      "bytes": 11504,
+      "depth": 28,
+      "contracts": 14
     },
     "19_books.rho": {
       "bytes": 4333,

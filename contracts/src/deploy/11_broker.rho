@@ -8,7 +8,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  authOwner, brokerProfileOk, brokerMake
+  authOwner, authIsOwner, brokerProfileOk, brokerMake
 in {
   // @@INLINE:lib/Auth.rho@@
 
@@ -39,16 +39,21 @@ in {
   } |
 
   contract brokerMake(@ownerId, @profile, ret) = {
+  new cfgOwnerId, cfgProfile in {
+    cfgOwnerId!(ownerId) |
+    cfgProfile!(profile) |
+    for (@ownerIdV <- cfgOwnerId; @profileV <- cfgProfile) {
+
     new Broker, brokerState, uriCh in {
       brokerState!({
-        "id": "brk:" ++ ownerId,
+        "id": "brk:" ++ ownerIdV,
         "uri": "",
-        "ownerId": ownerId,
-        "name": profile.get("name"),
-        "licenceHash": profile.get("licenceHash"),
-        "credentialUri": profile.get("credentialUri"),
-        "commissionBps": profile.get("commissionBps"),
-        "classes": profile.get("classes"),
+        "ownerId": ownerIdV,
+        "name": profileV.get("name"),
+        "licenceHash": profileV.get("licenceHash"),
+        "credentialUri": profileV.get("credentialUri"),
+        "commissionBps": profileV.get("commissionBps"),
+        "classes": profileV.get("classes"),
         "slips": {},
         "status": "active",
         "nonce": 0
@@ -138,10 +143,10 @@ in {
         for (@s2 <- brokerState) {
           brokerState!(s2.set("uri", uri)) |
           for (@b <- brokerBookState) {
-            match b.get("byOwner").get(ownerId) {
+            match b.get("byOwner").get(ownerIdV) {
               Nil => {
                 brokerBookState!(b.set("brokers", b.get("brokers").set(s2.get("id"), uri))
-                  .set("byOwner", b.get("byOwner").set(ownerId, s2.get("id")))
+                  .set("byOwner", b.get("byOwner").set(ownerIdV, s2.get("id")))
                   .set("nonce", b.get("nonce") + 1)) |
                 ret!((true, s2.get("id"), uri))
               }
@@ -151,7 +156,10 @@ in {
         }
       }
     }
-  } |
+  
+    }
+  }
+} |
 
   contract BrokerBook(@"register", dId, @profile, ret) = {
     new aCh, pCh in {

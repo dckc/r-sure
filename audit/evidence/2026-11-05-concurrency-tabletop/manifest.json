@@ -17,8 +17,8 @@
     "docs_check": "pass",
     "formal_check": "pass",
     "audit_check": "pass (coverage registers)",
-    "audit_scan": "fail (open P0 bundle defect and dead pause)",
-    "install": "not_run (devnet unavailable)"
+    "audit_scan": "fail (open Slip bundle and dead pause)",
+    "install": "not_run (devnet unavailable; Slip bundle open)"
   },
   "notes": "audit-scan.txt is the pre-fix scanner output. take-repost.txt is the pre-fix take-await-take report. The scanners are heuristics; the reviews are the normative record."
 }

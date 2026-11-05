@@ -21,7 +21,7 @@ so the devnet install and every behavioural suite remain `not_run`.
 | Hazards | 25 |
 | Findings | 19 |
 | P0 findings | 2 (1 fixed, 1 open) |
-| P1 findings | 10 (5 fixed, 5 open) |
+| P1 findings | 10 (9 fixed, 1 open) |
 | P2/P3 findings | 7 (3 fixed/documented, 4 deferred) |
 | Improvements | 19 |
 | Tests registered | 36 (`not_run`) |
@@ -33,11 +33,11 @@ so the devnet install and every behavioural suite remain `not_run`.
   external component, then took the same cell again without reposting the first snapshot.
   Fixed by reposting the original snapshot once after the awaits. The scanner
   `tools/check_take_repost.py` reports zero for the watched arms after the fix.
-- **F-002 — unclosed instance bundles (open).** Nine per-object contracts are published with
-  `bundle+{*X}` while the bundled body captures a state cell or capability. The node rejects
-  the bundle at install. The repair is a closed publication/init pattern. The devnet was
-  unavailable during this pass; the unverified unbundling experiment was reverted. **The
-  install cannot be called green until this is fixed.**
+- **F-002 — unclosed instance bundles (open for Slip).** Nine per-object contracts published
+  with `bundle+{*X}` while the bundled body captured a state cell or capability. Eight now
+  use a rebind wrapper and normalize cleanly. `Slip` remains open: its rebind wrapper pushes
+  the term past the parser's depth limit, so the fix needs a helper split. **The install
+  cannot be called green until this is fixed.**
 
 ## P1
 
@@ -45,14 +45,14 @@ so the devnet install and every behavioural suite remain `not_run`.
 |---|---|---|
 | F-003 dead global pause | open | `isPaused` is never consulted; wiring touches most mutating arms. |
 | F-004 fund nonce split | fixed | `fundAdmin` checks `govNonce`; cover writes `govNonce`. |
-| F-005 books never populated | open | Factory-to-book registration is missing. |
+| F-005 books never populated | fixed | Policy/Claim factories now register in the books. |
 | F-006 policy expiry leaks lines | fixed | `Policy.expire` now calls `Line.release`. |
 | F-007 `Slip.fundPremium` auth | fixed | Requires the insured. |
 | F-008 public `registerDone` | fixed | Removed; `brokerMake` updates the book directly. |
 | F-009 fake `SyndicateBook.verify` | fixed | Real URI scan over the book. |
-| F-010 no claim period/notice check | open | Needs a Clock check and a regression. |
-| F-011 no slip premium refund | open | Needs a value-move path and a regression. |
-| F-012 line capability/state ordering | open | Needs a single take/repost around the capability. |
+| F-010 no claim period/notice check | fixed | ClaimFactory checks the policy period and notice window. |
+| F-011 no slip premium refund | fixed | Slip.expire refunds the funded premium. |
+| F-012 line capability/state ordering | fixed | Line takes state first and reposts on every reply. |
 
 ## P2/P3
 
@@ -79,9 +79,10 @@ core/keystore tests pass; the install and behavioural campaign are not green.
 
 ## Next steps
 
-1. Fix F-002 with a closed publication/init pattern and complete `make install`.
+1. Split `Slip`'s bind/settlement logic into helper contracts, close its bundle, and complete
+   `make install`.
 2. Run the 36 behavioural suites and record honest pass/fail/not_run.
-3. Fix the remaining open P1s (F-003, F-005, F-010, F-011, F-012) with regressions.
+3. Wire the global pause into the market entry arms (F-003); the other P1s are fixed.
 4. Complete the Lean model and flow manifest.
 5. Run an independent adversarial review and record evidence.
 6. Do not describe any primitive as audited until the above is complete.

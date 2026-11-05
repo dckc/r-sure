@@ -27,8 +27,8 @@ improvements:
   hazards:
   - HZ-006
   - HZ-007
-  change: Refactor instance publication to a closed bundle/init pattern and verify
-    with make install.
+  change: Close the remaining Slip bundle via a helper split; eight instance types
+    are already rebound and normalize cleanly.
   type: design
   breaking: false
   migration: fresh devnet install
@@ -85,7 +85,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-006
   priority: P1
   findings:
@@ -165,7 +165,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-011
   priority: P1
   findings:
@@ -181,7 +181,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-012
   priority: P1
   findings:
@@ -197,7 +197,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-013
   priority: P2
   findings:
