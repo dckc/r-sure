@@ -8,7 +8,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  policyResolve, nowHeight, policyMake, lineEntries, payLinePlan,
+  policyResolve, nowHeight, policyMake, lineEntries, payLinePlan, releaseLinePlan,
   policyReqOk, authOwner
 in {
   // @@INLINE:lib/Auth.rho@@
@@ -69,6 +69,30 @@ in {
           lineEntries!(amounts, i + 1,
                        acc ++ [{"kind": "line", "uri": l.get("uri"),
                                 "fixed": l.get("amount")}], *ret)
+        }
+      }
+    }
+  } |
+
+  contract releaseLinePlan(@lines, @i, policyToken, ret) = {
+    if (i >= lines.length()) { ret!((true, Nil)) }
+    else {
+      match lines.nth(i) {
+        l => {
+          new lCh in {
+            rl!(l.get("uri"), *lCh) |
+            for (Line <- lCh) {
+              new rCh in {
+                Line!("release", *policyToken, *rCh) |
+                for (@r <- rCh) {
+                  match r {
+                    (true, _) => { releaseLinePlan!(lines, i + 1, *policyToken, *ret) }
+                    _ => { ret!(r) }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -239,11 +263,9 @@ in {
                                                                     for (@rr <- rrCh) {
                                                                       match rr {
                                                                         (true, _) => {
-                                                                          for (@s2 <- policyState) {
-                                                                            policyState!(s2.set("distributed", true)
-                                                                                           .set("nonce", s2.get("nonce") + 1)) |
-                                                                            ret2!((true, Nil))
-                                                                          }
+                                                                          policyState!(s.set("distributed", true)
+                                                                                         .set("nonce", s.get("nonce") + 1)) |
+                                                                          ret2!((true, Nil))
                                                                         }
                                                                         _ => { 1/0 }
                                                                       }
@@ -312,14 +334,12 @@ in {
                               for (@cr <- cfCh) {
                                 match cr {
                                   (true, claimId, claimUri) => {
-                                    for (@s2 <- policyState) {
-                                      policyState!(s2.set("claims",
-                                          s2.get("claims").set(claimId, {
-                                            "uri": claimUri, "status": "notified",
-                                            "agreed": 0, "paid": 0}))
-                                        .set("nonce", s2.get("nonce") + 1)) |
-                                      ret2!((true, claimId, claimUri))
-                                    }
+                                    policyState!(s.set("claims",
+                                        s.get("claims").set(claimId, {
+                                          "uri": claimUri, "status": "notified",
+                                          "agreed": 0, "paid": 0}))
+                                      .set("nonce", s.get("nonce") + 1)) |
+                                    ret2!((true, claimId, claimUri))
                                   }
                                   _ => { ret2!(cr) }
                                 }
@@ -388,19 +408,17 @@ in {
                                                                 for (@pr <- payCh) {
                                                                   match pr {
                                                                     (true, Nil) => {
-                                                                      for (@s2 <- policyState) {
-                                                                        policyState!(s2.set("aggregatePaid",
-                                                                            s2.get("aggregatePaid") + payable)
-                                                                          .set("aggregateRemaining",
-                                                                            s2.get("aggregateRemaining") - payable)
-                                                                          .set("claims",
-                                                                            s2.get("claims").set(claimId,
-                                                                              c2.set("status", "settled")
-                                                                                .set("agreed", agreed)
-                                                                                .set("paid", payable)))
-                                                                          .set("nonce", s2.get("nonce") + 1)) |
-                                                                        ret2!((true, payable))
-                                                                      }
+                                                                      policyState!(s.set("aggregatePaid",
+                                                                          s.get("aggregatePaid") + payable)
+                                                                        .set("aggregateRemaining",
+                                                                          s.get("aggregateRemaining") - payable)
+                                                                        .set("claims",
+                                                                          s.get("claims").set(claimId,
+                                                                            c2.set("status", "settled")
+                                                                              .set("agreed", agreed)
+                                                                              .set("paid", payable)))
+                                                                        .set("nonce", s.get("nonce") + 1)) |
+                                                                      ret2!((true, payable))
                                                                     }
                                                                     _ => { 1/0 }
                                                                   }
@@ -430,19 +448,17 @@ in {
                                                               for (@pr <- payCh) {
                                                                 match pr {
                                                                   (true, Nil) => {
-                                                                    for (@s2 <- policyState) {
-                                                                      policyState!(s2.set("aggregatePaid",
-                                                                          s2.get("aggregatePaid") + payable)
-                                                                        .set("aggregateRemaining",
-                                                                          s2.get("aggregateRemaining") - payable)
-                                                                        .set("claims",
-                                                                          s2.get("claims").set(claimId,
-                                                                            c2.set("status", "settled")
-                                                                              .set("agreed", agreed)
-                                                                              .set("paid", payable)))
-                                                                        .set("nonce", s2.get("nonce") + 1)) |
-                                                                      ret2!((true, payable))
-                                                                    }
+                                                                    policyState!(s.set("aggregatePaid",
+                                                                        s.get("aggregatePaid") + payable)
+                                                                      .set("aggregateRemaining",
+                                                                        s.get("aggregateRemaining") - payable)
+                                                                      .set("claims",
+                                                                        s.get("claims").set(claimId,
+                                                                          c2.set("status", "settled")
+                                                                            .set("agreed", agreed)
+                                                                            .set("paid", payable)))
+                                                                      .set("nonce", s.get("nonce") + 1)) |
+                                                                    ret2!((true, payable))
                                                                   }
                                                                   _ => { 1/0 }
                                                                 }
@@ -493,9 +509,19 @@ in {
                       if (now <= end) {
                         policyState!(s) | ret2!((false, "not expired"))
                       } else {
-                        policyState!(s.set("status", "expired")
-                                      .set("nonce", s.get("nonce") + 1)) |
-                        ret2!((true, Nil))
+                        new relCh in {
+                          releaseLinePlan!(s.get("lines"), 0, *policyToken, *relCh) |
+                          for (@rel <- relCh) {
+                            match rel {
+                              (true, Nil) => {
+                                policyState!(s.set("status", "expired")
+                                              .set("nonce", s.get("nonce") + 1)) |
+                                ret2!((true, Nil))
+                              }
+                              _ => { 1/0 }
+                            }
+                          }
+                        }
                       }
                     }
                   }

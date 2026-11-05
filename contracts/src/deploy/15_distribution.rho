@@ -357,12 +357,10 @@ in {
                                 for (@pr <- pCh) {
                                   match pr {
                                     (true, Nil) => {
-                                      for (@s2 <- distState) {
-                                        distState!(s2.set("status", "paid")
-                                                     .set("paid", payments)
-                                                     .set("nonce", s2.get("nonce") + 1)) |
-                                        ret2!((true, payments))
-                                      }
+                                      distState!(s.set("status", "paid")
+                                                   .set("paid", payments)
+                                                   .set("nonce", s.get("nonce") + 1)) |
+                                      ret2!((true, payments))
                                     }
                                     _ => { 1/0 }
                                   }

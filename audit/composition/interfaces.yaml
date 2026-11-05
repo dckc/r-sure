@@ -1,0 +1,692 @@
+schema: rsure.composition/v1
+interfaces:
+- id: C-01
+  caller: all terms
+  callee: SureRoot
+  arm: resolve
+  call_site: lib/Resolve.rho
+  request: key, minVersion
+  success_reply: (true, uri, version)
+  refusal_reply: (false, reason, key?)
+  awaits: registry lookup
+  state_held: caller-dependent
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards: []
+  findings: []
+- id: C-02
+  caller: AdminGuard
+  callee: Codec / crypto
+  arm: adminPayload / blake2b256Hash / secp256k1Verify
+  call_site: 02_admin.rho
+  request: domain, nonce, action, args
+  success_reply: (true, bool)
+  refusal_reply: (false, 'below threshold')
+  awaits: Root, Codec, hash, verify
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards: []
+  findings: []
+- id: C-03
+  caller: SureAdmin
+  callee: AdminGuard
+  arm: verify
+  call_site: 02_admin.rho
+  request: domain, nonce, action, args, sigs, admins, threshold
+  success_reply: (true, bool)
+  refusal_reply: (false, 'below threshold')
+  awaits: AdminGuard
+  state_held: adminState
+  atomicity: state reposted after verify
+  capabilities: none
+  verdict: concern
+  hazards:
+  - HZ-008
+  findings:
+  - F-003
+- id: C-04
+  caller: Payments
+  callee: r-cash Root
+  arm: resolve
+  call_site: 40_payments.rho
+  request: component key, minVersion
+  success_reply: (true, uri, version)
+  refusal_reply: (false, reason, key)
+  awaits: registry lookup + Root
+  state_held: paymentsState peek
+  atomicity: read-only
+  capabilities: none
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-05
+  caller: Payments
+  callee: r-cash AssetResolver
+  arm: issuer
+  call_site: 40_payments.rho
+  request: assetId
+  success_reply: (true, brand, issuer)
+  refusal_reply: (false, reason)
+  awaits: registry + AssetResolver
+  state_held: none after resolve
+  atomicity: read-only
+  capabilities: brand/issuer names
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-06
+  caller: Payments
+  callee: r-cash AccountFactory/Account
+  arm: getOrCreate/accountOf/depositFacet
+  call_site: 40_payments.rho
+  request: pubKey/ownerId/assetId
+  success_reply: (true, account, ownerId) / (true, facet)
+  refusal_reply: (false, reason)
+  awaits: AccountFactory/Account
+  state_held: none
+  atomicity: read-only
+  capabilities: account/facet names
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-07
+  caller: RgenAdapter
+  callee: r-gen Root/factories
+  arm: resolve/verify/Provenance.verify
+  call_site: 05_rgen.rho
+  request: component key; URI/hash
+  success_reply: (true, uri, version) / (true, record)
+  refusal_reply: (false, 'rgen unavailable'|reason)
+  awaits: registry + r-gen Root
+  state_held: rgenState peek
+  atomicity: read-only
+  capabilities: factory names
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-08
+  caller: Syndicate
+  callee: Payments
+  arm: issuer
+  call_site: 10_syndicate.rho:94,269,534
+  request: assetId
+  success_reply: (true, brand, issuer)
+  refusal_reply: (false, 'payments unavailable'|reason)
+  awaits: Payments
+  state_held: syndicateState in value arms
+  atomicity: value move after state update; `1/0` rollback
+  capabilities: brand/issuer
+  verdict: finding
+  hazards:
+  - HZ-001
+  findings:
+  - F-001
+- id: C-09
+  caller: Syndicate.openLine
+  callee: LineGrant
+  arm: consume
+  call_site: 10_syndicate.rho:832
+  request: slipId, shareBps, exposure, slipToken
+  success_reply: (true, quote)
+  refusal_reply: (false, 'closed'|'not holder'|'quote')
+  awaits: LineGrant after state take
+  state_held: syndicateState
+  atomicity: deploy atomic; second take blocks
+  capabilities: slipToken
+  verdict: finding
+  hazards:
+  - HZ-001
+  - HZ-006
+  findings:
+  - F-001
+  - F-002
+- id: C-10
+  caller: Syndicate.openLine
+  callee: LineFactory
+  arm: create
+  call_site: 10_syndicate.rho:857
+  request: line req + credit/settle/release caps + policyToken
+  success_reply: (true, lineUri)
+  refusal_reply: (false, reason)
+  awaits: LineFactory after state take
+  state_held: syndicateState
+  atomicity: '`1/0` on refusal'
+  capabilities: three caps + policyToken
+  verdict: finding
+  hazards:
+  - HZ-001
+  - HZ-007
+  findings:
+  - F-001
+  - F-002
+- id: C-11
+  caller: SyndicateBook
+  callee: makePurse
+  arm: issuer/makeEmptyPurse
+  call_site: 10_syndicate.rho:140
+  request: assetId
+  success_reply: (true, purse, brand, issuer)
+  refusal_reply: (false, reason)
+  awaits: Payments/issuer
+  state_held: book peek only
+  atomicity: read-only
+  capabilities: purse/issuer
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-12
+  caller: BrokerBook
+  callee: brokerMake / Broker
+  arm: create/registerDone/addSlip
+  call_site: 11_broker.rho:154-186
+  request: owner, profile, slip
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Broker creation
+  state_held: book peek then consume
+  atomicity: registerDone public
+  capabilities: broker name
+  verdict: finding
+  hazards:
+  - HZ-013
+  findings:
+  - F-008
+- id: C-13
+  caller: RiskBook
+  callee: riskMake / Risk
+  arm: create
+  call_site: 12_risk.rho:250
+  request: owner, req
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Risk creation
+  state_held: book consumed after create
+  atomicity: book written by maker
+  capabilities: risk name
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-14
+  caller: Slip.subscribe
+  callee: Syndicate
+  arm: quote
+  call_site: 13_slip.rho:295
+  request: dId, class, slipId, shareBps, exposure, expiry, slipToken
+  success_reply: (true, grantId, grantUri)
+  refusal_reply: (false, reason)
+  awaits: Syndicate while slipState held
+  state_held: slipState
+  atomicity: capacity reserved; state update after
+  capabilities: slipToken
+  verdict: finding
+  hazards:
+  - HZ-002
+  findings:
+  - F-001
+- id: C-15
+  caller: Slip.bind
+  callee: Syndicate
+  arm: openLine
+  call_site: 13_slip.rho:116
+  request: grantId, grantUri, policyId, slipId, slipToken, policyToken
+  success_reply: (true, lineId, lineUri)
+  refusal_reply: (false, reason)
+  awaits: Syndicate while slipState held
+  state_held: slipState
+  atomicity: '`1/0` on refusal'
+  capabilities: slip/policy tokens
+  verdict: finding
+  hazards:
+  - HZ-002
+  - HZ-006
+  findings:
+  - F-001
+  - F-002
+- id: C-16
+  caller: Slip.bind
+  callee: PolicyFactory
+  arm: create
+  call_site: 13_slip.rho:457
+  request: policy req + purse + tokens
+  success_reply: (true, policyUri)
+  refusal_reply: (false, reason)
+  awaits: PolicyFactory
+  state_held: slipState
+  atomicity: '`1/0` on failure'
+  capabilities: purse/policy/claim tokens
+  verdict: finding
+  hazards:
+  - HZ-002
+  findings:
+  - F-001
+- id: C-17
+  caller: Slip.bind
+  callee: Policy
+  arm: distribute
+  call_site: 13_slip.rho:479
+  request: policyToken
+  success_reply: (true, Nil)
+  refusal_reply: (false, 'not holder'|reason)
+  awaits: Policy/Distribution
+  state_held: slipState
+  atomicity: '`1/0` on failure'
+  capabilities: policyToken
+  verdict: finding
+  hazards:
+  - HZ-002
+  findings:
+  - F-001
+- id: C-18
+  caller: Policy
+  callee: SureMath
+  arm: premiumSplit/lineShares/payable/settlePlan
+  call_site: 17_policy.rho:200-206,358-380
+  request: amounts/shares
+  success_reply: (true, amounts)
+  refusal_reply: (false, 'bps'|'shares'|'amount')
+  awaits: component resolve
+  state_held: policyState
+  atomicity: read-only
+  capabilities: none
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-19
+  caller: Policy
+  callee: DistributionFactory/Distribution
+  arm: create/run
+  call_site: 17_policy.rho:227-...
+  request: purse, plan, policyToken
+  success_reply: (true, distUri) / (true, payments)
+  refusal_reply: (false, reason)
+  awaits: Distribution while policyState held
+  state_held: policyState
+  atomicity: '`1/0` on failure'
+  capabilities: purse/policyToken
+  verdict: finding
+  hazards:
+  - HZ-005
+  findings:
+  - F-001
+- id: C-20
+  caller: Policy
+  callee: SureFund
+  arm: covered
+  call_site: 17_policy.rho:369
+  request: claimId
+  success_reply: (true, cover)
+  refusal_reply: (false, 'not covered')
+  awaits: SureFund
+  state_held: policyState
+  atomicity: read-only
+  capabilities: none
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-21
+  caller: Policy.openClaim
+  callee: ClaimFactory
+  arm: create
+  call_site: 17_policy.rho:309
+  request: dId, policyUri, policyId, insured, broker, claimToken, req
+  success_reply: (true, claimId, claimUri)
+  refusal_reply: (false, reason)
+  awaits: ClaimFactory while policyState held
+  state_held: policyState
+  atomicity: second take blocks
+  capabilities: claimToken
+  verdict: finding
+  hazards:
+  - HZ-003
+  findings:
+  - F-001
+- id: C-22
+  caller: Claim.settle
+  callee: Policy
+  arm: settleClaim
+  call_site: 18_claim.rho:399
+  request: claimToken, claimId, agreed, insured
+  success_reply: (true, payable)
+  refusal_reply: (false, 'not holder'|'unknown claim'|'already settled'|reason)
+  awaits: Policy while claimState held
+  state_held: claimState
+  atomicity: second take blocks
+  capabilities: claimToken
+  verdict: finding
+  hazards:
+  - HZ-004
+  findings:
+  - F-001
+- id: C-23
+  caller: Claim.dispute
+  callee: RgenAdapter/OracleFactory
+  arm: oracleFactory/open
+  call_site: 18_claim.rho:330-356
+  request: dId, subjectRef, caseReq, applyCap
+  success_reply: (true, case)
+  refusal_reply: (false, 'rgen unavailable'|reason)
+  awaits: r-gen while claimState held
+  state_held: claimState
+  atomicity: second take blocks
+  capabilities: applyCap
+  verdict: finding
+  hazards:
+  - HZ-004
+  - HZ-023
+  findings:
+  - F-001
+  - F-018
+- id: C-24
+  caller: Distribution
+  callee: Payments/SureFund/Line
+  arm: depositFacet/contribute/credit
+  call_site: 15_distribution.rho
+  request: payment/amount
+  success_reply: (true, _)
+  refusal_reply: (false, reason)
+  awaits: value path
+  state_held: distState
+  atomicity: '`1/0` after value move'
+  capabilities: purse/token
+  verdict: finding
+  hazards:
+  - HZ-005
+  findings:
+  - F-001
+- id: C-25
+  caller: Line
+  callee: Syndicate capabilities
+  arm: credit/pay/release
+  call_site: 14_line.rho
+  request: lineToken, payment/claim/amount
+  success_reply: (true, amount)
+  refusal_reply: (false, 'not holder'|reason)
+  awaits: capability before state update
+  state_held: lineState
+  atomicity: value move inside cap; line state after
+  capabilities: policyToken
+  verdict: finding
+  hazards:
+  - HZ-017
+  findings:
+  - F-012
+- id: C-26
+  caller: PolicyBook/ClaimBook
+  callee: Policy/Claim
+  arm: info
+  call_site: 19_books.rho
+  request: none
+  success_reply: (true, state)
+  refusal_reply: (false, reason)
+  awaits: object info
+  state_held: book not held during read
+  atomicity: read-only
+  capabilities: none
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-27
+  caller: r-share (external)
+  callee: Distribution/Line/Policy
+  arm: documented reuse
+  call_site: docs/reference/share-reuse.md
+  request: purse/plan/token
+  success_reply: (true, payments/payable)
+  refusal_reply: (false, reason)
+  awaits: external
+  state_held: caller
+  atomicity: not tested
+  capabilities: purse/policyToken
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-28
+  caller: all terms
+  callee: Clock
+  arm: now
+  call_site: 10_syndicate.rho:26 etc.
+  request: none
+  success_reply: (true, height)
+  refusal_reply: (false, 'clock unavailable')
+  awaits: block data
+  state_held: caller-dependent
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards: []
+  findings: []
+- id: C-29
+  caller: SureFund
+  callee: Payments
+  arm: issuer/depositFacet
+  call_site: 16_fund.rho
+  request: assetId/owner
+  success_reply: (true, brand, issuer) / (true, facet)
+  refusal_reply: (false, reason)
+  awaits: Payments while fundState held
+  state_held: fundState
+  atomicity: state reposted before withdraw
+  capabilities: purse/issuer
+  verdict: finding
+  hazards:
+  - HZ-009
+  findings:
+  - F-004
+- id: C-30
+  caller: Claim.classify/assess
+  callee: Policy
+  arm: info
+  call_site: 18_claim.rho:51
+  request: none
+  success_reply: (true, state)
+  refusal_reply: (false, reason)
+  awaits: Policy while claimState held
+  state_held: claimState
+  atomicity: read-only
+  capabilities: none
+  verdict: concern
+  hazards: []
+  findings: []
+- id: C-31
+  caller: SlipFactory
+  callee: CoverTerms
+  arm: validate/hash
+  call_site: 13_slip.rho:607-625
+  request: terms
+  success_reply: (true, Nil) / (true, digest)
+  refusal_reply: (false, reason)
+  awaits: CoverTerms while opening a slip
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  hazards: []
+  verdict: safe-by-inspection
+  findings: []
+- id: C-32
+  caller: SlipFactory
+  callee: Slip
+  arm: slipMake/create
+  call_site: 13_slip.rho:632
+  request: owner, broker, sid, req, purse, tokens
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Slip creation
+  state_held: none
+  atomicity: bundle publication
+  capabilities: purse/tokens
+  hazards:
+  - HZ-007
+  verdict: finding
+  findings:
+  - F-002
+- id: C-33
+  caller: BrokerBook
+  callee: Broker
+  arm: brokerMake/create
+  call_site: 11_broker.rho:154
+  request: owner, profile
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Broker creation
+  state_held: book peek
+  atomicity: registerDone callback
+  capabilities: none
+  hazards:
+  - HZ-013
+  verdict: finding
+  findings:
+  - F-008
+- id: C-34
+  caller: RiskBook
+  callee: Risk
+  arm: riskMake/create
+  call_site: 12_risk.rho:250
+  request: owner, req
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Risk creation
+  state_held: book consumed after create
+  atomicity: book written by maker
+  capabilities: none
+  hazards:
+  - HZ-020
+  verdict: finding
+  findings:
+  - F-015
+- id: C-35
+  caller: ClaimFactory
+  callee: Claim
+  arm: claimMake/create
+  call_site: 18_claim.rho:435
+  request: policy, insured, broker, token, req
+  success_reply: (true, id, uri)
+  refusal_reply: (false, reason)
+  awaits: Claim creation
+  state_held: none
+  atomicity: bundle publication
+  capabilities: claimToken
+  hazards:
+  - HZ-007
+  verdict: finding
+  findings:
+  - F-002
+- id: C-36
+  caller: Policy
+  callee: Line
+  arm: pay
+  call_site: 17_policy.rho:86
+  request: policyToken, claimId, amount, insured
+  success_reply: (true, amount)
+  refusal_reply: (false, reason)
+  awaits: Line while policyState held
+  state_held: policyState
+  atomicity: '`1/0` on refusal'
+  capabilities: policyToken
+  hazards:
+  - HZ-004
+  - HZ-019
+  verdict: finding
+  findings:
+  - F-001
+  - F-014
+- id: C-37
+  caller: Policy
+  callee: PolicyBook
+  arm: register
+  call_site: not implemented
+  request: policyId, uri, slip, insured, broker
+  success_reply: (true, Nil)
+  refusal_reply: (false, reason)
+  awaits: never called
+  state_held: n/a
+  atomicity: not implemented
+  capabilities: none
+  hazards:
+  - HZ-010
+  verdict: finding
+  findings:
+  - F-005
+- id: C-38
+  caller: ClaimFactory
+  callee: ClaimBook
+  arm: register
+  call_site: not implemented
+  request: claimId, uri, policy, insured
+  success_reply: (true, Nil)
+  refusal_reply: (false, reason)
+  awaits: never called
+  state_held: n/a
+  atomicity: not implemented
+  capabilities: none
+  hazards:
+  - HZ-010
+  verdict: finding
+  findings:
+  - F-005
+- id: C-39
+  caller: PolicyBook
+  callee: Policy
+  arm: info
+  call_site: 19_books.rho:31
+  request: none
+  success_reply: (true, state)
+  refusal_reply: (false, reason)
+  awaits: read-only
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  hazards:
+  - HZ-010
+  verdict: concern
+  findings:
+  - F-005
+- id: C-40
+  caller: ClaimBook
+  callee: Claim
+  arm: info
+  call_site: 19_books.rho:112
+  request: none
+  success_reply: (true, state)
+  refusal_reply: (false, reason)
+  awaits: read-only
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  hazards:
+  - HZ-010
+  verdict: concern
+  findings:
+  - F-005
+- id: C-41
+  caller: SlipFactory
+  callee: BrokerBook
+  arm: brokerOf
+  call_site: 13_slip.rho:605
+  request: broker owner
+  success_reply: (true, id, uri)
+  refusal_reply: (false, 'broker not registered')
+  awaits: BrokerBook while opening a slip
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  hazards: []
+  verdict: concern
+  findings: []
+- id: C-42
+  caller: SlipFactory
+  callee: RiskBook
+  arm: risk
+  call_site: 13_slip.rho (risk lookup)
+  request: riskId
+  success_reply: (true, uri)
+  refusal_reply: (false, 'unknown risk')
+  awaits: RiskBook while opening a slip
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  hazards: []
+  verdict: concern
+  findings: []

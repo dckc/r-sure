@@ -82,6 +82,10 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
   } |
 
   contract fundAdmin(@nonce, @action, @args, @sigs, ret) = {
+    for (@fs <<- fundState) {
+      if (nonce <= fs.get("govNonce")) {
+        ret!((true, false))
+      } else {
     new aCh in {
       fundResolve!("component:admin", *aCh) |
       for (@a <- aCh) {
@@ -105,6 +109,8 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
           }
           _ => { ret!((false, "admin unavailable")) }
         }
+      }
+    }
       }
     }
   } |
@@ -234,7 +240,7 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
                                             "to": toOwner, "amount": amount,
                                             "policyId": policyId,
                                             "at": s.get("nonce")}))
-                                          .set("nonce", nonce)) |
+                                          .set("govNonce", nonce)) |
                                         new wCh in {
                                           @purse!("withdraw", (brand, amount), *wCh) |
                                           for (@w <- wCh) {

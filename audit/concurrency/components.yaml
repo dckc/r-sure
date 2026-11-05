@@ -1,0 +1,827 @@
+schema: rsure.concurrency/v1
+components:
+- component: SureRoot
+  file: 00_root.rho
+  kind: singleton
+  state_cells:
+  - rootState
+  cross_cell_writers: []
+  writers:
+  - register
+  - rotate
+  - deprecate
+  - freeze
+  - admin
+  readers:
+  - resolve
+  - get
+  - keys
+  - nonce
+  - resolveMany
+  awaits_while_holding_state:
+  - 'register: dops pubKeyBytes'
+  - 'admin/rotate/deprecate/freeze: AdminGuard'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: govNonce
+  verdict: concern
+  review: reviews/SureRoot.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/00_root.rho
+  findings: []
+- component: Clock
+  file: 01_kernel.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - now
+  awaits_while_holding_state:
+  - rho:block:data
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/Clock.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/01_kernel.rho
+  findings: []
+- component: Verifier
+  file: 01_kernel.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - hash
+  - sigOk
+  awaits_while_holding_state:
+  - crypto ops
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/Verifier.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/01_kernel.rho
+  findings: []
+- component: Codec
+  file: 01_kernel.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - adminPayload
+  - canonical
+  - hash
+  awaits_while_holding_state:
+  - crypto ops
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/Codec.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/01_kernel.rho
+  findings: []
+- component: AdminGuard
+  file: 02_admin.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - verify
+  awaits_while_holding_state:
+  - Root resolve
+  - Codec
+  - hash
+  - secp256k1
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/AdminGuard.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/02_admin.rho
+  findings: []
+- component: SureAdmin
+  file: 02_admin.rho
+  kind: singleton
+  state_cells:
+  - adminState
+  cross_cell_writers: []
+  writers:
+  - admin
+  readers:
+  - keys
+  - isPaused
+  - nonce
+  awaits_while_holding_state:
+  - 'admin: AdminGuard verify'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: nonce
+  verdict: finding
+  review: reviews/SureAdmin.md
+  hazards:
+  - HZ-008
+  evidence:
+  - contracts/src/deploy/02_admin.rho
+  findings:
+  - F-003
+- component: CoverTerms
+  file: 03_terms.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - fields
+  - values
+  - validate
+  - hash
+  awaits_while_holding_state:
+  - Codec hash
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/CoverTerms.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/03_terms.rho
+  findings: []
+- component: SureMath
+  file: 04_math.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - bpsSum
+  - share
+  - lineExposures
+  - premiumSplit
+  - lineShares
+  - payable
+  - settlePlan
+  awaits_while_holding_state: []
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: safe-by-inspection
+  review: reviews/SureMath.md
+  hazards: []
+  evidence:
+  - contracts/src/deploy/04_math.rho
+  findings: []
+- component: RgenAdapter
+  file: 05_rgen.rho
+  kind: singleton
+  state_cells:
+  - rgenState
+  cross_cell_writers: []
+  writers:
+  - admin
+  readers:
+  - health
+  - config
+  - oracleFactory
+  - credentialFactory
+  - claimFactory
+  - verifyCredential
+  - verifyClaim
+  - verifyProvenance
+  awaits_while_holding_state:
+  - 'rgenResolve: registry + r-gen Root'
+  - 'admin: AdminGuard'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: nonce
+  verdict: concern
+  review: reviews/RgenAdapter.md
+  hazards:
+  - HZ-023
+  - HZ-022
+  evidence:
+  - contracts/src/deploy/05_rgen.rho
+  findings:
+  - F-018
+- component: Payments
+  file: 40_payments.rho
+  kind: singleton
+  state_cells:
+  - paymentsState
+  cross_cell_writers: []
+  writers:
+  - admin
+  readers:
+  - health
+  - ensureAccount
+  - accountOf
+  - depositFacet
+  - issuer
+  - platformOwner
+  awaits_while_holding_state:
+  - 'admin: SureAdmin/AdminGuard'
+  - 'payResolveUri: r-cash Root'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: nonce
+  verdict: concern
+  review: reviews/Payments.md
+  hazards:
+  - HZ-022
+  evidence:
+  - contracts/src/deploy/40_payments.rho
+  findings:
+  - F-018
+- component: SyndicateBook
+  file: 10_syndicate.rho
+  kind: singleton
+  state_cells:
+  - syndicateBookState
+  cross_cell_writers:
+  - syndicateMake writes syndicateBookState
+  writers:
+  - create
+  readers:
+  - syndicateOf
+  - syndicates
+  - byClass
+  - count
+  - verify
+  awaits_while_holding_state:
+  - 'create: makePurse, dops'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: finding
+  review: reviews/SyndicateBook.md
+  hazards:
+  - HZ-006
+  - HZ-014
+  - HZ-020
+  evidence:
+  - contracts/src/deploy/10_syndicate.rho
+  findings:
+  - F-002
+  - F-009
+  - F-015
+- component: Syndicate
+  file: 10_syndicate.rho
+  kind: per-object
+  state_cells:
+  - syndicateState
+  cross_cell_writers: []
+  writers:
+  - setManager
+  - contribute
+  - withdrawCapital
+  - quote
+  - revokeQuote
+  - expireQuote
+  - openLine
+  - suspend
+  - resume
+  readers:
+  - info
+  - capacity
+  - quotes
+  - quote
+  - lines
+  - line
+  - members
+  - member
+  awaits_while_holding_state:
+  - 'openLine: LineGrant, LineFactory'
+  - 'quote: rs grant publication after repost'
+  - 'withdrawCapital: Payments'
+  - 'expireQuote: Clock'
+  value_moves:
+  - contribute
+  - withdrawCapital
+  - lineSettleCap.pay
+  bundle_publication: 'bundle+{*Syndicate} unclosed: captures syndicateState'
+  replay_guard: nonce/quotes
+  verdict: finding
+  review: reviews/Syndicate.md
+  hazards:
+  - HZ-001
+  - HZ-006
+  - HZ-020
+  evidence:
+  - contracts/src/deploy/10_syndicate.rho
+  findings:
+  - F-001
+  - F-002
+  - F-015
+- component: LineGrant
+  file: 10_syndicate.rho
+  kind: per-object
+  state_cells:
+  - grantState
+  cross_cell_writers: []
+  writers:
+  - consume
+  - revoke
+  - expire
+  readers:
+  - get
+  awaits_while_holding_state:
+  - 'expire: Clock'
+  value_moves: []
+  bundle_publication: 'bundle+{*LineGrant} unclosed: captures grantState/slipToken'
+  replay_guard: one-shot status/token
+  verdict: finding
+  review: reviews/LineGrant.md
+  hazards:
+  - HZ-006
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/10_syndicate.rho
+  findings:
+  - F-002
+- component: LineFactory
+  file: 14_line.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - create
+  awaits_while_holding_state:
+  - rs bundle publication
+  value_moves: []
+  bundle_publication: publishes Line with unclosed bundle
+  replay_guard: none
+  verdict: finding
+  review: reviews/LineFactory.md
+  hazards:
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/14_line.rho
+  findings:
+  - F-002
+- component: Line
+  file: 14_line.rho
+  kind: per-object
+  state_cells:
+  - lineState
+  cross_cell_writers: []
+  writers:
+  - credit
+  - pay
+  - release
+  readers:
+  - info
+  - remaining
+  - paidFor
+  awaits_while_holding_state:
+  - 'credit/pay/release: capability call before lineState update'
+  value_moves:
+  - pay
+  bundle_publication: 'bundle+{*Line} unclosed: captures lineState/caps/token'
+  replay_guard: policyToken/paidFor
+  verdict: finding
+  review: reviews/Line.md
+  hazards:
+  - HZ-007
+  - HZ-017
+  evidence:
+  - contracts/src/deploy/14_line.rho
+  findings:
+  - F-002
+  - F-012
+- component: BrokerBook
+  file: 11_broker.rho
+  kind: singleton
+  state_cells:
+  - brokerBookState
+  cross_cell_writers:
+  - brokerMake writes brokerBookState directly
+  writers:
+  - register
+  readers:
+  - brokerOf
+  - brokers
+  awaits_while_holding_state:
+  - 'register: brokerMake'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: finding
+  review: reviews/BrokerBook.md
+  hazards:
+  - HZ-013
+  - HZ-020
+  evidence:
+  - contracts/src/deploy/11_broker.rho
+  findings:
+  - F-008
+  - F-015
+- component: Broker
+  file: 11_broker.rho
+  kind: per-object
+  state_cells:
+  - brokerState
+  cross_cell_writers: []
+  writers:
+  - addSlip
+  - pause
+  - resume
+  readers:
+  - info
+  - profile
+  - slips
+  awaits_while_holding_state: []
+  value_moves: []
+  bundle_publication: 'bundle+{*Broker} unclosed: captures brokerState'
+  replay_guard: none
+  verdict: finding
+  review: reviews/Broker.md
+  hazards:
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/11_broker.rho
+  findings:
+  - F-002
+- component: RiskBook
+  file: 12_risk.rho
+  kind: singleton
+  state_cells:
+  - riskBookState
+  cross_cell_writers:
+  - riskMake writes riskBookState
+  writers:
+  - submit
+  readers:
+  - risk
+  - risks
+  - byInsured
+  - byBroker
+  awaits_while_holding_state:
+  - 'submit: auth/validation then riskMake'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: none
+  verdict: concern
+  review: reviews/RiskBook.md
+  hazards:
+  - HZ-020
+  - HZ-021
+  evidence:
+  - contracts/src/deploy/12_risk.rho
+  findings:
+  - F-015
+  - F-017
+- component: Risk
+  file: 12_risk.rho
+  kind: per-object
+  state_cells:
+  - riskState
+  cross_cell_writers: []
+  writers:
+  - addEvidence
+  - assess
+  - accept
+  - decline
+  - expire
+  readers:
+  - info
+  - evidence
+  awaits_while_holding_state:
+  - 'expire: Clock'
+  value_moves: []
+  bundle_publication: 'bundle+{*Risk} unclosed: captures riskState'
+  replay_guard: nonce
+  verdict: finding
+  review: reviews/Risk.md
+  hazards:
+  - HZ-007
+  - HZ-021
+  evidence:
+  - contracts/src/deploy/12_risk.rho
+  findings:
+  - F-002
+  - F-017
+- component: DistributionFactory
+  file: 15_distribution.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - create
+  awaits_while_holding_state:
+  - rs bundle publication
+  value_moves: []
+  bundle_publication: publishes Distribution with unclosed bundle
+  replay_guard: none
+  verdict: finding
+  review: reviews/DistributionFactory.md
+  hazards:
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/15_distribution.rho
+  findings:
+  - F-002
+- component: Distribution
+  file: 15_distribution.rho
+  kind: per-object
+  state_cells:
+  - distState
+  cross_cell_writers: []
+  writers:
+  - run
+  readers:
+  - info
+  - plan
+  - paid
+  awaits_while_holding_state:
+  - 'run: allocPlan/payPlan across value moves'
+  value_moves:
+  - payAccount
+  - payFund
+  - payLine
+  bundle_publication: 'bundle+{*Distribution} unclosed: captures distState/purse/token'
+  replay_guard: one-shot status/token
+  verdict: finding
+  review: reviews/Distribution.md
+  hazards:
+  - HZ-005
+  - HZ-007
+  - HZ-025
+  evidence:
+  - contracts/src/deploy/15_distribution.rho
+  findings:
+  - F-001
+  - F-002
+- component: SureFund
+  file: 16_fund.rho
+  kind: singleton
+  state_cells:
+  - fundState
+  cross_cell_writers: []
+  writers:
+  - contribute
+  - cover
+  - admin
+  readers:
+  - info
+  - balance
+  - covered
+  - shortfalls
+  awaits_while_holding_state:
+  - 'contribute: peek asset, deposit, then take'
+  - 'cover: fundAdmin then state'
+  value_moves:
+  - contribute
+  - cover
+  bundle_publication: top-level, closed
+  replay_guard: nonce/govNonce split
+  verdict: finding
+  review: reviews/SureFund.md
+  hazards:
+  - HZ-009
+  evidence:
+  - contracts/src/deploy/16_fund.rho
+  findings:
+  - F-004
+- component: SlipFactory
+  file: 13_slip.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - open
+  awaits_while_holding_state:
+  - 'open: broker/risk/terms/payments then slipMake'
+  value_moves: []
+  bundle_publication: publishes Slip with unclosed bundle
+  replay_guard: none
+  verdict: finding
+  review: reviews/SlipFactory.md
+  hazards:
+  - HZ-007
+  - HZ-020
+  evidence:
+  - contracts/src/deploy/13_slip.rho
+  findings:
+  - F-002
+  - F-015
+- component: Slip
+  file: 13_slip.rho
+  kind: per-object
+  state_cells:
+  - slipState
+  cross_cell_writers: []
+  writers:
+  - accept
+  - subscribe
+  - fundPremium
+  - bind
+  - expire
+  readers:
+  - info
+  - subscriptions
+  - subscription
+  - premium
+  - policy
+  awaits_while_holding_state:
+  - 'subscribe: Syndicate.quote while state held'
+  - 'bind: lines/policy/distribution'
+  value_moves:
+  - fundPremium
+  bundle_publication: 'bundle+{*Slip} unclosed: captures slipState/purse/tokens'
+  replay_guard: nonce/tokens
+  verdict: finding
+  review: reviews/Slip.md
+  hazards:
+  - HZ-002
+  - HZ-007
+  - HZ-012
+  - HZ-016
+  - HZ-018
+  evidence:
+  - contracts/src/deploy/13_slip.rho
+  findings:
+  - F-001
+  - F-002
+  - F-007
+  - F-011
+  - F-013
+- component: PolicyFactory
+  file: 17_policy.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - create
+  awaits_while_holding_state:
+  - rs bundle publication
+  value_moves: []
+  bundle_publication: publishes Policy with unclosed bundle
+  replay_guard: none
+  verdict: finding
+  review: reviews/PolicyFactory.md
+  hazards:
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/17_policy.rho
+  findings:
+  - F-002
+- component: Policy
+  file: 17_policy.rho
+  kind: per-object
+  state_cells:
+  - policyState
+  cross_cell_writers: []
+  writers:
+  - distribute
+  - openClaim
+  - settleClaim
+  - expire
+  readers:
+  - info
+  - terms
+  - lines
+  - line
+  - claims
+  - claim
+  - payable
+  awaits_while_holding_state:
+  - 'distribute: SureMath/Distribution'
+  - 'openClaim: ClaimFactory'
+  - 'settleClaim: SureFund/Line.pay'
+  - 'expire: Clock'
+  value_moves: []
+  bundle_publication: 'bundle+{*Policy} unclosed: captures policyState/purse/tokens'
+  replay_guard: policyToken/claimToken
+  verdict: finding
+  review: reviews/Policy.md
+  hazards:
+  - HZ-003
+  - HZ-007
+  - HZ-011
+  - HZ-015
+  - HZ-019
+  evidence:
+  - contracts/src/deploy/17_policy.rho
+  findings:
+  - F-001
+  - F-002
+  - F-006
+  - F-010
+  - F-014
+- component: ClaimFactory
+  file: 18_claim.rho
+  kind: stateless
+  state_cells: []
+  writers: []
+  readers:
+  - create
+  awaits_while_holding_state:
+  - rs bundle publication
+  value_moves: []
+  bundle_publication: publishes Claim with unclosed bundle
+  replay_guard: none
+  verdict: finding
+  review: reviews/ClaimFactory.md
+  hazards:
+  - HZ-007
+  evidence:
+  - contracts/src/deploy/18_claim.rho
+  findings:
+  - F-002
+- component: Claim
+  file: 18_claim.rho
+  kind: per-object
+  state_cells:
+  - claimState
+  cross_cell_writers: []
+  writers:
+  - addEvidence
+  - classify
+  - assess
+  - agree
+  - dispute
+  - settle
+  - close
+  readers:
+  - info
+  - evidence
+  awaits_while_holding_state:
+  - 'classify/assess: Policy info'
+  - 'dispute: RgenAdapter/OracleFactory'
+  - 'settle: Policy.settleClaim'
+  value_moves: []
+  bundle_publication: 'bundle+{*Claim} unclosed: captures claimState/token'
+  replay_guard: claimToken/status
+  verdict: finding
+  review: reviews/Claim.md
+  hazards:
+  - HZ-004
+  - HZ-007
+  - HZ-019
+  - HZ-023
+  evidence:
+  - contracts/src/deploy/18_claim.rho
+  findings:
+  - F-001
+  - F-002
+  - F-014
+  - F-018
+- component: PolicyBook
+  file: 19_books.rho
+  kind: singleton
+  state_cells:
+  - policyBookState
+  cross_cell_writers: []
+  writers:
+  - register
+  readers:
+  - policy
+  - policies
+  - byInsured
+  - byBroker
+  - bySlip
+  awaits_while_holding_state:
+  - 'register: Policy info before book take'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: nonce
+  verdict: concern
+  review: reviews/PolicyBook.md
+  hazards:
+  - HZ-010
+  evidence:
+  - contracts/src/deploy/19_books.rho
+  findings:
+  - F-005
+- component: ClaimBook
+  file: 19_books.rho
+  kind: singleton
+  state_cells:
+  - claimBookState
+  cross_cell_writers: []
+  writers:
+  - register
+  readers:
+  - claim
+  - claims
+  - byPolicy
+  - byInsured
+  awaits_while_holding_state:
+  - 'register: Claim info before book take'
+  value_moves: []
+  bundle_publication: top-level, closed
+  replay_guard: nonce
+  verdict: concern
+  review: reviews/ClaimBook.md
+  hazards:
+  - HZ-010
+  evidence:
+  - contracts/src/deploy/19_books.rho
+  findings:
+  - F-005

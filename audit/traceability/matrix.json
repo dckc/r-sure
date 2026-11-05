@@ -1,13 +1,13 @@
 {
   "schema": "rshare.traceability/v1",
   "summary": {
-    "arms": 163,
+    "arms": 162,
     "arms_with_flow_rule": 0,
-    "arms_with_hazard": 0,
-    "hazards": 3,
-    "findings": 0,
-    "improvements": 0,
-    "tests": 3
+    "arms_with_hazard": 20,
+    "hazards": 25,
+    "findings": 19,
+    "improvements": 19,
+    "tests": 36
   },
   "arms": [
     {
@@ -278,10 +278,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-008"
+      ],
+      "findings": [
+        "F-003"
+      ],
+      "improvements": [
+        "R-003"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "CoverTerms",
@@ -551,10 +559,21 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-006",
+        "HZ-020"
+      ],
+      "findings": [
+        "F-002",
+        "F-015"
+      ],
+      "improvements": [
+        "R-002",
+        "R-015"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "SyndicateBook",
@@ -616,10 +635,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-014"
+      ],
+      "findings": [
+        "F-009"
+      ],
+      "improvements": [
+        "R-009"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "LineCredit",
@@ -889,10 +916,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-001"
+      ],
+      "findings": [
+        "F-001"
+      ],
+      "improvements": [
+        "R-001"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Syndicate",
@@ -1006,23 +1041,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
-    },
-    {
-      "component": "BrokerBook",
-      "arm": "registerDone",
-      "source": null,
-      "visibility": null,
-      "flow_rule": null,
-      "flow_status": null,
-      "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-013"
+      ],
+      "findings": [
+        "F-008"
+      ],
+      "improvements": [
+        "R-008"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "BrokerBook",
@@ -1149,10 +1179,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-021"
+      ],
+      "findings": [
+        "F-017"
+      ],
+      "improvements": [
+        "R-017"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "RiskBook",
@@ -1305,10 +1343,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-012"
+      ],
+      "findings": [
+        "F-007"
+      ],
+      "improvements": [
+        "R-007"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Slip",
@@ -1318,10 +1364,21 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-002",
+        "HZ-018"
+      ],
+      "findings": [
+        "F-001",
+        "F-013"
+      ],
+      "improvements": [
+        "R-001",
+        "R-013"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Slip",
@@ -1331,10 +1388,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-016"
+      ],
+      "findings": [
+        "F-011"
+      ],
+      "improvements": [
+        "R-011"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "SlipFactory",
@@ -1357,10 +1422,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-007"
+      ],
+      "findings": [
+        "F-002"
+      ],
+      "improvements": [
+        "R-002"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Line",
@@ -1422,10 +1495,21 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-017",
+        "HZ-019"
+      ],
+      "findings": [
+        "F-012",
+        "F-014"
+      ],
+      "improvements": [
+        "R-012",
+        "R-014"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Line",
@@ -1500,10 +1584,19 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-005",
+        "HZ-025"
+      ],
+      "findings": [
+        "F-001"
+      ],
+      "improvements": [
+        "R-001"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "SureFund",
@@ -1578,10 +1671,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-009"
+      ],
+      "findings": [
+        "F-004"
+      ],
+      "improvements": [
+        "R-004"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "SureFund",
@@ -1695,10 +1796,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-003"
+      ],
+      "findings": [
+        "F-001"
+      ],
+      "improvements": [
+        "R-001"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Policy",
@@ -1708,10 +1817,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-015"
+      ],
+      "findings": [
+        "F-010"
+      ],
+      "improvements": [
+        "R-010"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Policy",
@@ -1734,10 +1851,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-011"
+      ],
+      "findings": [
+        "F-006"
+      ],
+      "improvements": [
+        "R-006"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "PolicyFactory",
@@ -1838,10 +1963,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-023"
+      ],
+      "findings": [
+        "F-018"
+      ],
+      "improvements": [
+        "R-018"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "applyCap",
@@ -1864,10 +1997,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-004"
+      ],
+      "findings": [
+        "F-001"
+      ],
+      "improvements": [
+        "R-001"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Claim",
@@ -1903,10 +2044,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-010"
+      ],
+      "findings": [
+        "F-005"
+      ],
+      "improvements": [
+        "R-005"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "PolicyBook",
@@ -2046,10 +2195,18 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
-      "findings": [],
-      "improvements": [],
-      "tests": []
+      "hazards": [
+        "HZ-022"
+      ],
+      "findings": [
+        "F-018"
+      ],
+      "improvements": [
+        "R-018"
+      ],
+      "tests": [
+        "T-003"
+      ]
     },
     {
       "component": "Payments",

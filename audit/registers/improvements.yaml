@@ -1,1 +1,313 @@
-improvements: []
+improvements:
+- id: R-001
+  priority: P0
+  findings:
+  - F-001
+  hazards:
+  - HZ-001
+  - HZ-002
+  - HZ-003
+  - HZ-004
+  - HZ-005
+  change: Replace the second state take with a repost of the original snapshot after
+    the awaits.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-002
+  priority: P0
+  findings:
+  - F-002
+  hazards:
+  - HZ-006
+  - HZ-007
+  change: Refactor instance publication to a closed bundle/init pattern and verify
+    with make install.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-003
+  priority: P1
+  findings:
+  - F-003
+  hazards:
+  - HZ-008
+  change: Wire isPaused into mutating arms, exempting settlement/close/expiry/refund.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-004
+  priority: P1
+  findings:
+  - F-004
+  hazards:
+  - HZ-009
+  change: Unify SureFund cover/admin on govNonce and add a replay check.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-005
+  priority: P1
+  findings:
+  - F-005
+  hazards:
+  - HZ-010
+  change: Call PolicyBook/ClaimBook.register from the factories.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-006
+  priority: P1
+  findings:
+  - F-006
+  hazards:
+  - HZ-011
+  change: Release every policy line in Policy.expire.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-007
+  priority: P1
+  findings:
+  - F-007
+  hazards:
+  - HZ-012
+  change: Require the insured in Slip.fundPremium.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-008
+  priority: P1
+  findings:
+  - F-008
+  hazards:
+  - HZ-013
+  change: Remove the public registerDone callback; register in brokerMake.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-009
+  priority: P1
+  findings:
+  - F-009
+  hazards:
+  - HZ-014
+  change: Implement SyndicateBook.verify with a real URI scan.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-010
+  priority: P1
+  findings:
+  - F-010
+  hazards:
+  - HZ-015
+  change: Check loss period and notice window in Policy.openClaim.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-011
+  priority: P1
+  findings:
+  - F-011
+  hazards:
+  - HZ-016
+  change: Refund the funded premium from Slip.expire.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-012
+  priority: P1
+  findings:
+  - F-012
+  hazards:
+  - HZ-017
+  change: Restructure Line credit/pay/release around a single take/repost.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-013
+  priority: P2
+  findings:
+  - F-013
+  hazards:
+  - HZ-018
+  change: Recompute and compare termsHash at bind.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-014
+  priority: P2
+  findings:
+  - F-014
+  hazards:
+  - HZ-019
+  change: Bind claimId to policy/line in the line pay path.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-015
+  priority: P2
+  findings:
+  - F-015
+  hazards:
+  - HZ-020
+  change: Declare cross-cell writers and overloaded arms; update the architecture
+    graph.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-016
+  priority: P3
+  findings:
+  - F-016
+  hazards: []
+  change: Rename the catalogue cell to distState.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented
+- id: R-017
+  priority: P2
+  findings:
+  - F-017
+  hazards:
+  - HZ-021
+  change: Add a quality/evidence gate or document the presence-only limit.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-018
+  priority: P2
+  findings:
+  - F-018
+  hazards:
+  - HZ-022
+  - HZ-023
+  change: Add explicit reply-shape tests and health preflight.
+  type: design
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+- id: R-019
+  priority: P3
+  findings:
+  - F-019
+  hazards:
+  - HZ-024
+  change: Sync tests.yaml with the 36-suite harness.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: implemented

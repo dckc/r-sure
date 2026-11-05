@@ -1,0 +1,12 @@
+post-fix:
+Syndicate@"openLine": second consume of syndicateState at line 868 (first at line 811) without an intervening repost
+Slip@"bind": second consume of slipState at line 484 (first at line 427) without an intervening repost
+Policy@"distribute": second consume of policyState at line 242 (first at line 191) without an intervening repost
+Policy@"openClaim": second consume of policyState at line 315 (first at line 293) without an intervening repost
+Policy@"settleClaim": second consume of policyState at line 391 (first at line 346) without an intervening repost
+Policy@"settleClaim": second consume of policyState at line 433 (first at line 391) without an intervening repost
+Claim@"dispute": second consume of claimState at line 361 (first at line 322) without an intervening repost
+Claim@"settle": second consume of claimState at line 404 (first at line 390) without an intervening repost
+Distribution@"run": second consume of distState at line 360 (first at line 345) without an intervening repost
+
+(After fix, the scanner reports: no second consume without a repost.)

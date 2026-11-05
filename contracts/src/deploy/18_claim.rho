@@ -358,12 +358,10 @@ in {
                                     for (@oo <- ooCh) {
                                       match oo {
                                         (true, case) => {
-                                          for (@s2 <- claimState) {
-                                            claimState!(s2.set("oracleRef", case)
-                                                          .set("status", "disputed")
-                                                          .set("nonce", s2.get("nonce") + 1)) |
-                                            ret2!((true, case))
-                                          }
+                                          claimState!(s.set("oracleRef", case)
+                                                        .set("status", "disputed")
+                                                        .set("nonce", s.get("nonce") + 1)) |
+                                          ret2!((true, case))
                                         }
                                         _ => { claimState!(s) | ret2!(oo) }
                                       }
@@ -401,12 +399,10 @@ in {
                   for (@sc <- scCh) {
                     match sc {
                       (true, paid) => {
-                        for (@s2 <- claimState) {
-                          claimState!(s2.set("paid", paid)
-                                        .set("status", "settled")
-                                        .set("nonce", s2.get("nonce") + 1)) |
-                          ret2!((true, paid))
-                        }
+                        claimState!(s.set("paid", paid)
+                                     .set("status", "settled")
+                                     .set("nonce", s.get("nonce") + 1)) |
+                        ret2!((true, paid))
                       }
                       _ => { claimState!(s) | ret2!(sc) }
                     }

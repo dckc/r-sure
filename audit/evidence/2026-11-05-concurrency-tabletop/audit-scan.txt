@@ -1,0 +1,93 @@
+$ python3 tools/check_bundle_closedness.py
+bundle-closedness: 10_syndicate.rho:727: bundle+{*LineGrant} captures grantState not bound inside the contract
+bundle-closedness: 10_syndicate.rho:982: bundle+{*Syndicate} captures syndicateState not bound inside the contract
+bundle-closedness: 11_broker.rho:136: bundle+{*Broker} captures brokerState not bound inside the contract
+bundle-closedness: 12_risk.rho:246: bundle+{*Risk} captures riskState not bound inside the contract
+bundle-closedness: 13_slip.rho:561: bundle+{*Slip} captures slipState not bound inside the contract
+bundle-closedness: 14_line.rho:129: bundle+{*Line} captures lineState not bound inside the contract
+bundle-closedness: 15_distribution.rho:379: bundle+{*Distribution} captures distState not bound inside the contract
+bundle-closedness: 17_policy.rho:536: bundle+{*Policy} captures policyState not bound inside the contract
+bundle-closedness: 18_claim.rho:429: bundle+{*Claim} captures claimState not bound inside the contract
+bundle-closedness: 9 candidate(s)
+exit=1
+
+$ python3 tools/check_take_repost.py
+take-repost: no second consume without a repost
+exit=0
+
+$ python3 tools/check_reply_shapes.py
+reply-shapes: 00_root.rho:95: dops@"pubKeyBytes" has no nearby match
+reply-shapes: 01_kernel.rho:57: ret@"rsure:admin:v1|" has no nearby match
+reply-shapes: 01_kernel.rho:90: Codec@"canonical" has no nearby match
+reply-shapes: 01_kernel.rho:105: Root@"register" has no nearby match
+reply-shapes: 01_kernel.rho:106: Root@"register" has no nearby match
+reply-shapes: 01_kernel.rho:107: Root@"register" has no nearby match
+reply-shapes: 02_admin.rho:205: Root@"register" has no nearby match
+reply-shapes: 02_admin.rho:206: Root@"register" has no nearby match
+reply-shapes: 03_terms.rho:167: Codec@"hash" has no nearby match
+reply-shapes: 03_terms.rho:180: Root@"register" has no nearby match
+reply-shapes: 04_math.rho:170: Root@"register" has no nearby match
+reply-shapes: 05_rgen.rho:66: rgenResolve@"component:oracle-factory" has no nearby match
+reply-shapes: 05_rgen.rho:67: rgenResolve@"component:credential-factory" has no nearby match
+reply-shapes: 05_rgen.rho:68: rgenResolve@"component:claim-factory" has no nearby match
+reply-shapes: 05_rgen.rho:69: rgenResolve@"component:provenance-factory" has no nearby match
+reply-shapes: 05_rgen.rho:129: ClaimFactory@"verify" has no nearby match
+reply-shapes: 05_rgen.rho:240: Root@"register" has no nearby match
+reply-shapes: 10_syndicate.rho:31: Clock@"now" has no nearby match
+reply-shapes: 10_syndicate.rho:276: purse@"getCurrentAmount" has no nearby match
+reply-shapes: 10_syndicate.rho:282: syndicateResolve@"component:payments" has no nearby match
+reply-shapes: 10_syndicate.rho:287: Payments@"depositFacet" has no nearby match
+reply-shapes: 10_syndicate.rho:548: syndicateResolve@"component:payments" has no nearby match
+reply-shapes: 10_syndicate.rho:553: Payments@"depositFacet" has no nearby match
+reply-shapes: 10_syndicate.rho:837: syndicateResolve@"component:line-factory" has no nearby match
+reply-shapes: 10_syndicate.rho:850: LineGrant@"consume" has no nearby match
+reply-shapes: 10_syndicate.rho:874: LineFactory@"create" has no nearby match
+reply-shapes: 10_syndicate.rho:1029: Root@"register" has no nearby match
+reply-shapes: 11_broker.rho:204: Root@"register" has no nearby match
+reply-shapes: 12_risk.rho:27: Clock@"now" has no nearby match
+reply-shapes: 12_risk.rho:336: Root@"register" has no nearby match
+reply-shapes: 13_slip.rho:42: Clock@"now" has no nearby match
+reply-shapes: 13_slip.rho:54: ret@"subscribed" has no nearby match
+reply-shapes: 13_slip.rho:55: ret@"open" has no nearby match
+reply-shapes: 13_slip.rho:290: Syndicate@"quote" has no nearby match
+reply-shapes: 13_slip.rho:456: slipResolve@"component:policy-factory" has no nearby match
+reply-shapes: 13_slip.rho:461: PolicyFactory@"create" has no nearby match
+reply-shapes: 13_slip.rho:579: Broker@"addSlip" has no nearby match
+reply-shapes: 13_slip.rho:603: slipResolve@"component:broker-book" has no nearby match
+reply-shapes: 13_slip.rho:609: BrokerBook@"brokerOf" has no nearby match
+reply-shapes: 13_slip.rho:614: slipResolve@"component:terms" has no nearby match
+reply-shapes: 13_slip.rho:619: CoverTerms@"validate" has no nearby match
+reply-shapes: 13_slip.rho:624: CoverTerms@"hash" has no nearby match
+reply-shapes: 13_slip.rho:629: slipResolve@"component:payments" has no nearby match
+reply-shapes: 13_slip.rho:634: Payments@"issuer" has no nearby match
+reply-shapes: 13_slip.rho:640: issuer@"makeEmptyPurse" has no nearby match
+reply-shapes: 13_slip.rho:710: Root@"register" has no nearby match
+reply-shapes: 14_line.rho:147: Root@"register" has no nearby match
+reply-shapes: 15_distribution.rho:397: Root@"register" has no nearby match
+reply-shapes: 16_fund.rho:80: adminGuard@"fund" has no nearby match
+reply-shapes: 16_fund.rho:124: fundResolve@"component:payments" has no nearby match
+reply-shapes: 16_fund.rho:128: Payments@"issuer" has no nearby match
+reply-shapes: 17_policy.rho:41: Clock@"now" has no nearby match
+reply-shapes: 17_policy.rho:201: SureMath@"payable" has no nearby match
+reply-shapes: 17_policy.rho:220: policyResolve@"component:suremath" has no nearby match
+reply-shapes: 17_policy.rho:246: policyResolve@"component:distribution-factory" has no nearby match
+reply-shapes: 17_policy.rho:251: DistributionFactory@"create" has no nearby match
+reply-shapes: 17_policy.rho:374: policyResolve@"component:suremath" has no nearby match
+reply-shapes: 17_policy.rho:378: SureMath@"payable" has no nearby match
+reply-shapes: 17_policy.rho:400: SureMath@"settlePlan" has no nearby match
+reply-shapes: 17_policy.rho:440: SureMath@"settlePlan" has no nearby match
+reply-shapes: 17_policy.rho:562: Root@"register" has no nearby match
+reply-shapes: 18_claim.rho:41: Clock@"now" has no nearby match
+reply-shapes: 18_claim.rho:53: Policy@"info" has no nearby match
+reply-shapes: 18_claim.rho:327: claimResolve@"component:rgen" has no nearby match
+reply-shapes: 18_claim.rho:459: Root@"register" has no nearby match
+reply-shapes: 19_books.rho:193: Root@"register" has no nearby match
+reply-shapes: 19_books.rho:194: Root@"register" has no nearby match
+reply-shapes: 40_payments.rho:144: AssetResolver@"issuer" has no nearby match
+reply-shapes: 40_payments.rho:259: Root@"register" has no nearby match
+reply-shapes: 179 call site(s); run --write to refresh the table
+exit=0
+
+$ python3 tools/check_pause_scope.py
+pause-scope: pauseAll is written but no arm consults isPaused
+exit=1

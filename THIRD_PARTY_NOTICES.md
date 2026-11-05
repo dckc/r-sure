@@ -40,5 +40,9 @@ parallel receives; the 64 KiB deploy cap; ERTP receive-only deposit facets; and 
 
 ## Papers
 
-`docs/papers/NAIC_CIPR_2C_20July_2016.pdf` is third-party background (NAIC/CIPR). It is not
-relicensed and is not a source of the contracts.
+`docs/papers/NAIC_CIPR_2C_20July_2016.pdf` is third-party background: Daniel R. Robles,
+"Insurance: The Highest and Best Use Case for Blockchain Technology," NAIC CIPR Newsletter,
+July 2016, pp. 17–27. It is not relicensed and is not a source of the contracts. It is cited
+on pp. 17, 20, 22 and 25 for the capital-cost, insurability and adjudication rationale; it
+is an opinion column, not an NAIC standard or specification, and its views are the author's,
+not the NAIC's. The page-level extract is `docs/papers/extracts/robles2016naic.md`.

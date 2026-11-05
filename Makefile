@@ -23,6 +23,7 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         integration-rcash integration-rgen integration-rshare unit-all \
         lean-build lean-check vectors check-flows check-flows-strict formal-check \
         audit-check audit-trace audit-trace-check check-audit check-arm-inventory audit-dynamic \
+        check-concurrency-audit check-composition-audit audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
         client-fixtures client-journey client-keystores web-install web-test web-build web-e2e \
         check ci clean
@@ -159,7 +160,19 @@ check-flows-strict:
 
 formal-check: lean-check vectors check-flows check-flows-strict
 
-audit-check: check-audit check-arm-inventory audit-trace-check
+audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit
+
+check-concurrency-audit:
+	$(PY) tools/check_concurrency_audit.py
+
+check-composition-audit:
+	$(PY) tools/check_composition_audit.py
+
+audit-scan:
+	$(PY) tools/check_bundle_closedness.py
+	$(PY) tools/check_take_repost.py
+	$(PY) tools/check_reply_shapes.py
+	$(PY) tools/check_pause_scope.py
 
 audit-trace:
 	$(PY) tools/audit_trace.py --write

@@ -1,1 +1,523 @@
-findings: []
+findings:
+- id: F-001
+  title: Eight arms take-await-take the same state cell
+  severity: P0
+  class: concurrency
+  status: fixed
+  confidence: high
+  components:
+  - Syndicate
+  - Slip
+  - Policy
+  - Claim
+  - Distribution
+  arms:
+  - Syndicate@"openLine"
+  - Slip@"bind"
+  - Policy@"distribute"
+  - Policy@"openClaim"
+  - Policy@"settleClaim"
+  - Claim@"settle"
+  - Claim@"dispute"
+  - Distribution@"run"
+  hazards:
+  - HZ-001
+  - HZ-002
+  - HZ-003
+  - HZ-004
+  - HZ-005
+  - HZ-025
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The first consume is never reposted; a later consume of the same cell
+    blocks because the only datum was taken.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Cornerstone flows hang; no policy bind, premium distribution, settlement
+    or dispute completes.
+  proposed_fix: R-001
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-002
+  title: Instance bundles capture state/capabilities
+  severity: P0
+  class: concurrency
+  status: confirmed
+  confidence: high
+  components:
+  - Syndicate
+  - LineGrant
+  - Line
+  - Slip
+  - Policy
+  - Claim
+  - Distribution
+  - Broker
+  - Risk
+  arms:
+  - SyndicateBook@"create"
+  - Syndicate@"openLine"
+  - LineFactory@"create"
+  - SlipFactory@"open"
+  - PolicyFactory@"create"
+  - ClaimFactory@"create"
+  hazards:
+  - HZ-006
+  - HZ-007
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: Nine per-object contracts are published with bundle+{*X} while X's
+    body references a state cell or token created outside X. The node rejects the
+    bundle.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Devnet install is blocked; no instance can be created.
+  proposed_fix: R-002
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-003
+  title: Global pause is dead
+  severity: P1
+  class: composition
+  status: confirmed
+  confidence: high
+  components:
+  - SureAdmin
+  arms:
+  - SureAdmin@"admin"
+  hazards:
+  - HZ-008
+  invariants:
+  - INV-12
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: pauseAll writes pausedAll but no mutating arm reads isPaused.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Operators cannot pause the market; the pause-scope invariant is vacuous.
+  proposed_fix: R-003
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-004
+  title: SureFund mixes nonce and govNonce
+  severity: P1
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - SureFund
+  arms:
+  - SureFund@"cover"
+  - SureFund@"admin"
+  hazards:
+  - HZ-009
+  invariants:
+  - INV-8
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: cover writes nonce and has no govNonce replay check; admin uses govNonce.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Cover replay analysis is inconsistent and a repeated cover can be attempted.
+  proposed_fix: R-004
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-005
+  title: Books are never populated
+  severity: P1
+  class: composition
+  status: confirmed
+  confidence: high
+  components:
+  - PolicyBook
+  - ClaimBook
+  - Policy
+  - Claim
+  arms:
+  - PolicyBook@"register"
+  - ClaimBook@"register"
+  hazards:
+  - HZ-010
+  invariants:
+  - INV-8
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: Policy and Claim creation never call the books.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Discovery indexes are empty; clients cannot enumerate policies/claims on-chain.
+  proposed_fix: R-005
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-006
+  title: Policy expiry does not release lines
+  severity: P1
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - Policy
+  - Line
+  arms:
+  - Policy@"expire"
+  hazards:
+  - HZ-011
+  invariants:
+  - INV-7
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: expire sets status expired without calling Line.release.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Written capacity is never returned; syndicates leak capacity.
+  proposed_fix: R-006
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-007
+  title: Slip.fundPremium does not check the insured
+  severity: P1
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - Slip
+  arms:
+  - Slip@"fundPremium"
+  hazards:
+  - HZ-012
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The arm authenticates any owner but does not require the insured.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: A third party can fund a slip and influence its state.
+  proposed_fix: R-007
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-008
+  title: BrokerBook.registerDone is public
+  severity: P1
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - BrokerBook
+  arms:
+  - BrokerBook@"register"
+  hazards:
+  - HZ-013
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The broker registration path used a public registerDone callback that
+    accepted an arbitrary owner/id/uri.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Broker registry can be front-run/poisoned.
+  proposed_fix: R-008
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-009
+  title: SyndicateBook.verify always returns false
+  severity: P1
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - SyndicateBook
+  arms:
+  - SyndicateBook@"verify"
+  hazards:
+  - HZ-014
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The verify arm ignores its argument and returns false.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Callers cannot verify a syndicate URI; a fake verify is a composition trap.
+  proposed_fix: R-009
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-010
+  title: Policy.openClaim has no period/notice check
+  severity: P1
+  class: composition
+  status: confirmed
+  confidence: high
+  components:
+  - Policy
+  arms:
+  - Policy@"openClaim"
+  hazards:
+  - HZ-015
+  invariants:
+  - INV-5
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: openClaim does not compare lossHeight to the policy period or notice
+    window.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Out-of-period or late claims can be accepted.
+  proposed_fix: R-010
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-011
+  title: Slip.expire does not refund a funded premium
+  severity: P1
+  class: composition
+  status: confirmed
+  confidence: high
+  components:
+  - Slip
+  arms:
+  - Slip@"expire"
+  hazards:
+  - HZ-016
+  invariants:
+  - INV-4
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: expire releases grants but leaves the premium purse untouched.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: A funded premium is stranded on an expired slip.
+  proposed_fix: R-011
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-012
+  title: Line capability call precedes lineState update
+  severity: P1
+  class: composition
+  status: confirmed
+  confidence: high
+  components:
+  - Line
+  arms:
+  - Line@"credit"
+  - Line@"pay"
+  - Line@"release"
+  hazards:
+  - HZ-017
+  invariants:
+  - INV-7
+  - INV-8
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The line calls the syndicate capability first and updates its own cell
+    after.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: If the update cannot complete, value has moved without a line record.
+  proposed_fix: R-012
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-013
+  title: termsHash is not revalidated at bind
+  severity: P2
+  class: composition
+  status: deferred
+  confidence: high
+  components:
+  - Slip
+  - Policy
+  arms:
+  - Slip@"bind"
+  hazards:
+  - HZ-018
+  invariants:
+  - INV-4
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The slip computes termsHash at open and trusts it at bind.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: A changed or malformed terms map could diverge from the hash.
+  proposed_fix: R-013
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-014
+  title: Line.pay trusts a claimId without policy binding
+  severity: P2
+  class: composition
+  status: deferred
+  confidence: high
+  components:
+  - Line
+  - Policy
+  arms:
+  - Line@"pay"
+  - Policy@"settleClaim"
+  hazards:
+  - HZ-019
+  invariants:
+  - INV-8
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The line checks paidFor[claimId] but not that claimId belongs to the
+    paying policy.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: A cross-policy claimId could be paid if the policy token is leaked.
+  proposed_fix: R-014
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-015
+  title: Cross-cell writers and declared edges are incomplete
+  severity: P2
+  class: composition
+  status: deferred
+  confidence: high
+  components:
+  - SyndicateBook
+  - Syndicate
+  - RiskBook
+  - Risk
+  - Slip
+  - BrokerBook
+  - Broker
+  arms:
+  - SyndicateBook@"create"
+  - RiskBook@"submit"
+  - SlipFactory@"open"
+  - BrokerBook@"register"
+  hazards:
+  - HZ-020
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: Instance makers write book cells; factories are declared as depending
+    on their products; overloaded arms are undercounted.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: The architecture graph and ownership model understate coupling.
+  proposed_fix: R-015
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-016
+  title: Distribution state cell name mismatch
+  severity: P3
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - Distribution
+  arms:
+  - Distribution@"run"
+  hazards: []
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: components.json declared distributionState while the code uses distState.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Static coverage missed the distribution state cell.
+  proposed_fix: R-016
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-017
+  title: Risk tri-test checks presence only
+  severity: P2
+  class: composition
+  status: deferred
+  confidence: high
+  components:
+  - Risk
+  arms:
+  - RiskBook@"submit"
+  hazards:
+  - HZ-021
+  invariants:
+  - INV-5
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: The four tri-test fields are non-empty strings; probability/cost quality
+    and evidence binding are not checked.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: An uninsurable or weakly supported risk can be submitted.
+  proposed_fix: R-017
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-018
+  title: External reply shapes are assumed
+  severity: P2
+  class: composition
+  status: deferred
+  confidence: high
+  components:
+  - Payments
+  - RgenAdapter
+  - Claim
+  arms:
+  - Payments@"issuer"
+  - RgenAdapter@"oracleFactory"
+  - Claim@"dispute"
+  hazards:
+  - HZ-022
+  - HZ-023
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: r-cash and r-gen reply shapes are matched by hand; a changed or missing
+    reply can hang or roll back.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Integration failures are not diagnosed at the boundary.
+  proposed_fix: R-018
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-019
+  title: Test register was stale
+  severity: P3
+  class: composition
+  status: fixed
+  confidence: high
+  components:
+  - all
+  arms:
+  - all
+  hazards:
+  - HZ-024
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy
+  description: tests.yaml listed 3 suites while the harness has 36.
+  preconditions: A caller reaches the arm on the affected path.
+  impact: Audit coverage was overstated.
+  proposed_fix: R-019
+  reviewer: internal
+  verified_at: '2026-11-05'

@@ -231,9 +231,6 @@ arms:
   arm: register
   file: 11_broker.rho
 - component: BrokerBook
-  arm: registerDone
-  file: 11_broker.rho
-- component: BrokerBook
   arm: brokerOf
   file: 11_broker.rho
 - component: BrokerBook

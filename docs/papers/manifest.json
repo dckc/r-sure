@@ -1,0 +1,18 @@
+{
+  "schema": "rsure.papers/v1",
+  "papers": [
+    {
+      "key": "robles2016naic",
+      "file": "NAIC_CIPR_2C_20July_2016.pdf",
+      "sha256": "11a54621be8bd33fb926131ddd32a95c70c1e4d9e4ff9fdd08305be66dd3f10d",
+      "title": "Insurance: The Highest and Best Use Case for Blockchain Technology",
+      "author": "Daniel R. Robles",
+      "venue": "NAIC Center for Insurance Policy and Research (CIPR) Newsletter",
+      "date": "July 2016",
+      "printed_pages": "17-27",
+      "pdf_pages": 11,
+      "standing": "opinion column; not an NAIC standard or regulation",
+      "extract": "extracts/robles2016naic.md"
+    }
+  ]
+}

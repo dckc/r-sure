@@ -12,7 +12,7 @@ new
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
   authOwner, authIsOwner, resolveComponent, syndicateResolve,
-  bookAddClasses, bookByClass, classAllowed, profileOk,
+  bookAddClasses, bookByClass, classAllowed, profileOk, bookHasUri,
   nowHeight, makePurse, lineFactoryCreate, lineIdFor, syndicateMake,
   lineCreditCap, lineSettleCap, lineReleaseCap
 in {
@@ -45,6 +45,19 @@ in {
             Nil => { bookAddClasses!(classes, i + 1, byClass.set(k, [id]), id, *ret) }
             ids => { bookAddClasses!(classes, i + 1, byClass.set(k, ids ++ [id]), id, *ret) }
           }
+        }
+      }
+    }
+  } |
+
+  contract bookHasUri(@entries, @keys, @i, @uri, ret) = {
+    if (i >= keys.length()) { ret!(false) }
+    else {
+      match entries.get(keys.nth(i)) {
+        Nil => { bookHasUri!(entries, keys, i + 1, uri, *ret) }
+        u => {
+          if (u == uri) { ret!(true) }
+          else { bookHasUri!(entries, keys, i + 1, uri, *ret) }
         }
       }
     }
@@ -189,9 +202,14 @@ in {
 
   contract SyndicateBook(@"verify", @uri, ret) = {
     for (@b <<- syndicateBookState) {
-      new found in {
-        found!(false) |
-        for (@f <- found) { ret!((true, f)) }
+      new kCh in {
+        kCh!(b.get("syndicates").keys()) |
+        for (@keys <- kCh) {
+          new hCh in {
+            bookHasUri!(b.get("syndicates"), keys, 0, uri, *hCh) |
+            for (@h <- hCh) { ret!((true, h)) }
+          }
+        }
       }
     }
   } |
@@ -865,35 +883,33 @@ in {
                                                               for (@lfr <- lfRet) {
                                                                 match lfr {
                                                                   (true, lineUri) => {
-                                                                    for (@s2 <- syndicateState) {
-                                                                      match s2.get("quotes").get(grantId) {
-                                                                        Nil => {
-                                                                          syndicateState!(s2) |
-                                                                          ret2!((false, "quote lost"))
-                                                                        }
-                                                                        q2 => {
-                                                                          syndicateState!(
-                                                                            s2.set("committed",
-                                                                              s2.get("committed") - q2.get("exposure"))
-                                                                              .set("written",
-                                                                                s2.get("written") + q2.get("exposure"))
-                                                                              .set("quotes",
-                                                                                s2.get("quotes").set(grantId,
-                                                                                  q2.set("status", "consumed")))
-                                                                              .set("lines",
-                                                                                s2.get("lines").set(lineId, {
-                                                                                  "uri": lineUri,
-                                                                                  "policyId": policyId,
-                                                                                  "shareBps": q2.get("shareBps"),
-                                                                                  "exposure": q2.get("exposure"),
-                                                                                  "paid": 0,
-                                                                                  "paidFor": {},
-                                                                                  "status": "bound"
-                                                                                }))
-                                                                              .set("nonce",
-                                                                                s2.get("nonce") + 1)) |
-                                                                          ret2!((true, lineId, lineUri))
-                                                                        }
+                                                                    match s.get("quotes").get(grantId) {
+                                                                      Nil => {
+                                                                        syndicateState!(s) |
+                                                                        ret2!((false, "quote lost"))
+                                                                      }
+                                                                      q2 => {
+                                                                        syndicateState!(
+                                                                          s.set("committed",
+                                                                            s.get("committed") - q2.get("exposure"))
+                                                                            .set("written",
+                                                                              s.get("written") + q2.get("exposure"))
+                                                                            .set("quotes",
+                                                                              s.get("quotes").set(grantId,
+                                                                                q2.set("status", "consumed")))
+                                                                            .set("lines",
+                                                                              s.get("lines").set(lineId, {
+                                                                                "uri": lineUri,
+                                                                                "policyId": policyId,
+                                                                                "shareBps": q2.get("shareBps"),
+                                                                                "exposure": q2.get("exposure"),
+                                                                                "paid": 0,
+                                                                                "paidFor": {},
+                                                                                "status": "bound"
+                                                                              }))
+                                                                            .set("nonce",
+                                                                              s.get("nonce") + 1)) |
+                                                                        ret2!((true, lineId, lineUri))
                                                                       }
                                                                     }
                                                                   }

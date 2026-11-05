@@ -1,16 +1,181 @@
 tests:
-  - id: T-001
-    name: unit_syndicate
-    file: harness/unit_syndicate.py
-    status: not_run
-    focus: capacity, quotes, grants and lines
-  - id: T-002
-    name: unit_slip
-    file: harness/unit_slip.py
-    status: not_run
-    focus: subscriptions, funding, bind and expiry
-  - id: T-003
-    name: unit_claim_lifecycle
-    file: harness/unit_claim_lifecycle.py
-    status: not_run
-    focus: classify, assess, agree and settle
+- id: T-001
+  name: root
+  file: harness/unit_root.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-002
+  name: payments
+  file: harness/unit_payments.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-003
+  name: syndicate
+  file: harness/unit_syndicate.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-004
+  name: capital
+  file: harness/unit_capital.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-005
+  name: broker
+  file: harness/unit_broker.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-006
+  name: risk
+  file: harness/unit_risk.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-007
+  name: slip
+  file: harness/unit_slip.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-008
+  name: subscription
+  file: harness/unit_subscription.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-009
+  name: binding
+  file: harness/unit_binding.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-010
+  name: line
+  file: harness/unit_line.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-011
+  name: policy
+  file: harness/unit_policy.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-012
+  name: distribution
+  file: harness/unit_distribution.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-013
+  name: premium
+  file: harness/unit_premium.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-014
+  name: fund
+  file: harness/unit_fund.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-015
+  name: books
+  file: harness/unit_books.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-016
+  name: pause
+  file: harness/unit_pause.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-017
+  name: pause_scope
+  file: harness/unit_pause_scope.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-018
+  name: admin
+  file: harness/unit_admin.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-019
+  name: admin_keys
+  file: harness/unit_admin_keys.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-020
+  name: cell_liveness
+  file: harness/unit_cell_liveness.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-021
+  name: factory_auth
+  file: harness/unit_factory_auth.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-022
+  name: replay
+  file: harness/unit_replay.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-023
+  name: expiry
+  file: harness/unit_expiry.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-024
+  name: evidence
+  file: harness/unit_evidence.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-025
+  name: oracle
+  file: harness/unit_oracle.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-026
+  name: claim_lifecycle
+  file: harness/unit_claim_lifecycle.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-027
+  name: claim_refusals
+  file: harness/unit_claim_refusals.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-028
+  name: settlement
+  file: harness/unit_settlement.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-029
+  name: shortfall
+  file: harness/unit_shortfall.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-030
+  name: conservation
+  file: harness/unit_conservation.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-031
+  name: behavior
+  file: harness/unit_behavior.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-032
+  name: generality
+  file: harness/unit_generality.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-033
+  name: share_reuse
+  file: harness/unit_share_reuse.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-034
+  name: integration_rcash
+  file: harness/integration_rcash.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-035
+  name: integration_rgen
+  file: harness/integration_rgen.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0
+- id: T-036
+  name: integration_rshare
+  file: harness/integration_rshare.py
+  status: not_run
+  focus: behavioural suite; not run until the devnet install clears P0

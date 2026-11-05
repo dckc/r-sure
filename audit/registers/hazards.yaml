@@ -1,49 +1,603 @@
 hazards:
-  - id: HZ-001
-    node: N05
-    guide_word: more
-    parameter: syndicate capacity
-    deviation: two slips reserve more than free capacity
-    causes: [concurrent quotes, stale capacity read]
-    consequences: [overcommitment, unpaid claim]
-    severity: high
-    likelihood: low
-    risk: high
-    controls: [single syndicate cell, committed/written counters, bindLine re-check]
-    findings: []
-    tests: []
-    disposition: mitigate
-    owner: contracts
-    evidence: [spec/invariants.md]
-  - id: HZ-002
-    node: N12
-    guide_word: other
-    parameter: claim settlement
-    deviation: the same claim is paid twice
-    causes: [replayed settle, line retry, policy retry]
-    consequences: [double payout, capital loss]
-    severity: critical
-    likelihood: low
-    risk: critical
-    controls: [claim status, line paidFor, policy claimPaid, policy token]
-    findings: []
-    tests: []
-    disposition: mitigate
-    owner: contracts
-    evidence: [spec/invariants.md]
-  - id: HZ-003
-    node: N14
-    guide_word: as_well_as
-    parameter: r-gen evidence
-    deviation: a forged credential or case is accepted
-    causes: [adapter disabled, no strict credentials, wrong adjudicator]
-    consequences: [wrong decision, payout]
-    severity: high
-    likelihood: medium
-    risk: high
-    controls: [RgenAdapter verify, strictCredentials, OracleCase credential proof]
-    findings: []
-    tests: []
-    disposition: mitigate
-    owner: contracts
-    evidence: [docs/reference/rgen-integration.md]
+- id: HZ-001
+  node: N05
+  guide_word: LOST
+  parameter: syndicateState
+  deviation: Syndicate.openLine takes the cell then takes it again after awaits without
+    a repost
+  causes:
+  - take-await-take
+  consequences:
+  - bind blocks; capacity not written
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Syndicate@"openLine"
+- id: HZ-002
+  node: N08
+  guide_word: LOST
+  parameter: slipState
+  deviation: Slip.bind takes the cell then takes it again after line/policy/distribution
+    calls
+  causes:
+  - take-await-take
+  consequences:
+  - slip never binds; premium/policy inconsistent
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Slip@"bind"
+- id: HZ-003
+  node: N11
+  guide_word: LOST
+  parameter: policyState
+  deviation: Policy.distribute/openClaim/settleClaim take the cell then take it again
+  causes:
+  - take-await-take
+  consequences:
+  - policy locks and settlement hangs
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Policy@"distribute"
+- id: HZ-004
+  node: N12
+  guide_word: LOST
+  parameter: claimState
+  deviation: Claim.settle/dispute take the cell then take it again
+  causes:
+  - take-await-take
+  consequences:
+  - claim locks; settlement/dispute hangs
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Claim@"settle"
+- id: HZ-005
+  node: N10
+  guide_word: LOST
+  parameter: distState
+  deviation: Distribution.run takes the cell then takes it again after payPlan
+  causes:
+  - take-await-take
+  consequences:
+  - premium distribution hangs after value moves
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Distribution@"run"
+- id: HZ-006
+  node: N05
+  guide_word: PART OF
+  parameter: bundle
+  deviation: bundle+{*Syndicate}/{*LineGrant} captures a state cell or token
+  causes:
+  - free capture in bundle
+  consequences:
+  - node rejects the deploy; install blocked
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-002
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: SyndicateBook@"create"
+- id: HZ-007
+  node: N09
+  guide_word: PART OF
+  parameter: bundle
+  deviation: bundle+{*Line}/{*Slip}/{*Policy}/{*Claim}/{*Distribution}/{*Broker}/{*Risk}
+    captures state/capabilities
+  causes:
+  - free capture in bundle
+  consequences:
+  - instance publication fails
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-002
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: LineFactory@"create"
+- id: HZ-008
+  node: N02
+  guide_word: NO/NOT
+  parameter: pause
+  deviation: pauseAll is written but no mutating arm consults isPaused
+  causes:
+  - dead switch
+  consequences:
+  - global pause does not pause anything
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-003
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: SureAdmin@"admin"
+- id: HZ-009
+  node: N13
+  guide_word: REVERSE
+  parameter: nonce
+  deviation: SureFund.cover writes nonce while admin uses govNonce
+  causes:
+  - split replay domain
+  consequences:
+  - cover replay analysis inconsistent
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-004
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: SureFund@"cover"
+- id: HZ-010
+  node: N15
+  guide_word: NO/NOT
+  parameter: books
+  deviation: PolicyBook/ClaimBook are never populated
+  causes:
+  - missing composition glue
+  consequences:
+  - discovery books empty
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-005
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: PolicyBook@"register"
+- id: HZ-011
+  node: N11
+  guide_word: AFTER
+  parameter: lines
+  deviation: Policy.expire sets expired without releasing lines
+  causes:
+  - missing release
+  consequences:
+  - written capacity never freed
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-006
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Policy@"expire"
+- id: HZ-012
+  node: N08
+  guide_word: UNAUTHORIZED
+  parameter: insured
+  deviation: Slip.fundPremium authenticates any owner but not the insured
+  causes:
+  - missing authorization
+  consequences:
+  - third party can fund/observe a slip
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-007
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Slip@"fundPremium"
+- id: HZ-013
+  node: N06
+  guide_word: UNAUTHORIZED
+  parameter: broker book
+  deviation: BrokerBook.registerDone is public and accepts arbitrary id/uri
+  causes:
+  - front-run registration
+  consequences:
+  - broker registry can be poisoned
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-008
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: BrokerBook@"register"
+- id: HZ-014
+  node: N05
+  guide_word: OTHER THAN
+  parameter: verify
+  deviation: SyndicateBook.verify always returns false
+  causes:
+  - fake verification
+  consequences:
+  - callers cannot verify syndicate URIs
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-009
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: SyndicateBook@"verify"
+- id: HZ-015
+  node: N11
+  guide_word: LATE
+  parameter: notice
+  deviation: Policy.openClaim does not check loss period or notice window
+  causes:
+  - missing period check
+  consequences:
+  - late or out-of-period claims accepted
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-010
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Policy@"openClaim"
+- id: HZ-016
+  node: N08
+  guide_word: EARLY
+  parameter: premium
+  deviation: Slip.expire does not refund a funded premium
+  causes:
+  - missing refund
+  consequences:
+  - insured loses a premium on an expired slip
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-011
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Slip@"expire"
+- id: HZ-017
+  node: N09
+  guide_word: AFTER
+  parameter: line state
+  deviation: Line.credit/pay/release call a capability before the lineState update
+  causes:
+  - value/state ordering
+  consequences:
+  - line can pay without recording
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-012
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Line@"pay"
+- id: HZ-018
+  node: N12
+  guide_word: STALE
+  parameter: termsHash
+  deviation: Policy accepts the slip termsHash without revalidating it at bind
+  causes:
+  - stale hash
+  consequences:
+  - policy terms and hash can diverge
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-013
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Slip@"bind"
+- id: HZ-019
+  node: N12
+  guide_word: OTHER THAN
+  parameter: claimId
+  deviation: Line.pay trusts a claimId without checking it belongs to the policy
+  causes:
+  - unbound identifier
+  consequences:
+  - cross-policy claim payment
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-014
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Line@"pay"
+- id: HZ-020
+  node: N05
+  guide_word: AS WELL AS
+  parameter: book cell
+  deviation: Syndicate/Risk/Slip/Broker write another component's book cell
+  causes:
+  - cross-cell writer
+  consequences:
+  - ownership model and lock order are unclear
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-015
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: SyndicateBook@"create"
+- id: HZ-021
+  node: N03
+  guide_word: MORE
+  parameter: triTest
+  deviation: triTest checks presence only, not numerical probability/cost
+  causes:
+  - quality not checked
+  consequences:
+  - uninsurable risk can be submitted
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-017
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: RiskBook@"submit"
+- id: HZ-022
+  node: N04
+  guide_word: UNAVAILABLE
+  parameter: r-cash
+  deviation: r-cash Root/issuer/depositFacet may not reply
+  causes:
+  - external hang
+  consequences:
+  - caller waits forever
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-018
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Payments@"health"
+- id: HZ-023
+  node: N14
+  guide_word: UNAVAILABLE
+  parameter: r-gen
+  deviation: r-gen factories may not reply during adjudication
+  causes:
+  - external hang
+  consequences:
+  - claim stays disputed
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-018
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Claim@"dispute"
+- id: HZ-024
+  node: N15
+  guide_word: STALE
+  parameter: test register
+  deviation: tests.yaml listed 3 suites while harness has 36
+  causes:
+  - stale audit inventory
+  consequences:
+  - coverage is overstated
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-019
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+- id: HZ-025
+  node: N10
+  guide_word: DUPLICATE
+  parameter: premium
+  deviation: Distribution.run could pay twice if status update is lost
+  causes:
+  - double payout
+  consequences:
+  - premium loss
+  severity: medium
+  likelihood: medium
+  risk: medium
+  controls:
+  - review finding
+  - regression suite
+  findings:
+  - F-001
+  tests:
+  - T-003
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - audit/concurrency/components.yaml
+  arm: Distribution@"run"

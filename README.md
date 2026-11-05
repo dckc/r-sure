@@ -14,6 +14,11 @@ The repository is a sibling of r-gen, r-share and r-cash. It follows their conve
 Rholang contracts with one state cell per object, a Rust client stack, a Python devnet
 harness, a Lean model, audit registers and an mdBook.
 
+**New to the domain?** Read the primer first: [insurance
+basics](docs/primer/insurance-basics.md), [Lloyd's for
+dummies](docs/primer/lloyds-for-dummies.md), and the [NAIC/CIPR design
+philosophy](docs/primer/design-philosophy.md).
+
 ## What is here
 
 | Area | Path |
@@ -57,18 +62,20 @@ harness, a Lean model, audit registers and an mdBook.
 | Rust client | core/keystore/sdk/cli/wasm crates compile; 6 unit tests pass; SDK/CLI are scaffolds |
 | Web client | React/Vite scaffold; not installed or built here |
 | Lean model | 2 proved arithmetic theorems, 2 vectors, 8 owed flow rules |
-| Audit | registers, HAZOP nodes and 3 hazards; 0 findings; no completed audit |
+| Audit | 30/30 component concurrency reviews, 42 interfaces, 25 hazards, 19 findings; 1 of 2 P0s fixed; tabletop HAZOP is internal |
 
 "Do not use real funds." The chain is pre-testnet and the contracts are unaudited.
 
 ### Known install blocker
 
 A local devnet install reaches `16_fund.rho`; `10_syndicate.rho` is refused at deploy time
-with `Bundle's content must not have free variables or wildcards`. The instance contracts
-(`Syndicate`, `LineGrant`) capture their creation parameters, so the `bundle+{*…}` publication
-needs the same refactor r-share uses for per-object contracts. Static build/measure/parse and
-the Rust core/keystore tests pass; the devnet campaign is not green yet. This is recorded in
-`audit/report.md`.
+with `Bundle's content must not have free variables or wildcards`. The 2026-11-05 audit found
+nine affected instance types (`LineGrant`, `Syndicate`, `Line`, `Slip`, `Policy`, `Claim`,
+`Distribution`, `Broker`, `Risk`), not just `Syndicate`/`LineGrant`. The fix is a closed
+publication/init pattern; it is recorded as open finding F-002 in `audit/registers/findings.yaml`
+and `audit/report.md`. The audit also fixed a P0 take-await-take defect in eight cornerstone
+arms. Static build/measure/parse and the Rust core/keystore tests pass; the devnet campaign is
+not green yet. The tabletop HAZOP is an internal simulation, not an independent audit.
 
 ## Integrations
 

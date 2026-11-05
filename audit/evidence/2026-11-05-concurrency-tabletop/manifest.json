@@ -1,0 +1,24 @@
+{
+  "schema": "rsure.evidence/v1",
+  "date": "2026-11-05",
+  "kind": "internal desk review and tabletop HAZOP",
+  "commit": "working-tree",
+  "commands": [
+    "make spec-check",
+    "make parse-check",
+    "make docs-check",
+    "make formal-check",
+    "make audit-check",
+    "make audit-scan"
+  ],
+  "results": {
+    "spec_check": "pass",
+    "parse_check": "pass",
+    "docs_check": "pass",
+    "formal_check": "pass",
+    "audit_check": "pass (coverage registers)",
+    "audit_scan": "fail (open P0 bundle defect and dead pause)",
+    "install": "not_run (devnet unavailable)"
+  },
+  "notes": "audit-scan.txt is the pre-fix scanner output. take-repost.txt is the pre-fix take-await-take report. The scanners are heuristics; the reviews are the normative record."
+}

@@ -21,9 +21,17 @@ and capital cannot go negative (`paid <= exposure <= written <= capital`).
 
 ## Central fund
 
-`SureFund` receives the premium levy and pays a capped, one-shot shortfall with 2-of-3 admin
-signatures. The claim reads `covered(claimId)`; a retried settlement subtracts the cover
-before paying the lines, so
+At Lloyd's, the Central Fund is the last layer of the chain of security: a market-level fund
+governed by the Council, available at its discretion if a member cannot meet its liabilities.
+It is not an ordinary insurance policy and it is not a guarantee that every claim is paid
+automatically. The layers before it are the syndicate's assets, the members' funds at
+Lloyd's, and the Corporation's central assets. See [Lloyd's of London for
+dummies](../primer/lloyds-for-dummies.md) for the full chain.
+
+r-sure deliberately simplifies that to two layers: the syndicate claims purse, then
+`SureFund`. `SureFund` receives the premium levy and pays a capped, one-shot shortfall with
+2-of-3 admin signatures. The claim reads `covered(claimId)`; a retried settlement subtracts
+the cover before paying the lines, so
 
 ```
 sum(line payouts) + fund cover == payable

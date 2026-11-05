@@ -162,13 +162,15 @@ contract authIsOwner(dId, @ownerId, ret) = {
       for (@uri <- uriCh) {
         for (@s2 <- brokerState) {
           brokerState!(s2.set("uri", uri)) |
-          new doneCh in {
-            BrokerBook!("registerDone", ownerId, s2.get("id"), uri, *doneCh) |
-            for (@d <- doneCh) {
-              match d {
-                (true, Nil) => { ret!((true, s2.get("id"), uri)) }
-                _ => { ret!(d) }
+          for (@b <- brokerBookState) {
+            match b.get("byOwner").get(ownerId) {
+              Nil => {
+                brokerBookState!(b.set("brokers", b.get("brokers").set(s2.get("id"), uri))
+                  .set("byOwner", b.get("byOwner").set(ownerId, s2.get("id")))
+                  .set("nonce", b.get("nonce") + 1)) |
+                ret!((true, s2.get("id"), uri))
               }
+              existing => { ret!((false, "duplicate owner", existing)) }
             }
           }
         }
@@ -192,20 +194,6 @@ contract authIsOwner(dId, @ownerId, ret) = {
             }
           }
         }
-      }
-    }
-  } |
-
-  contract BrokerBook(@"registerDone", @ownerId, @id, @uri, ret) = {
-    for (@b <- brokerBookState) {
-      match b.get("byOwner").get(ownerId) {
-        Nil => {
-          brokerBookState!(b.set("brokers", b.get("brokers").set(id, uri))
-            .set("byOwner", b.get("byOwner").set(ownerId, id))
-            .set("nonce", b.get("nonce") + 1)) |
-          ret!((true, Nil))
-        }
-        existing => { brokerBookState!(b) | ret!((false, "duplicate owner", existing)) }
       }
     }
   } |

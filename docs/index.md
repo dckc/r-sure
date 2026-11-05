@@ -11,6 +11,12 @@ comes from r-gen.
 > **This is not an insurer and carries no regulatory approval.** Do not use it with real
 > funds. Read [Status and scope](orientation/status-and-scope.md) first.
 
+New to insurance or Lloyd's? Start with the primer:
+
+- [Insurance basics](primer/insurance-basics.md)
+- [Lloyd's of London for dummies](primer/lloyds-for-dummies.md)
+- [Design philosophy: the NAIC/CIPR basis](primer/design-philosophy.md)
+
 ## The five moving parts
 
 ```

@@ -175,7 +175,7 @@
     "Distribution": {
       "file": "15_distribution.rho",
       "state_cells": [
-        "distributionState"
+        "distState"
       ],
       "depends_on": [
         "DistributionFactory"

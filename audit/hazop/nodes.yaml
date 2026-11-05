@@ -1,0 +1,177 @@
+schema: rsure.hazop-nodes/v1
+guide_words: &id001
+- NO/NOT
+- MORE
+- LESS
+- AS WELL AS
+- PART OF
+- REVERSE
+- OTHER THAN
+- EARLY
+- LATE
+- BEFORE
+- AFTER
+- REPEAT
+- CONCURRENT
+- UNAUTHORIZED
+- STALE
+- LOST
+- DUPLICATE
+- UNKNOWN
+- UNAVAILABLE
+parameters: &id002
+- amount
+- authority
+- signature count
+- nonce/opId
+- state/status
+- capacity
+- shareBps
+- claimId
+- grantId
+- lineId
+- policyId
+- height
+- cell
+- token
+- purse
+- asset
+- admin set
+nodes:
+- id: N01
+  name: Install / SureRoot
+  components:
+  - SureRoot
+  design_intent: Only the installer registers components until freeze; governance
+    can rotate, deprecate and freeze.
+  guide_words: *id001
+  parameters: *id002
+- id: N02
+  name: Admin / SureAdmin
+  components:
+  - AdminGuard
+  - SureAdmin
+  design_intent: 2-of-3 signatures over a domain-separated payload; nonce replay protection;
+    threshold integrity; global pause.
+  guide_words: *id001
+  parameters: *id002
+- id: N03
+  name: CoverTerms / SureMath
+  components:
+  - CoverTerms
+  - SureMath
+  design_intent: Coverage fields validate; integer arithmetic conserves premium, payable
+    and line shares.
+  guide_words: *id001
+  parameters: *id002
+- id: N04
+  name: Payments / r-cash
+  components:
+  - Payments
+  design_intent: r-cash Root, issuer, account and deposit facet are resolved per arm;
+    assets are allowlisted; failures refuse or roll back.
+  guide_words: *id001
+  parameters: *id002
+- id: N05
+  name: Syndicate / LineGrant
+  components:
+  - SyndicateBook
+  - Syndicate
+  - LineGrant
+  design_intent: One syndicate cell per syndicate; quotes reserve capacity; a grant
+    is one-shot and bound to the slip token.
+  guide_words: *id001
+  parameters: *id002
+- id: N06
+  name: Broker
+  components:
+  - BrokerBook
+  - Broker
+  design_intent: One broker per owner; licence hash, commission cap, class list; broker
+    opens slips.
+  guide_words: *id001
+  parameters: *id002
+- id: N07
+  name: Risk
+  components:
+  - RiskBook
+  - Risk
+  design_intent: Risk submission records the asset, period, evidence and the four
+    tri-test fields.
+  guide_words: *id001
+  parameters: *id002
+- id: N08
+  name: Slip / subscription
+  components:
+  - SlipFactory
+  - Slip
+  design_intent: Broker opens; insured accepts; managers subscribe; premium is funded;
+    bind requires 10000 bps.
+  guide_words: *id001
+  parameters: *id002
+- id: N09
+  name: Line / capabilities
+  components:
+  - LineFactory
+  - Line
+  design_intent: A line holds credit/pay/release capabilities and the policy token;
+    pay is one-shot per claim.
+  guide_words: *id001
+  parameters: *id002
+- id: N10
+  name: Distribution / premium
+  components:
+  - DistributionFactory
+  - Distribution
+  design_intent: Exactly-once plan over a purse; commission, levy and line credits
+    conserve the premium.
+  guide_words: *id001
+  parameters: *id002
+- id: N11
+  name: Policy
+  components:
+  - PolicyFactory
+  - Policy
+  design_intent: Policy owns lines, premium purse, aggregate limit and claims; distribution
+    and settlement use the policy token.
+  guide_words: *id001
+  parameters: *id002
+- id: N12
+  name: Claim / classification
+  components:
+  - ClaimFactory
+  - Claim
+  design_intent: FNOL, classify standard/complex, assess, agree; claim state gates
+    settlement and dispute.
+  guide_words: *id001
+  parameters: *id002
+- id: N13
+  name: Settlement / SureFund
+  components:
+  - SureFund
+  - Claim
+  - Policy
+  - Line
+  design_intent: Payable is capped by per-claim, aggregate and deductible; cover is
+    capped and one-shot.
+  guide_words: *id001
+  parameters: *id002
+- id: N14
+  name: r-gen / OracleCase
+  components:
+  - RgenAdapter
+  - Claim
+  design_intent: Evidence and credentials are optional; a disputed claim opens an
+    OracleCase with a private applyDecision.
+  guide_words: *id001
+  parameters: *id002
+- id: N15
+  name: Books / client
+  components:
+  - PolicyBook
+  - ClaimBook
+  - web
+  design_intent: Discovery is a curated catalogue plus on-chain books; no indexer;
+    reads must not leak capabilities.
+  guide_words: *id001
+  parameters: *id002
