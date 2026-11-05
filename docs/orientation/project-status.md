@@ -35,11 +35,12 @@ refinement of the Rholang contracts. The 14 critical primitives are model-covere
 mechanically linked to the deployed terms. See [Formal model](../reference/formal-model.md),
 [Proof map](../reference/proof-map.md) and [Invariants](../reference/invariants.md).
 
-The web client is exercised by Playwright against the same devnet: it boots, creates a
-wallet, reads the books, creates a syndicate, registers a broker, submits a risk and opens
-a slip. The remaining pages share the same WASM read/write surface and are read-verified
-against the seeded placements; the full claim journey is covered by the Python campaign.
-See [Use the web client](../guides/use-the-web-client.md).
+The web client is exercised by Playwright against the same devnet: it boots, creates and
+funds a wallet, reads the books, creates a syndicate and contributes capital, registers a
+broker, submits a risk, opens a slip, subscribes the syndicate, accepts, funds the premium,
+binds the policy and reads the policy back. The claim, fund and admin pages share the same
+WASM read/write surface and are covered by the Python campaign and the SDK tests. See
+[Use the web client](../guides/use-the-web-client.md).
 
 ## Boundaries
 

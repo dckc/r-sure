@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import DeployResult from "../components/DeployResult";
 import { Field, Panel } from "../components/ui";
+import { createdUri } from "../lib/chain";
 import { useWallet } from "../lib/store";
 import { useAction } from "../lib/useAction";
 
@@ -87,13 +88,8 @@ export default function SlipNew() {
       () => client.write_component_json("slip-factory", "open", JSON.stringify([req]), true),
       [["catalogue"]],
     );
-    if (result) {
-      const envelope = result as { data?: unknown };
-      const data = envelope.data as unknown;
-      const uri = Array.isArray(data) ? data[data.length - 1] : undefined;
-      if (typeof uri === "string") navigate(`/slips/${encodeURIComponent(uri)}`);
-      else navigate("/slips");
-    }
+    const uri = result ? createdUri(result.data) : undefined;
+    navigate(uri ? `/slips/${encodeURIComponent(uri)}` : "/slips");
   };
 
   return (

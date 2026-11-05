@@ -1,6 +1,14 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-test("creates a syndicate and registers a broker", async ({ page }) => {
+const FINALITY = { timeout: 120_000 };
+
+async function waitForReceipt(page: Page) {
+  const receipt = page.locator("details.receipt").last();
+  await expect(receipt).toBeVisible(FINALITY);
+  await expect(page.locator(".warn-box")).toHaveCount(0);
+}
+
+async function createWalletAndFund(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: "Create", exact: true }).click();
   const passwords = page.locator('input[type="password"]');
@@ -9,25 +17,40 @@ test("creates a syndicate and registers a broker", async ({ page }) => {
   await page.getByRole("button", { name: "Create wallet" }).click();
   await expect(page.getByRole("button", { name: "Lock" })).toBeVisible();
 
-  // Fund the fresh key so it can precharge a deploy.
+  // The faucet drips native REV for deploy precharge; premiums and capital come from
+  // the r-cash account, so move REV into it before the placement.
   await page.locator(".tabs").getByRole("link", { name: "Me", exact: true }).click();
   await page.getByRole("button", { name: "Request devnet REV" }).click();
   await page.waitForTimeout(15_000);
+  await page.locator('input[inputmode="numeric"]').first().fill("20000");
+  await page.getByRole("button", { name: "Fund r-cash account" }).click();
+  await expect(page.getByText("Funded the r-cash account")).toBeVisible(FINALITY);
+}
+
+test("places a risk, binds a policy and reads it back", async ({ page }) => {
+  await createWalletAndFund(page);
 
   await page.locator(".tabs").getByRole("link", { name: "Syndicates", exact: true }).click();
   await page.getByRole("link", { name: "Create syndicate" }).click();
   await page.getByLabel("Name").fill("E2E Syndicate");
   await page.getByRole("button", { name: "Create syndicate" }).click();
-  await expect(page).toHaveURL(/#\/syndicates$/, { timeout: 120_000 });
-  await expect(page.getByRole("heading", { name: "Syndicates" })).toBeVisible();
+  await expect(page).toHaveURL(/#\/syndicates\/rho%3Aid%3A/, FINALITY);
+  const syndicateUri = decodeURIComponent(
+    page.url().split("/syndicates/")[1] ?? "",
+  );
+  expect(syndicateUri).toMatch(/^rho:id:/);
+
+  // Capacity is real capital: contribute before any quote can reserve it.
+  await page.locator('input[inputmode="numeric"]').first().fill("6000");
+  await page.getByRole("button", { name: "Contribute" }).click();
+  await waitForReceipt(page);
 
   await page.locator(".tabs").getByRole("link", { name: "Brokers", exact: true }).click();
   await page.getByRole("link", { name: "Register broker" }).click();
   await page.getByLabel("Name").fill("E2E Broker");
   await page.getByLabel("Licence hash").fill("e2e-licence");
   await page.getByRole("button", { name: "Register broker" }).click();
-  await expect(page).toHaveURL(/#\/brokers$/, { timeout: 120_000 });
-  await expect(page.getByRole("heading", { name: "Brokers" })).toBeVisible();
+  await expect(page).toHaveURL(/#\/brokers\/rho%3Aid%3A/, FINALITY);
 
   await page.locator(".tabs").getByRole("link", { name: "Risks", exact: true }).click();
   await page.getByRole("link", { name: "Submit risk" }).click();
@@ -36,13 +59,30 @@ test("creates a syndicate and registers a broker", async ({ page }) => {
   await page.getByLabel("Exposure ref").fill("exposure-e2e");
   await page.getByLabel("Consequence ref").fill("consequence-e2e");
   await page.getByRole("button", { name: "Submit risk" }).click();
-  await expect(page).toHaveURL(/#\/risks$/, { timeout: 120_000 });
-  await expect(page.getByRole("heading", { name: "Risks" })).toBeVisible();
-
-  await page.locator(".card").filter({ hasText: "Open" }).first().getByRole("link").last().click();
+  await expect(page).toHaveURL(/#\/risks\/rho%3Aid%3A/, FINALITY);
   await expect(page.getByRole("link", { name: "Open slip from this risk" })).toBeVisible();
+
   await page.getByRole("link", { name: "Open slip from this risk" }).click();
   await page.getByRole("button", { name: "Open slip" }).click();
-  await expect(page).toHaveURL(/#\/slips\/rho%3Aid%3A/, { timeout: 120_000 });
+  await expect(page).toHaveURL(/#\/slips\/rho%3Aid%3A/, FINALITY);
   await expect(page.getByRole("heading", { name: /Slip|slp:/ })).toBeVisible();
+
+  await page.getByLabel("Syndicate URI").fill(syndicateUri);
+  await page.getByLabel("Share bps").fill("10000");
+  await page.getByRole("button", { name: "Subscribe" }).click();
+  await waitForReceipt(page);
+
+  await page.getByRole("button", { name: "Accept", exact: true }).click();
+  await waitForReceipt(page);
+
+  await page.getByRole("button", { name: "Fund premium" }).click();
+  await waitForReceipt(page);
+
+  await page.getByRole("button", { name: "Bind" }).click();
+  await waitForReceipt(page);
+
+  await expect(page.getByRole("link", { name: "Open policy" })).toBeVisible(FINALITY);
+  await page.getByRole("link", { name: "Open policy" }).click();
+  await expect(page).toHaveURL(/#\/policies\/rho%3Aid%3A/, FINALITY);
+  await expect(page.getByRole("heading", { name: /Policy|pol:/ })).toBeVisible();
 });

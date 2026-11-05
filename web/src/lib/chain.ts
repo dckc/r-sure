@@ -100,6 +100,21 @@ export async function writeUri(
   return parseWrite(raw);
 }
 
+/**
+ * The registry URI a create/register/submit arm replied with. Write replies are the
+ * decoded reply array; `Reply::Ok` strips the leading `true`, so the URI is the last
+ * `rho:id:` string.
+ */
+export function createdUri(data: unknown): string | undefined {
+  const value = unwrap(data);
+  if (!Array.isArray(value)) return undefined;
+  for (let index = value.length - 1; index >= 0; index -= 1) {
+    const item = value[index];
+    if (typeof item === "string" && item.startsWith("rho:id:")) return item;
+  }
+  return undefined;
+}
+
 export function shortUri(uri: string | null | undefined, size = 12): string {
   if (!uri) return "—";
   return uri.length > size * 2

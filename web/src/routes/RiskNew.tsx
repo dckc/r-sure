@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeployResult from "../components/DeployResult";
 import { Field, Panel } from "../components/ui";
+import { createdUri } from "../lib/chain";
 import { useWallet } from "../lib/store";
 import { useAction } from "../lib/useAction";
 
@@ -55,7 +56,8 @@ export default function RiskNew() {
       () => client.write_component_json("risk-book", "submit", JSON.stringify([req]), true),
       [["read", "risk-book"]],
     );
-    if (result) navigate("/risks");
+    const uri = result ? createdUri(result.data) : undefined;
+    navigate(uri ? `/risks/${encodeURIComponent(uri)}` : "/risks");
   };
 
   return (

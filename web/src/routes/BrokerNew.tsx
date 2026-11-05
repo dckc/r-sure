@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeployResult from "../components/DeployResult";
 import { Field, Panel } from "../components/ui";
+import { createdUri } from "../lib/chain";
 import { useWallet } from "../lib/store";
 import { useAction } from "../lib/useAction";
 
@@ -44,7 +45,8 @@ export default function BrokerNew() {
         ),
       [["read", "broker-book"]],
     );
-    if (result) navigate("/brokers");
+    const uri = result ? createdUri(result.data) : undefined;
+    navigate(uri ? `/brokers/${encodeURIComponent(uri)}` : "/brokers");
   };
 
   return (

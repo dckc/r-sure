@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { asMap, shortUri, unwrap } from "./chain";
+import { asMap, createdUri, shortUri, unwrap } from "./chain";
 import { syndicateRole, claimManager } from "./capabilities";
 import { networkForNode } from "./network";
 
@@ -16,6 +16,12 @@ describe("chain reply helpers", () => {
 
   it("shortens long ids without hiding the tail", () => {
     expect(shortUri("rho:id:abcdefghijklmnopqrstuvwxyz")).toContain("…");
+  });
+
+  it("finds the created URI after Reply::Ok strips the true tag", () => {
+    expect(createdUri(["syn:1", "rho:id:abc"])).toBe("rho:id:abc");
+    expect(createdUri([true, "syn:1", "rho:id:abc"])).toBe("rho:id:abc");
+    expect(createdUri("not-a-reply")).toBeUndefined();
   });
 });
 

@@ -17,8 +17,8 @@ Recorded locally: 17 terms parse; 30 components; 19 state cells; acyclic; all te
 budget; 162 source arms registered; 261 Lean theorems, 33 vectors and 51 flow rules with 11
 `proved-model` core arms. The claims register reports 24 covered, 1 partial and 1 tool entry,
 with 161 substantive theorems, 1 weak and no unaudited theorem. The Rust core, keystore, SDK,
-CLI and WASM crates compile; `cargo test --workspace` passes 10 tests (5 core, 3 keystore,
-2 SDK). The web app typechecks, runs 7 Vitest tests, lints with no errors and builds; the
+CLI and WASM crates compile; `cargo test --workspace` passes 12 tests (5 core, 3 keystore,
+4 SDK). The web app typechecks, runs 8 Vitest tests, lints with no errors and builds; the
 Playwright journeys pass against the installed devnet.
 
 ## Audit gates (2026-11-05)

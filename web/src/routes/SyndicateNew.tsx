@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeployResult from "../components/DeployResult";
 import { Field, Panel } from "../components/ui";
+import { createdUri } from "../lib/chain";
 import { useAction } from "../lib/useAction";
 import { useWallet } from "../lib/store";
 
@@ -36,7 +37,8 @@ export default function SyndicateNew() {
         ),
       [["read", "syndicate-book"], ["read", "syndicate-book", "count"]],
     );
-    if (result) navigate("/syndicates");
+    const uri = result ? createdUri(result.data) : undefined;
+    navigate(uri ? `/syndicates/${encodeURIComponent(uri)}` : "/syndicates");
   };
 
   return (
