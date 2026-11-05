@@ -1,45 +1,146 @@
-# Arm -> Lean flow manifest. `owed` means the arm is implemented but not yet proved.
+# Arm -> Lean flow manifest. Every core arm is `proved-model`: the target is a theorem
+# about the shallow component model, not a refinement of the Rholang contract.
 schema: rsure.flows/v1
 source_globs:
   - contracts/src/deploy
+
+invariants:
+  INV-1:
+    statement: capacity and free are non-negative
+    lean: RSure.Model.Syndicate.synd_quote_WF
+    lean_status: proved-model
+  INV-2:
+    statement: a bound slip is fully subscribed
+    lean: RSure.Model.Slip.slip_bind_requires_subscription
+    lean_status: proved-model
+  INV-3:
+    statement: the exposure plan sums to the aggregate
+    lean: RSure.Model.Math.math_alloc_sums
+    lean_status: proved-model
+  INV-4:
+    statement: premium conservation
+    lean: RSure.Model.Policy.policy_distribute_conserves
+    lean_status: proved-model
+  INV-5:
+    statement: payable bounds
+    lean: RSure.Model.Math.math_payable_le_perClaim
+    lean_status: proved-model
+  INV-6:
+    statement: settlement conservation
+    lean: RSure.Model.System.system_settlement_conserves
+    lean_status: proved-model
+  INV-7:
+    statement: line payout bounded by exposure
+    lean: RSure.Model.Line.line_pay_bounded
+    lean_status: proved-model
+  INV-8:
+    statement: exactly once per claim per line, policy and fund
+    lean: RSure.Model.Line.line_pay_once
+    lean_status: proved-model
+  INV-9:
+    statement: aggregate decreases and stays non-negative
+    lean: RSure.Model.Policy.policy_settle_aggregate
+    lean_status: proved-model-bounded
+  INV-10:
+    statement: terminal states cannot re-open
+    lean: RSure.Model.Claim.claim_settle_once
+    lean_status: proved-model-bounded
+  INV-11:
+    statement: an atomic step commits wholly or is refused
+    lean: RSure.Model.System.system_step_atomic
+    lean_status: proved-model-bounded
+  INV-12:
+    statement: pause does not block settlement, close, expiry or refunds
+    lean_status: assumption
+
 rules:
   - id: F-001
     arm: 'Syndicate@"quote"'
     source: contracts/src/deploy/10_syndicate.rho
-    lean_status: owed
+    lean: RSure.Model.Syndicate.synd_quote_WF
+    lean_status: proved-model
+    invariants: [INV-1, INV-7]
     note: capacity reservation and one-shot grant
   - id: F-002
     arm: 'Syndicate@"openLine"'
     source: contracts/src/deploy/10_syndicate.rho
-    lean_status: owed
+    lean: RSure.Model.Syndicate.synd_openLine_WF
+    lean_status: proved-model
+    invariants: [INV-1, INV-7]
     note: committed -> written and line capability creation
   - id: F-003
     arm: 'Slip@"bind"'
     source: contracts/src/deploy/13_slip.rho
-    lean_status: owed
+    lean: RSure.Model.Slip.slip_bind_requires_subscription
+    lean_status: proved-model
+    invariants: [INV-2, INV-3, INV-4]
     note: full subscription, line creation, policy creation and premium distribution
   - id: F-004
     arm: 'Policy@"distribute"'
     source: contracts/src/deploy/17_policy.rho
-    lean_status: owed
+    lean: RSure.Model.Policy.policy_distribute_conserves
+    lean_status: proved-model
+    invariants: [INV-4]
     note: premium conservation
   - id: F-005
     arm: 'Claim@"settle"'
     source: contracts/src/deploy/18_claim.rho
-    lean_status: owed
+    lean: RSure.Model.Claim.claim_settle_once
+    lean_status: proved-model
+    invariants: [INV-8, INV-10]
     note: payable bound and exactly-once settlement
   - id: F-006
     arm: 'Policy@"settleClaim"'
     source: contracts/src/deploy/17_policy.rho
-    lean_status: owed
-    note: line conservation and aggregate update
+    lean: RSure.Model.Policy.policy_settle_remaining
+    lean_status: proved-model
+    invariants: [INV-6, INV-8, INV-9]
+    note: aggregate update and line conservation
   - id: F-007
     arm: 'Distribution@"run"'
     source: contracts/src/deploy/15_distribution.rho
-    lean_status: owed
-    note: plan conservation
+    lean: RSure.Model.Distribution.distribution_run_sums
+    lean_status: proved-model
+    invariants: [INV-4, INV-6]
+    note: plan conservation and one-shot run
   - id: F-008
     arm: 'SureFund@"cover"'
     source: contracts/src/deploy/16_fund.rho
-    lean_status: owed
+    lean: RSure.Model.Fund.fund_cover_once
+    lean_status: proved-model
+    invariants: [INV-6, INV-8]
     note: capped one-shot cover
+  - id: F-009
+    arm: 'Line@"pay"'
+    source: contracts/src/deploy/14_line.rho
+    lean: RSure.Model.Line.line_pay_once
+    lean_status: proved-model
+    invariants: [INV-7, INV-8]
+    note: exactly once per claim and exposure bound
+  - id: F-010
+    arm: 'Claim@"agree"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_agree_standard_lead
+    lean_status: proved-model
+    invariants: [INV-10]
+    note: standard lead-only agreement
+  - id: F-011
+    arm: 'Claim@"dispute"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_apply_uphold
+    lean_status: proved-model
+    invariants: [INV-8]
+    note: oracle decision mapping and case binding
+
+core_arms:
+  - 'Syndicate@"quote"'
+  - 'Syndicate@"openLine"'
+  - 'Slip@"bind"'
+  - 'Policy@"distribute"'
+  - 'Claim@"settle"'
+  - 'Policy@"settleClaim"'
+  - 'Distribution@"run"'
+  - 'SureFund@"cover"'
+  - 'Line@"pay"'
+  - 'Claim@"agree"'
+  - 'Claim@"dispute"'

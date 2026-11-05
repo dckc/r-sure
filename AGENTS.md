@@ -40,7 +40,7 @@ make rcash-keys      # generate and faucet the r-cash keys
 make rcash-bootstrap # install the r-cash components r-sure needs
 make keys install    # copy keys and install r-sure
 make unit-all        # all behavioural suites (honest not-run is reported)
-make formal-check    # Lean build, axioms, vectors and flow manifest
+make formal-check    # Lean build, axioms, vectors, flows and claims register
 make audit-check     # registers, arm inventory, traceability, 30 component and 42 interface coverage
 make audit-scan      # heuristic bundle/take-repost/reply-shape/pause scanners (open P0s fail)
 make client-lint/test/wasm

@@ -1,7 +1,8 @@
 # Status and scope
 
-> **Status:** Implemented (source + static/parser gates). Behavioural suites are scaffolded
-> and mostly report `not_run`.
+> **Status:** Implemented (source + static/parser gates); a Lean component model now proves
+> the insurance economics. Behavioural suites are scaffolded and mostly report `not_run`.
+> The model is not a Rholang refinement and is not an independent audit.
 
 ## What is implemented
 
@@ -17,7 +18,11 @@
 ## What is not implemented or not yet verified
 
 - The devnet campaigns. Most `unit_*` suites exit 2 (`not_run`) until the campaign is run.
-- The Lean model is scaffolded; the proofs and flow manifest are not complete.
+- The Lean model proves the economic core (capacity, subscription, premium, payable,
+  settlement, exactly-once, agreement, adjudication, books and linear cells) but is a shallow
+  component model, not a refinement of the Rholang contracts. INV-9 and INV-10 are partial,
+  INV-11 is boundary-limited and INV-12 is deferred while F-003 is open. See
+  `reference/formal-model.md`.
 - The Rust client, CLI, WASM and web app are scaffolds; they are not built or tested here.
 - Endorsements, renewals, reinstatement, reinsurance, delegated underwriting, premium
   instalment schedules, subrogation, salvage and FX at claim time are out of scope for v1.

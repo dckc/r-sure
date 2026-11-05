@@ -1,0 +1,92 @@
+# Proof map
+
+> **Status:** Rendered from `spec/lean/claims.yaml` and `spec/flows/core.yaml`. The register
+> is authoritative; this page is a reading aid. `proved-model` is not a Rholang refinement.
+
+## Invariants
+
+| ID | Predicate | Carrying theorems | Flow rules | Status |
+|---|---|---|---|---|
+| INV-1 | `Syndicate.SyndicateWF` | `synd_quote_WF`, `synd_openLine_WF`, `synd_release_restores`, `synd_payLoss_preserves_free` | F-001, F-002 | covered |
+| INV-2 | `Slip.bind` | `slip_bind_requires_subscription`, `slip_bind_moves` | F-003 | covered |
+| INV-3 | `Math.alloc` | `math_alloc_sums`, `distribution_plan_sums` | F-003, F-007 | covered (guard-conditional) |
+| INV-4 | `Policy.distribute` | `math_premiumSplit_conserves`, `policy_distribute_conserves`, `policy_distribute_once` | F-003, F-004 | covered (guard-conditional) |
+| INV-5 | `Math.payable` | `math_payable_le_agreed`, `math_payable_le_perClaim`, `math_payable_le_aggregate_of_lt`, `math_payable_zero_of_le_deductible` | F-006 | covered |
+| INV-6 | `System.system_settlement_conserves` | `system_settlement_conserves`, `policy_settle_conserves`, `fund_conserves` | F-006, F-007, F-008 | covered |
+| INV-7 | `Line.LineWF` | `line_pay_bounded`, `synd_written_le_capital` | F-001, F-002, F-009 | covered |
+| INV-8 | once-per-claim guards | `line_pay_once`, `line_pay_once_per_claim`, `policy_settle_once`, `fund_cover_once`, `claim_settle_once`, `oracle_execute_once` | F-005, F-008, F-009, F-011 | covered |
+| INV-9 | `Policy.settleClaim` | `policy_settle_remaining`, `policy_settle_aggregate` | F-006 | partial (F-020) |
+| INV-10 | terminal guards | `claim_settle_once`, `claim_terminal_sticky`, `policy_terminal`, `claim_agree_terminal_gap` | F-005, F-010 | partial (F-021) |
+| INV-11 | `System.transfer`, `Linear.Cell.commit` | `system_step_atomic`, `system_step_refuses`, `commit_all_or_none`, `commit_keeps_held` | none | partial (ERTP assumed) |
+| INV-12 | pause boundary | none | none | deferred (F-003) |
+
+## Cornerstone flows
+
+| Rule | Arm | Primary theorem | Invariants |
+|---|---|---|---|
+| F-001 | `Syndicate@"quote"` | `Syndicate.synd_quote_WF` | INV-1, INV-7 |
+| F-002 | `Syndicate@"openLine"` | `Syndicate.synd_openLine_WF` | INV-1, INV-7 |
+| F-003 | `Slip@"bind"` | `Slip.slip_bind_requires_subscription` | INV-2, INV-3, INV-4 |
+| F-004 | `Policy@"distribute"` | `Policy.policy_distribute_conserves` | INV-4 |
+| F-005 | `Claim@"settle"` | `Claim.claim_settle_once` | INV-8, INV-10 |
+| F-006 | `Policy@"settleClaim"` | `Policy.policy_settle_remaining` | INV-6, INV-8, INV-9 |
+| F-007 | `Distribution@"run"` | `Distribution.distribution_run_sums` | INV-4, INV-6 |
+| F-008 | `SureFund@"cover"` | `Fund.fund_cover_once` | INV-6, INV-8 |
+| F-009 | `Line@"pay"` | `Line.line_pay_once` | INV-7, INV-8 |
+| F-010 | `Claim@"agree"` | `Claim.claim_agree_standard_lead` | INV-10 |
+| F-011 | `Claim@"dispute"` | `Claim.claim_apply_uphold` | INV-8 |
+
+## Components
+
+| Component | What the model proves | What is assumed or out of scope |
+|---|---|---|
+| `SureRoot` | none | installer gate, 2-of-3 signatures and nonce are a boundary |
+| `Clock` | block-height arithmetic is a `Nat` input | proposer clock and chain height are not modelled |
+| `Verifier` | hash/signature interface is opaque | cryptography is assumed |
+| `Codec` | terms are ids and lists | canonical hashing is assumed |
+| `AdminGuard` | none | threshold and distinct-key semantics are assumed |
+| `SureAdmin` | pause is a boundary flag | F-003: no mutating arm consults the flag |
+| `CoverTerms` | `terms_validate_sound` extracts limits, deductible, bps and period bounds | class strings, evidence URIs and licence quality are off-chain |
+| `SureMath` | premium split, payable, allocation, exposure sum | signed integer and overflow bounds are assumed |
+| `RgenAdapter` | none | r-gen availability, credential truth and OracleCase binding are assumed |
+| `Payments` | none | ERTP total conservation is assumed |
+| `SyndicateBook` | none | registration authority and uniqueness are not modelled |
+| `Syndicate` | capacity, quote, openLine, release, payLoss | purse custody and member withdrawal are ERTP |
+| `LineGrant` | `grant_consume_once`, `grant_consume_moves` | grant URI resolution is assumed |
+| `LineFactory` | constructor postcondition is `LineState` init | creation is Rholang, not modelled |
+| `Line` | pay once, paid <= exposure, release credit | credit capability deposit is ERTP |
+| `BrokerBook` | none | owner authority and licence validity are off-chain |
+| `Broker` | commission cap is a terms bound | licence truth is off-chain |
+| `RiskBook` | none | risk registration authority is not modelled |
+| `Risk` | tri-test presence is a terms guard | probability and cost quality are off-chain |
+| `DistributionFactory` | plan construction is `buildPlan` | purse creation is ERTP |
+| `Distribution` | plan sums, last remainder, run once | native move is ERTP |
+| `SureFund` | cover cap, balance conservation, one-shot, nonce advances | 2-of-3 signatures and discretionary cover policy are assumed |
+| `SlipFactory` | constructor postcondition is `SlipState` init | creation is Rholang |
+| `Slip` | full subscription, funding, bind, expiry refund | premium refund is ERTP |
+| `PolicyFactory` | constructor postcondition is `PolicyState` init | creation is Rholang |
+| `Policy` | premium conservation, payable bound, settle once, aggregate update | claimId/policy binding and fund lookup are assumed |
+| `ClaimFactory` | constructor postcondition is `ClaimState` init | creation is Rholang |
+| `Claim` | lead/follow agreement, adjudication mapping, settle once | r-gen truth and applyDecision binding are assumed |
+| `PolicyBook` | unique register, lookup soundness | none material |
+| `ClaimBook` | unique register, lookup soundness | none material |
+
+## Capability sub-contracts
+
+| Capability | Model theorem | Status |
+|---|---|---|
+| `LineCredit` | none; deposit is an ERTP move | deferred |
+| `LineSettle` | `Line.line_pay_once`, `Line.line_pay_bounded` | covered |
+| `LineRelease` | `Line.line_release_restores` | covered |
+| `applyCap` | `Oracle.oracle_execute_once`, `Claim.claim_apply_case_bound` | covered |
+
+## Maintenance
+
+`spec/lean/claims.yaml` is the source of truth. Update it with the carrying theorem, the
+flow manifest and `RSure/Audit.lean` in the same change. Run:
+
+```sh
+python3 tools/check_claims.py --check --strict-audit
+python3 tools/check_flows.py --strict
+python3 tools/check_audit.py
+```

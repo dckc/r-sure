@@ -311,3 +311,35 @@ improvements:
   rollout_stage: devnet
   rollback: redeploy previous Root
   status: implemented
+- priority: P1
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+  id: R-020
+  findings:
+  - F-020
+  hazards:
+  - HZ-026
+  change: Reject settleClaim when payable > aggregateRemaining before any value move.
+  tests:
+  - T-011
+- priority: P1
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  rollout_stage: devnet
+  rollback: redeploy previous Root
+  status: planned
+  id: R-021
+  findings:
+  - F-021
+  hazards:
+  - HZ-027
+  change: Reject agree and addEvidence on settled, denied or closed claims.
+  tests:
+  - T-027

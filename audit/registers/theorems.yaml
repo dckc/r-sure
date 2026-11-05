@@ -1,23 +1,1459 @@
 theorems:
-  - id: TH-001
-    name: share_zero
-    module: RSure.Basic
-    kind: theorem
-    status: proved-model
-    statement: share amount 0 = 0
-    axioms: [propext]
-    scope: integer bps arithmetic
-    evidence: spec/lean/RSure/Basic.lean
-    reviewer: internal
-    audit_line: true
-  - id: TH-002
-    name: share_bps_zero
-    module: RSure.Basic
-    kind: theorem
-    status: proved-model
-    statement: share amount BPS = amount
-    axioms: [propext]
-    scope: integer bps arithmetic
-    evidence: spec/lean/RSure/Basic.lean
-    reviewer: internal
-    audit_line: true
+- id: TH-001
+  name: share_zero
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) : share amount 0 = 0'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-002
+  name: share_bps_zero
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) : share amount BPS = amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-003
+  name: div_add_div_le
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(x y k : Nat) (hk : 0 < k) : x / k + y / k ≤ (x + y) / k'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-004
+  name: share_add_le
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(amount a b : Nat) : share amount a + share amount b ≤ share amount
+    (a + b)'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-005
+  name: share_le_self
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '{amount bps : Nat} (h : bps ≤ BPS) : share amount bps ≤ amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-006
+  name: share_sum_le
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) : ∀ bpses : List Nat, sumNat (bpses.map (fun b => share
+    amount b)) ≤ share amount (sumNat bpses) | [] => by simp [sumNat] | b :: bs =>
+    by simp only [List.map_cons, sumNat] calc share amount b + sumNat (bs.map (fun
+    b => share amount b)) ≤ share amount b + share amount (sumNat bs)'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-007
+  name: share_sum_le_self
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) (bpses : List Nat) (h : sumNat bpses ≤ BPS) : sumNat
+    (bpses.map (fun b => share amount b)) ≤ amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-008
+  name: sumNat_append
+  module: RSure.Basic
+  kind: theorem
+  status: proved-model
+  statement: '(xs ys : List Nat) : sumNat (xs ++ ys) = sumNat xs + sumNat ys'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Basic.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-009
+  name: math_premiumSplit_le
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(total brokerBps fundBps : Nat) (h : brokerBps + fundBps ≤ BPS) : (premiumSplit
+    total brokerBps fundBps).commission + (premiumSplit total brokerBps fundBps).levy
+    ≤ total'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-010
+  name: math_premiumSplit_conserves
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(total brokerBps fundBps : Nat) (h : brokerBps + fundBps ≤ BPS) : (premiumSplit
+    total brokerBps fundBps).commission + (premiumSplit total brokerBps fundBps).levy
+    + (premiumSplit total brokerBps fundBps).net = total'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-011
+  name: math_premiumSplit_commission_le
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(total brokerBps fundBps : Nat) (h : brokerBps + fundBps ≤ BPS) : (premiumSplit
+    total brokerBps fundBps).commission ≤ total'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-012
+  name: math_premiumSplit_levy_le
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(total brokerBps fundBps : Nat) (h : brokerBps + fundBps ≤ BPS) : (premiumSplit
+    total brokerBps fundBps).levy ≤ total'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-013
+  name: math_payable_le_agreed
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) : payable agreed perClaim
+    aggregate deductible ≤ agreed'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-014
+  name: math_payable_le_perClaim
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) : payable agreed perClaim
+    aggregate deductible ≤ perClaim'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-015
+  name: math_payable_le_aggregate_of_lt
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) (h1 : agreed < perClaim)
+    : payable agreed perClaim aggregate deductible ≤ aggregate'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-016
+  name: math_payable_zero_of_le_deductible
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) (h : payableBase agreed
+    perClaim aggregate ≤ deductible) : payable agreed perClaim aggregate deductible
+    = 0'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-017
+  name: math_allocAux_sums
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) : ∀ (bpses : List Nat) (paid : Nat), allocFits amount
+    bpses paid → sumNat (allocAux amount bpses paid) = amount - paid'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-018
+  name: math_alloc_sums
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(amount : Nat) (bpses : List Nat) (h : allocFits amount bpses 0) : sumNat
+    (alloc amount bpses) = amount'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-019
+  name: math_lineExposures_sums
+  module: RSure.Model.Math
+  kind: theorem
+  status: proved-model
+  statement: '(aggregate : Nat) (bpses : List Nat) (h : allocFits aggregate bpses
+    0) : sumNat (alloc aggregate bpses) = aggregate'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Math.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-020
+  name: terms_validate_sound
+  module: RSure.Model.Terms
+  kind: theorem
+  status: proved-model
+  statement: '(t : Terms) (h : validate t = true) : TermsOk t'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Terms.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-021
+  name: terms_validate_asset
+  module: RSure.Model.Terms
+  kind: theorem
+  status: proved-model
+  statement: '(t : Terms) (h : validate t = true) : 1 ≤ t.assetLen ∧ t.assetLen ≤
+    32'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Terms.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-022
+  name: grant_consume_moves
+  module: RSure.Model.Grant
+  kind: theorem
+  status: proved-model
+  statement: '(g : GrantState) (tokenOk idsOk : Bool) (g'' : GrantState) (h : consume
+    g tokenOk idsOk = some g'') : g''.status = GrantStatus.consumed'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Grant.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-023
+  name: grant_consume_once
+  module: RSure.Model.Grant
+  kind: theorem
+  status: proved-model
+  statement: '(g : GrantState) (tokenOk idsOk : Bool) (g'' : GrantState) (h : consume
+    g tokenOk idsOk = some g'') : consume g'' tokenOk idsOk = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Grant.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-024
+  name: synd_quote_WF
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (a : QuoteArgs) (hwf : SyndicateWF s) (h :
+    quote s a = some s'') : SyndicateWF s'' ∧ s''.committed = s.committed + a.exposure
+    ∧ s''.written = s.written ∧ free s'' = free s - a.exposure'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-025
+  name: synd_quote_reserves
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (a : QuoteArgs) (hwf : SyndicateWF s) (h :
+    quote s a = some s'') : s''.committed = s.committed + a.exposure ∧ free s'' =
+    free s - a.exposure'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-026
+  name: synd_quote_requires_capacity
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (a : QuoteArgs) (h : quote s a = some s'')
+    : a.exposure ≤ free s'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-027
+  name: synd_openLine_WF
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (exposure : Nat) (grantOk : Bool) (hwf : SyndicateWF
+    s) (h : openLine s exposure grantOk = some s'') : SyndicateWF s'' ∧ s''.committed
+    = s.committed - exposure ∧ s''.written = s.written + exposure ∧ free s'' = free
+    s'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-028
+  name: synd_openLine_moves
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (exposure : Nat) (grantOk : Bool) (hwf : SyndicateWF
+    s) (h : openLine s exposure grantOk = some s'') : s''.committed = s.committed
+    - exposure ∧ s''.written = s.written + exposure'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-029
+  name: synd_release_restores
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (exposure paid : Nat) (hwf : SyndicateWF s)
+    (h : release s exposure paid = some s'') : SyndicateWF s'' ∧ s''.written = s.written
+    - (exposure - paid) ∧ free s'' = free s + (exposure - paid)'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-030
+  name: synd_payLoss_preserves_free
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (amount : Nat) (hwf : SyndicateWF s) (h : payLoss
+    s amount = some s'') : SyndicateWF s'' ∧ free s'' = free s'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-031
+  name: synd_written_le_capital
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s : SyndicateState) (h : SyndicateWF s) : s.written ≤ s.capital'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-032
+  name: synd_capacity_invariant
+  module: RSure.Model.Syndicate
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SyndicateState) (a : QuoteArgs) (hwf : SyndicateWF s) (h :
+    quote s a = some s'') : SyndicateWF s'''
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Syndicate.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-033
+  name: line_pay_fields
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (claimId amount : Nat) (tokenOk : Bool) (h : pay
+    s claimId amount tokenOk = some s'') : PayResult s s'' claimId amount'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-034
+  name: line_pay_bounded
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (claimId amount : Nat) (tokenOk : Bool) (hwf : LineWF
+    s) (h : pay s claimId amount tokenOk = some s'') : LineWF s'''
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-035
+  name: line_pay_once
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (claimId amount : Nat) (tokenOk : Bool) (h : pay
+    s claimId amount tokenOk = some s'') : pay s'' claimId amount tokenOk = none'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-036
+  name: line_pay_once_per_claim
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (claimId amount amount2 : Nat) (tokenOk : Bool)
+    (h : pay s claimId amount tokenOk = some s'') : pay s'' claimId amount2 tokenOk
+    = none'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-037
+  name: line_release_restores
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (credit : Nat) (tokenOk : Bool) (_hwf : LineWF s)
+    (h : release s tokenOk = some (s'', credit)) : s''.status = LineStatus.released
+    ∧ credit = s.exposure - s.paid ∧ s''.paid = s.paid ∧ s''.exposure = s.exposure'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-038
+  name: line_invariant
+  module: RSure.Model.Line
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : LineState) (claimId amount : Nat) (tokenOk : Bool) (hwf : LineWF
+    s) (h : pay s claimId amount tokenOk = some s'') : s''.paid ≤ s''.exposure'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Line.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-039
+  name: slip_bind_requires_subscription
+  module: RSure.Model.Slip
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SlipState) (h : bind s = some s'') : s.insuredAccepted = true
+    ∧ s.funded = s.premiumTotal ∧ s.shares ≠ [] ∧ sumNat s.shares = BPS'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Slip.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-040
+  name: slip_share_sum_bps
+  module: RSure.Model.Slip
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SlipState) (h : bind s = some s'') : sumNat s.shares = BPS'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Slip.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-041
+  name: slip_bind_moves
+  module: RSure.Model.Slip
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SlipState) (h : bind s = some s'') : s''.status = SlipStatus.bound
+    ∧ s''.funded = s.funded'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Slip.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-042
+  name: slip_expire_refund
+  module: RSure.Model.Slip
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : SlipState) (credit : Nat) (nowPast : Bool) (h : expire s nowPast
+    = some (s'', credit)) : credit = s.funded'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Slip.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-043
+  name: distribution_planAux_sums
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(base : Nat) : ∀ (bpses : List Nat) (i paid : Nat), allocFits base bpses
+    paid → sumPlan (buildPlanAux base bpses i paid) = base - paid'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-044
+  name: distribution_plan_sums
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(base : Nat) (bpses : List Nat) (h : allocFits base bpses 0) : sumPlan
+    (buildPlan base bpses) = base'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-045
+  name: distribution_plan_single
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(base b i : Nat) : buildPlanAux base [b] i 0 = [(i, base)]'
+  axioms: []
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-046
+  name: distribution_run_once
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : DistributionState) (h : run s = some s'') : run s'' = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-047
+  name: distribution_run_preserves_plan
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : DistributionState) (h : run s = some s'') : s''.plan = s.plan'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-048
+  name: distribution_run_sums
+  module: RSure.Model.Distribution
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : DistributionState) (base : Nat) (bpses : List Nat) (h : run
+    s = some s'') (hp : s.plan = buildPlan base bpses) (hfit : allocFits base bpses
+    0) : sumPlan s''.plan = base'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Distribution.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-049
+  name: fund_cover_bounds
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (h : cover
+    s claimId amount nonce sigs = some (s'', paid)) : 1 ≤ amount ∧ amount ≤ s.balance
+    ∧ amount ≤ s.maxCover'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-050
+  name: fund_cover_records
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (h : cover
+    s claimId amount nonce sigs = some (s'', paid)) : paid = amount ∧ s''.balance
+    = s.balance - amount ∧ s''.govNonce = nonce ∧ lookup claimId s''.covers = some
+    amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-051
+  name: fund_cover_le_balance
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (h : cover
+    s claimId amount nonce sigs = some (s'', paid)) : amount ≤ s.balance'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-052
+  name: fund_cover_le_cap
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (h : cover
+    s claimId amount nonce sigs = some (s'', paid)) : amount ≤ s.maxCover'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-053
+  name: fund_conserves
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (h : cover
+    s claimId amount nonce sigs = some (s'', paid)) : s''.balance + paid = s.balance'
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-054
+  name: fund_cover_once
+  module: RSure.Model.Fund
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : FundState) (claimId amount nonce sigs paid : Nat) (amount2
+    nonce2 sigs2 : Nat) (h : cover s claimId amount nonce sigs = some (s'', paid))
+    : cover s'' claimId amount2 nonce2 sigs2 = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Fund.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-055
+  name: policy_distribute_conserves
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s : PolicyState) (p : DistributionPlan) (h : distribute s = some p)
+    (hbps : s.brokerBps + s.fundBps ≤ BPS) (hfit : allocFits (premiumSplit s.premiumTotal
+    s.brokerBps s.fundBps).net s.lineBps 0) : p.commission + p.levy + sumNat p.lines
+    = s.premiumTotal'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-056
+  name: policy_distribute_once
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s : PolicyState) (p : DistributionPlan) (h : distribute s = some p)
+    : distribute { s with distributed'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-057
+  name: policy_settle_fields
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : PolicyState) (claimId agreed : Nat) (h : settleClaim s claimId
+    agreed = some s'') : s''.aggregatePaid = s.aggregatePaid + payable agreed s.perClaimLimit
+    s.aggregateRemaining s.deductible ∧ s''.aggregateRemaining = s.aggregateRemaining
+    - payable agreed s.perClaimLimit s.aggregateRemaining s.deductible ∧ s''.settledClaims
+    = claimId :: s.settledClaims'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-058
+  name: policy_settle_once
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : PolicyState) (claimId agreed agreed2 : Nat) (h : settleClaim
+    s claimId agreed = some s'') : settleClaim s'' claimId agreed2 = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-059
+  name: policy_settle_remaining
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : PolicyState) (claimId agreed : Nat) (h : settleClaim s claimId
+    agreed = some s'') : s''.aggregateRemaining = s.aggregateRemaining - payable agreed
+    s.perClaimLimit s.aggregateRemaining s.deductible'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-060
+  name: policy_settle_aggregate
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : PolicyState) (claimId agreed : Nat) (h : settleClaim s claimId
+    agreed = some s'') (hle : payable agreed s.perClaimLimit s.aggregateRemaining
+    s.deductible ≤ s.aggregateRemaining) : s''.aggregateRemaining + payable agreed
+    s.perClaimLimit s.aggregateRemaining s.deductible = s.aggregateRemaining'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-061
+  name: policy_settle_conserves
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(payable cover : Nat) (h : cover ≤ payable) : cover + (payable - cover)
+    = payable'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-062
+  name: policy_terminal
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(s : PolicyState) (claimId agreed : Nat) (h : s.status = PolicyStatus.expired)
+    : settleClaim s claimId agreed = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-063
+  name: policy_payable_le_agreed
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) : payable agreed perClaim
+    aggregate deductible ≤ agreed'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-064
+  name: policy_payable_le_perClaim
+  module: RSure.Model.Policy
+  kind: theorem
+  status: proved-model
+  statement: '(agreed perClaim aggregate deductible : Nat) : payable agreed perClaim
+    aggregate deductible ≤ perClaim'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Policy.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-065
+  name: claim_agree_standard_lead
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (a : AgreeArgs) (h : agree s a = some s'') (hk
+    : s.kind = some ClaimKind.standard) : a.caller = s.leadManager ∧ s''.status =
+    ClaimStatus.agreed ∧ s''.agreedAmount = a.amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-066
+  name: claim_agree_complex_quorum
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (a : AgreeArgs) (h : agree s a = some s'') (hk
+    : s.kind = some ClaimKind.complex) (hs : s''.status = ClaimStatus.agreed) : a.caller
+    = s.secondManager ∧ s.leadAgreed = true ∧ s''.agreedAmount = a.amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-067
+  name: claim_agree_complex_requires_lead
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (a : AgreeArgs) (h : agree s a = some s'') (hk
+    : s.kind = some ClaimKind.complex) (hs : s''.status = ClaimStatus.agreed) : s.leadAgreed
+    = true'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-068
+  name: claim_settle_once
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (h : settle s = some s'') : settle s'' = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-069
+  name: claim_paid_le_agreed
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (h : settle s = some s'') : s''.paid ≤ s''.agreedAmount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-070
+  name: claim_terminal_sticky
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s : ClaimState) (h : s.status = ClaimStatus.settled) : settle s = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-071
+  name: claim_apply_case_bound
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (caseId : Nat) (outcome : DecisionOutcome) (amount
+    : Nat) (h : applyDecision s caseId outcome amount = some s'') : s.oracleCase =
+    some caseId'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-072
+  name: claim_apply_uphold
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (caseId amount : Nat) (h : applyDecision s caseId
+    DecisionOutcome.uphold amount = some s'') : s''.status = ClaimStatus.upheld ∧
+    s''.agreedAmount = s.assessmentAmount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-073
+  name: claim_apply_partial
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (caseId amount : Nat) (h : applyDecision s caseId
+    DecisionOutcome.partiallyUpheld amount = some s'') : amount ≤ s.claimedAmount
+    ∧ s''.status = ClaimStatus.partiallyUpheld ∧ s''.agreedAmount = amount'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-074
+  name: claim_apply_revoke
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : ClaimState) (caseId amount : Nat) (h : applyDecision s caseId
+    DecisionOutcome.revoke amount = some s'') : s''.status = ClaimStatus.denied ∧
+    s''.agreedAmount = 0'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-075
+  name: claim_agree_terminal_gap
+  module: RSure.Model.Claim
+  kind: theorem
+  status: proved-model
+  statement: ': ∃ s'', agree settledStandardClaim { caller'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Claim.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-076
+  name: oracle_decide_requires_credential
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (caseId subject outcome : Nat) (credentialOk :
+    Bool) (h : decide s caseId subject outcome credentialOk = some s'') : credentialOk
+    = true ∧ caseId = s.caseId ∧ subject = s.subjectRef'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-077
+  name: oracle_execute_once
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (caseId : Nat) (h : execute s caseId = some s'')
+    : execute s'' caseId = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-078
+  name: oracle_execute_subject_bound
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (caseId : Nat) (h : execute s caseId = some s'')
+    : caseId = s.caseId ∧ s''.status = OracleStatus.executed ∧ s''.applied = true'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-079
+  name: oracle_applied_matches
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (caseId : Nat) (h : execute s caseId = some s'')
+    : s''.applied = true'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-080
+  name: oracle_apply_once
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (caseId : Nat) (h : execute s caseId = some s'')
+    : execute s'' caseId = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-081
+  name: oracle_close_requires_finished
+  module: RSure.Model.Oracle
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : OracleState) (h : close s = some s'') : s.status = OracleStatus.executed'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Oracle.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-082
+  name: book_register_absent
+  module: RSure.Model.Books
+  kind: theorem
+  status: proved-model
+  statement: '(b b'' : Book) (k v : Nat) (h : register b k v = some b'') : lookup
+    k b.entries = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Books.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-083
+  name: book_lookup_sound
+  module: RSure.Model.Books
+  kind: theorem
+  status: proved-model
+  statement: '(b b'' : Book) (k v : Nat) (h : register b k v = some b'') : lookup
+    k b''.entries = some v'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Books.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-084
+  name: book_register_unique
+  module: RSure.Model.Books
+  kind: theorem
+  status: proved-model
+  statement: '(b b'' : Book) (k v v2 : Nat) (h : register b k v = some b'') : register
+    b'' k v2 = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Books.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-085
+  name: book_lookup_preserved
+  module: RSure.Model.Books
+  kind: theorem
+  status: proved-model
+  statement: '(b b'' : Book) (k v k'' : Nat) (h : register b k v = some b'') (hne
+    : k ≠ k'') : lookup k'' b''.entries = lookup k'' b.entries'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Books.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-086
+  name: system_step_atomic
+  module: RSure.Model.System
+  kind: theorem
+  status: proved-model
+  statement: '(s s'' : TwoCell) (amount : Nat) (h : transfer s amount = some s'')
+    : s''.left + s''.right = s.left + s.right'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/System.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-087
+  name: system_step_refuses
+  module: RSure.Model.System
+  kind: theorem
+  status: proved-model
+  statement: '(s : TwoCell) (amount : Nat) (h : amount > s.left) : transfer s amount
+    = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/System.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-088
+  name: system_settlement_conserves
+  module: RSure.Model.System
+  kind: theorem
+  status: proved-model
+  statement: '(payable cover : Nat) (bpses : List Nat) (hcov : cover ≤ payable) (hfit
+    : allocFits (payable - cover) bpses 0) : cover + sumNat (alloc (payable - cover)
+    bpses) = payable'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/System.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-089
+  name: system_settlement_plan
+  module: RSure.Model.System
+  kind: theorem
+  status: proved-model
+  statement: '(payable cover : Nat) (bpses : List Nat) (_hcov : cover ≤ payable) (hfit
+    : allocFits (payable - cover) bpses 0) : sumNat (alloc (payable - cover) bpses)
+    = payable - cover'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/System.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-090
+  name: set_same
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '(s : Store α) (c : CellId) (v : List α) : (s.set c v).cells c = v'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-091
+  name: set_other
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '(s : Store α) (c d : CellId) (v : List α) (h : d ≠ c) : (s.set c v).cells
+    d = s.cells d'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-092
+  name: peek_then_put_rejected
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {v : α} (hne
+    : s.cells c ≠ []) : run s h [Op.peek c, Op.put c v] = none'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-093
+  name: put_without_take_rejected
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {v : α} (hempty
+    : s.cells c = []) (hnot : c ∉ h) : run s h [Op.put c v] = none'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-094
+  name: take_without_put_not_wf
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {v : α} (hcell
+    : s.cells c = [v]) : ¬ WF s h [Op.take c]'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-095
+  name: nested_call_rejected
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} (hheld : c ∈
+    h) : run s h [Op.call c] = none'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-096
+  name: take_put_commit
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {v : α} (hcell
+    : s.cells c = [v]) (hnot : c ∉ h) : run s h [Op.take c, Op.put c v] = some ((s.set
+    c []).set c [v], h.erase c)'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-097
+  name: wf_quiescent
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} (s : Store α) : WF s [] []'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-098
+  name: commit_keeps_held
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {f : α → Option
+    α} {s'' h''} (hrun : run s h [Op.commit c f] = some (s'', h'')) : h'' = h'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-099
+  name: commit_success
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {f : α → Option
+    α} {s'' h''} (hrun : run s h [Op.commit c f] = some (s'', h'')) : ∃ v v'', s.cells
+    c = [v] ∧ f v = some v'' ∧ s'' = s.set c [v''] ∧ h'' = h'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-100
+  name: commit_all_or_none
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {f : α → Option
+    α} : run s h [Op.commit c f] = none ∨ ∃ v v'', s.cells c = [v] ∧ f v = some v''
+    ∧ run s h [Op.commit c f] = some (s.set c [v''], h)'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-101
+  name: commit_requires_single
+  module: RSure.Linear.Cell
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {f : α → Option
+    α} {s'' h''} (hrun : run s h [Op.commit c f] = some (s'', h'')) : s.cells c ≠
+    []'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Cell.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-102
+  name: h1_pure
+  module: RSure.Linear.Protocol
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} (s : Store α) (h : List CellId) : run s h [] = some (s, h)'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Protocol.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-103
+  name: h2a_caller_token
+  module: RSure.Linear.Protocol
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {c : CellId} {v : α} (hcell : s.cells c = [v])
+    : run s [] [Op.take c, Op.put c v] = some ((s.set c []).set c [v], [])'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Protocol.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-104
+  name: h2b_delegated
+  module: RSure.Linear.Protocol
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {c : CellId} {v : α} (hcell : s.cells c = [v])
+    : run s [] [Op.peek c, Op.take c, Op.put c v] = some ((s.set c []).set c [v],
+    [])'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Protocol.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-105
+  name: p2_await_then_commit
+  module: RSure.Linear.Protocol
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} {s : Store α} {h : List CellId} {c : CellId} {f : α → Option
+    α} {s'' h''} (hrun : run s h [Op.commit c f] = some (s'', h'')) : h'' = h'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Protocol.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-106
+  name: commit_counts
+  module: RSure.Linear.Protocol
+  kind: theorem
+  status: proved-model
+  statement: '{α : Type} (c : CellId) (v : α) : countOp isTake [Op.take c, Op.put
+    c v] = 1 ∧ countOp isPut [Op.take c, Op.put c v] = 1'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Linear/Protocol.lean
+  reviewer: internal
+  audit_line: true

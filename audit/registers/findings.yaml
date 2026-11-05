@@ -521,3 +521,59 @@ findings:
   proposed_fix: R-019
   reviewer: internal
   verified_at: '2026-11-05'
+- id: F-020
+  title: Policy.settleClaim can pay more than the remaining aggregate
+  severity: P1
+  class: invariant
+  status: confirmed
+  confidence: high
+  components:
+  - Policy
+  arms:
+  - Policy@"settleClaim"
+  hazards:
+  - HZ-026
+  invariants:
+  - INV-9
+  evidence_level: E1
+  evidence:
+  - kind: lean
+    ref: spec/lean/RSure/Model/Policy.lean
+  description: The arm computes payable and subtracts it from aggregateRemaining without
+    checking payable <= aggregateRemaining. The SureMath payable branch can exceed
+    the remaining aggregate when agreed >= perClaimLimit.
+  preconditions: A claim is settled after the aggregate has been partly exhausted
+    and the agreed amount reaches the per-claim limit.
+  impact: aggregateRemaining underflows in Rholang or is clamped in the model; INV-9
+    does not hold.
+  proposed_fix: R-020
+  reviewer: internal
+  verified_at: '2026-11-05'
+- id: F-021
+  title: Claim.agree re-opens a settled claim
+  severity: P1
+  class: invariant
+  status: confirmed
+  confidence: high
+  components:
+  - Claim
+  arms:
+  - Claim@"agree"
+  hazards:
+  - HZ-027
+  invariants:
+  - INV-10
+  evidence_level: E1
+  evidence:
+  - kind: lean
+    ref: spec/lean/RSure/Model/Claim.lean
+  description: Claim.agree checks that the claim is classified but not that it is
+    terminal. A settled claim can be moved back to agreed, and addEvidence has a similar
+    partial guard.
+  preconditions: A claim has settled and the lead manager calls agree again with a
+    standard classification.
+  impact: 'INV-10 does not hold: a settled claim can be re-opened and potentially
+    re-settled.'
+  proposed_fix: R-021
+  reviewer: internal
+  verified_at: '2026-11-05'

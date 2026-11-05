@@ -1,0 +1,222 @@
+# Machine-readable claim register for the r-sure Lean component model.
+#
+# This is the proof-value contract. It states, for every invariant in
+# spec/invariants.md, the Lean theorem that carries it, the strength of that
+# theorem, and the assumptions the theorem is conditional on. It is not a
+# refinement of the Rholang contracts: `proved-model` means proved about the
+# shallow model in spec/lean.
+#
+# Status values: covered | partial | deferred | tool
+# Strength values: substantive | definitional | restatement | stub | alias
+
+schema: rsure.lean-claims/v1
+review_date: 2026-11-05
+
+assumptions:
+  ertp.native_total:
+    status: assumed
+    note: >-
+      An r-cash purse or issuer move conserves total value or fails. ERTP and
+      purse custody are not modelled; every value-moving theorem is conditional
+      on this boundary (INV-6, INV-8, INV-11).
+  rgen.oracle_binding:
+    status: assumed
+    note: >-
+      r-gen OracleCase.execute calls the subject's applyDecision once, for the
+      named case only. The Oracle model proves the local execute-once guard; the
+      binding to r-gen is an assumption.
+  crypto.authority:
+    status: assumed
+    note: >-
+      Deployer identity, policy/claim tokens and 2-of-3 signatures are
+      unforgeable. The model uses opaque Nat actors and Bool possession flags.
+  deploy.atomicity:
+    status: assumed
+    note: >-
+      A failed deploy rolls back all state and value effects. The model's
+      refusal steps are pure `none`; node rollback is not modelled.
+  arithmetic.no_overflow:
+    status: assumed
+    note: >-
+      Lean Nat is unbounded. The contracts use fixed-width integers; the
+      arithmetic theorems are conditional on the deployed bounds.
+  scheduler.fairness:
+    status: out_of_scope
+    note: No liveness or fairness claim is made; the model proves safety only.
+  pause.contract:
+    status: assumed
+    note: >-
+      The global pause gate is dead in the deployed contracts (F-003). Pause is
+      a boundary flag, not a proved gate; INV-12 is deferred.
+  evidence.quality:
+    status: out_of_scope
+    note: >-
+      r-sure checks evidence presence, not probability or cost quality. Loss
+      quality is an off-chain underwriting duty.
+
+invariants:
+  INV-1:
+    statement: committed + written <= capital and free capacity is non-negative.
+    predicate: RSure.Model.Syndicate.SyndicateWF
+    status: covered
+    theorems:
+      - {name: RSure.Model.Syndicate.synd_quote_WF, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_openLine_WF, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_release_restores, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_payLoss_preserves_free, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_written_le_capital, strength: substantive, kind: invariant}
+
+  INV-2:
+    statement: A bound slip has shares summing to 10000 bps and at least one line.
+    predicate: RSure.Model.Slip.bind
+    status: covered
+    theorems:
+      - {name: RSure.Model.Slip.slip_bind_requires_subscription, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_bind_moves, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_share_sum_bps, strength: alias, kind: projection}
+
+  INV-3:
+    statement: Line exposures sum to the aggregate; the last line absorbs the remainder.
+    predicate: RSure.Model.Math.alloc
+    status: covered
+    note: >-
+      Conditional on the contract's own `paid == amount` feasibility guard,
+      represented by allocFits. The guard is checked by planBuild in the
+      contract; the model does not prove feasibility from the bps sum alone.
+    theorems:
+      - {name: RSure.Model.Math.math_alloc_sums, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Distribution.distribution_plan_sums, strength: substantive, kind: preservation}
+
+  INV-4:
+    statement: commission + levy + line credits = premiumTotal.
+    predicate: RSure.Model.Policy.distribute
+    status: covered
+    note: >-
+      Conditional on brokerBps + fundBps <= 10000 and on allocFits for the line
+      plan; both are the deployed contract's own guards.
+    theorems:
+      - {name: RSure.Model.Math.math_premiumSplit_conserves, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_distribute_conserves, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_distribute_once, strength: substantive, kind: preservation}
+
+  INV-5:
+    statement: The payable is capped by the agreed amount, the per-claim limit and the aggregate branch.
+    predicate: RSure.Model.Math.payable
+    status: covered
+    note: >-
+      The contract's branch order differs from the prose three-way min when
+      agreed >= perClaimLimit and aggregateRemaining < perClaimLimit; the
+      aggregate bound is proved only for agreed < perClaimLimit.
+    theorems:
+      - {name: RSure.Model.Math.math_payable_le_agreed, strength: substantive, kind: bound}
+      - {name: RSure.Model.Math.math_payable_le_perClaim, strength: substantive, kind: bound}
+      - {name: RSure.Model.Math.math_payable_le_aggregate_of_lt, strength: substantive, kind: bound}
+      - {name: RSure.Model.Math.math_payable_zero_of_le_deductible, strength: substantive, kind: bound}
+
+  INV-6:
+    statement: line payouts plus the central-fund cover equal the payable.
+    predicate: RSure.Model.System.system_settlement_conserves
+    status: covered
+    note: Conditional on the native total assumption and on the cover/payable split.
+    theorems:
+      - {name: RSure.Model.System.system_settlement_conserves, strength: substantive, kind: composition}
+      - {name: RSure.Model.Policy.policy_settle_conserves, strength: substantive, kind: arithmetic}
+      - {name: RSure.Model.Fund.fund_conserves, strength: substantive, kind: preservation}
+
+  INV-7:
+    statement: paid <= exposure and exposure is backed by written capital.
+    predicate: RSure.Model.Line.LineWF
+    status: covered
+    note: The exposure-to-written link is the Syndicate invariant; the Line model proves the paid bound.
+    theorems:
+      - {name: RSure.Model.Line.line_pay_bounded, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_written_le_capital, strength: substantive, kind: invariant}
+
+  INV-8:
+    statement: A claim is paid at most once per line, per policy and per fund.
+    predicate: once-per-claim guards
+    status: covered
+    note: Conditional on the native total assumption and on the r-gen applyDecision binding.
+    theorems:
+      - {name: RSure.Model.Line.line_pay_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Line.line_pay_once_per_claim, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Policy.policy_settle_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Fund.fund_cover_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_settle_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Oracle.oracle_execute_once, strength: substantive, kind: rejection}
+
+  INV-9:
+    statement: aggregateRemaining decreases by the payable and never goes negative.
+    predicate: RSure.Model.Policy.settleClaim
+    status: partial
+    note: >-
+      The deployed settleClaim does not guard payable <= aggregateRemaining. The
+      model proves the remaining-amount update and the non-negativity only under
+      the missing guard, which is recorded as finding F-020. This is not a
+      proved property of the deployed contract.
+    theorems:
+      - {name: RSure.Model.Policy.policy_settle_remaining, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_settle_aggregate, strength: substantive, kind: conditional}
+
+  INV-10:
+    statement: settled/denied claims and expired policies cannot be re-opened.
+    predicate: terminal guards
+    status: partial
+    note: >-
+      Settlement and policy expiry are terminal, but Claim.agree does not reject
+      a settled claim. claim_agree_terminal_gap is a counterexample against the
+      deployed arm; the terminal guard is finding F-021, not a proved property.
+    theorems:
+      - {name: RSure.Model.Claim.claim_settle_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_terminal_sticky, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Policy.policy_terminal, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_agree_terminal_gap, strength: substantive, kind: counterexample}
+
+  INV-11:
+    statement: no partial value move survives a failed deploy.
+    predicate: RSure.Model.System.transfer
+    status: partial
+    note: >-
+      The two-cell model proves all-or-nothing and conservation, and the linear
+      cell proves commit atomicity. Native ERTP value moves and node rollback are
+      assumed, not proved.
+    theorems:
+      - {name: RSure.Model.System.system_step_atomic, strength: substantive, kind: preservation}
+      - {name: RSure.Model.System.system_step_refuses, strength: substantive, kind: rejection}
+      - {name: RSure.commit_all_or_none, strength: substantive, kind: preservation}
+      - {name: RSure.commit_keeps_held, strength: substantive, kind: preservation}
+
+  INV-12:
+    statement: global pause does not block settlement, close, expiry or refunds.
+    predicate: pause boundary
+    status: deferred
+    deferral:
+      phase: 5
+      reason: F-003 is open; no mutating arm consults isPaused, so the invariant is vacuous.
+    theorems: []
+
+primitives:
+  LineSettle:
+    statement: A line settles one claim and never pays more than its exposure.
+    status: covered
+    theorems:
+      - {name: RSure.Model.Line.line_pay_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Line.line_pay_bounded, strength: substantive, kind: preservation}
+  LineRelease:
+    statement: Release returns the unpaid exposure and marks the line released.
+    status: covered
+    theorems:
+      - {name: RSure.Model.Line.line_release_restores, strength: substantive, kind: preservation}
+  LineCredit:
+    statement: The credit capability deposits premium into the syndicate purse.
+    status: deferred
+    deferral:
+      phase: 5
+      reason: the deposit is an ERTP move; only the local credited counter is modelled.
+    theorems: []
+  ApplyCap:
+    statement: The r-gen applyDecision capability applies one case decision.
+    status: covered
+    theorems:
+      - {name: RSure.Model.Oracle.oracle_execute_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_apply_case_bound, strength: substantive, kind: binding}

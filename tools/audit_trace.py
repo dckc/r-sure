@@ -55,7 +55,7 @@ def build() -> dict:
             "visibility": arm.get("visibility"),
             "flow_rule": arm.get("flow_rule"),
             "flow_status": arm.get("flow_status"),
-            "lean_target": arm.get("lean_target"),
+            "lean_target": arm.get("lean_target") or arm.get("flow_target"),
             "hazards": sorted(hazard_ids),
             "findings": sorted(finding_ids),
             "improvements": sorted(improvement_ids),

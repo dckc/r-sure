@@ -18,14 +18,15 @@ so the devnet install and every behavioural suite remain `not_run`.
 | Interfaces in the composition matrix | 42 |
 | HAZOP nodes | 15 |
 | Public arms registered | 162 |
-| Hazards | 25 |
-| Findings | 19 |
+| Hazards | 27 |
+| Findings | 21 |
 | P0 findings | 2 (1 fixed, 1 open) |
-| P1 findings | 10 (9 fixed, 1 open) |
+| P1 findings | 12 (9 fixed, 3 open) |
 | P2/P3 findings | 7 (3 fixed/documented, 4 deferred) |
-| Improvements | 19 |
+| Improvements | 21 |
 | Tests registered | 36 (`not_run`) |
-| Lean theorems | 2 arithmetic theorems |
+| Lean theorems | 106 component-model theorems |
+| Lean invariants | 11 covered, 3 partial, 2 deferred |
 
 ## P0
 
@@ -53,6 +54,8 @@ so the devnet install and every behavioural suite remain `not_run`.
 | F-010 no claim period/notice check | fixed | ClaimFactory checks the policy period and notice window. |
 | F-011 no slip premium refund | fixed | Slip.expire refunds the funded premium. |
 | F-012 line capability/state ordering | fixed | Line takes state first and reposts on every reply. |
+| F-020 payable can exceed aggregate | open | `Policy.settleClaim` does not guard `payable <= aggregateRemaining`; INV-9 is partial. |
+| F-021 settled claim can be re-agreed | open | `Claim.agree` does not reject terminal status; the Lean model records the counterexample. |
 
 ## P2/P3
 
@@ -83,6 +86,7 @@ core/keystore tests pass; the install and behavioural campaign are not green.
    `make install`.
 2. Run the 36 behavioural suites and record honest pass/fail/not_run.
 3. Wire the global pause into the market entry arms (F-003); the other P1s are fixed.
-4. Complete the Lean model and flow manifest.
+4. Keep the Lean component model, claims register and flow manifest current; close F-020
+   and F-021 with contract guards and regression suites.
 5. Run an independent adversarial review and record evidence.
 6. Do not describe any primitive as audited until the above is complete.

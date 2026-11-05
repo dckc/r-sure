@@ -17,6 +17,8 @@
 
 `distribute`, `openClaim` and `settleClaim` take `policyState` and later take it again after external awaits without a repost (P0, HZ-C4). `expire` does not release the policy lines, so capacity remains written (P1, HZ-L1). `openClaim` does not check the loss period or notice window (P1). `bundle+{*Policy}` is unclosed.
 
+The Lean model exposes a further P1: `settleClaim` does not guard `payable <= aggregateRemaining`, so the aggregate can underflow (F-020, HZ-026). `policy_settle_aggregate` proves the update only under the missing guard; INV-9 is `partial`, not covered.
+
 ## Await / value-move notes
 
 - Awaits while holding state: distribute: SureMath/Distribution, openClaim: ClaimFactory, settleClaim: SureFund/Line.pay, expire: Clock

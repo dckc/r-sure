@@ -601,3 +601,55 @@ hazards:
   evidence:
   - audit/concurrency/components.yaml
   arm: Distribution@"run"
+- id: HZ-026
+  node: N11
+  guide_word: MORE
+  parameter: aggregateRemaining
+  deviation: Policy.settleClaim does not reject a payable larger than aggregateRemaining
+  causes:
+  - missing guard
+  - payable branch ignores the aggregate when agreed >= perClaimLimit
+  consequences:
+  - aggregateRemaining underflows or is clamped
+  - INV-9 is violated
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - Lean conditional theorem
+  - audit finding
+  findings:
+  - F-020
+  tests:
+  - T-011
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - spec/lean/RSure/Model/Policy.lean
+  arm: Policy@"settleClaim"
+- id: HZ-027
+  node: N12
+  guide_word: AFTER
+  parameter: claimState
+  deviation: Claim.agree accepts a settled claim and moves it back to agreed
+  causes:
+  - missing terminal guard
+  - classification-only guard
+  consequences:
+  - INV-10 is violated
+  - a settled claim can be re-opened
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - Lean counterexample
+  - audit finding
+  findings:
+  - F-021
+  tests:
+  - T-027
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - spec/lean/RSure/Model/Claim.lean
+  arm: Claim@"agree"

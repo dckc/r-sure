@@ -61,8 +61,8 @@ philosophy](docs/primer/design-philosophy.md).
 | Behavioural suites | 36 suites mapped; most are `not_run` until the devnet campaign |
 | Rust client | core/keystore/sdk/cli/wasm crates compile; 6 unit tests pass; SDK/CLI are scaffolds |
 | Web client | React/Vite scaffold; not installed or built here |
-| Lean model | 2 proved arithmetic theorems, 2 vectors, 8 owed flow rules |
-| Audit | 30/30 component concurrency reviews, 42 interfaces, 25 hazards, 19 findings; 1 of 2 P0s fixed; tabletop HAZOP is internal |
+| Lean model | 106 kernel-checked theorems over a shallow component model; 31 vectors; 11 proved-model flow rules; claims register 11 covered, 3 partial, 2 deferred |
+| Audit | 30/30 component concurrency reviews, 42 interfaces, 27 hazards, 21 findings; 1 of 2 P0s fixed; tabletop HAZOP is internal |
 
 "Do not use real funds." The chain is pre-testnet and the contracts are unaudited.
 

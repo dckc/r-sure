@@ -39,6 +39,8 @@
 - [Data schemas](reference/data-schemas.md)
 - [Install order and keys](reference/install-order-and-keys.md)
 - [Invariants](reference/invariants.md)
+- [Formal model](reference/formal-model.md)
+- [Proof map](reference/proof-map.md)
 - [r-gen integration](reference/rgen-integration.md)
 - [r-share reuse](reference/share-reuse.md)
 - [Verification](reference/verification.md)

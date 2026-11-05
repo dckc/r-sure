@@ -19,11 +19,11 @@ the book chapters summarise them.
 | [composition/interfaces.yaml](composition/interfaces.yaml) | one row per interface (42) |
 | [hazop/nodes.yaml](hazop/nodes.yaml) | 15 nodes, guide words and parameters |
 | [hazop/tabletop-2026-11-05.md](hazop/tabletop-2026-11-05.md) | internal tabletop record |
-| [registers/findings.yaml](registers/findings.yaml) | 19 findings |
-| [registers/hazards.yaml](registers/hazards.yaml) | 25 hazards |
-| [registers/improvements.yaml](registers/improvements.yaml) | 19 fixes/deferred items |
+| [registers/findings.yaml](registers/findings.yaml) | 21 findings |
+| [registers/hazards.yaml](registers/hazards.yaml) | 27 hazards |
+| [registers/improvements.yaml](registers/improvements.yaml) | 21 fixes/deferred items |
 | [registers/tests.yaml](registers/tests.yaml) | 36 suites, all `not_run` |
-| [registers/theorems.yaml](registers/theorems.yaml) | 2 Lean arithmetic theorems |
+| [registers/theorems.yaml](registers/theorems.yaml) | 106 Lean component-model theorems |
 | [traceability/matrix.md](traceability/matrix.md) | generated arm/hazard/finding/test matrix |
 
 ## What to read for the verdict

@@ -1,13 +1,129 @@
 {
   "generated_by": "spec/lean/RSure/Emit.lean",
   "vectors": {
-    "share_half": {
+    "book.register.twice": {
+      "input": "id=1",
+      "output": "none"
+    },
+    "claim.apply.partial-bound": {
+      "input": "amount=1200,claimed=1000",
+      "output": "none"
+    },
+    "claim.complex.second-first": {
+      "input": "caller=2",
+      "output": "none"
+    },
+    "claim.standard.lead": {
+      "input": "caller=1,lead=1",
+      "output": "ok:agreed,500"
+    },
+    "claim.terminal.reopen": {
+      "input": "settled",
+      "output": "ok:agreed,999"
+    },
+    "distribution.run.sum": {
+      "input": "1000,[4000,6000]",
+      "output": "1000"
+    },
+    "distribution.run.twice": {
+      "input": "planned",
+      "output": "none"
+    },
+    "fund.cover.cap": {
+      "input": "amount=600,max=500",
+      "output": "none"
+    },
+    "fund.cover.once": {
+      "input": "claim=7",
+      "output": "none"
+    },
+    "grant.consume.once": {
+      "input": "open",
+      "output": "none"
+    },
+    "line.pay.bound": {
+      "input": "exposure=500,amount=600",
+      "output": "none"
+    },
+    "line.pay.once": {
+      "input": "claim=7",
+      "output": "none"
+    },
+    "math.alloc.remainder": {
+      "input": "1001,[3333,3333,3334]",
+      "output": "1001"
+    },
+    "math.alloc.sum": {
+      "input": "1000,[5000,5000]",
+      "output": "1000"
+    },
+    "math.payable.aggregate": {
+      "input": "1000,2000,600,0",
+      "output": "600"
+    },
+    "math.payable.cap": {
+      "input": "1000,800,900,100",
+      "output": "700"
+    },
+    "math.payable.deduct": {
+      "input": "1000,800,900,900",
+      "output": "0"
+    },
+    "math.share.full": {
+      "input": "1000,10000",
+      "output": "1000"
+    },
+    "math.share.half": {
       "input": "1000,5000",
       "output": "500"
     },
-    "share_zero": {
-      "input": "0",
-      "output": "0"
+    "math.share.trunc": {
+      "input": "999,3333",
+      "output": "332"
+    },
+    "math.split.conserve": {
+      "input": "1000,1000,500",
+      "output": "100,50,850"
+    },
+    "policy.settle.aggregate": {
+      "input": "remaining=1000,payable=700",
+      "output": "ok:300"
+    },
+    "slip.bind.subscribed": {
+      "input": "[5000,5000]",
+      "output": "ok:bound"
+    },
+    "slip.bind.under": {
+      "input": "[5000,4000]",
+      "output": "none"
+    },
+    "slip.bind.unfunded": {
+      "input": "100,90",
+      "output": "none"
+    },
+    "slip.expire.refund": {
+      "input": "funded=100",
+      "output": "100"
+    },
+    "synd.openLine": {
+      "input": "1000,400,0,400",
+      "output": "ok:1000,0,400,600"
+    },
+    "synd.pay.free": {
+      "input": "1000,0,400,100",
+      "output": "ok:900,0,300,600"
+    },
+    "synd.quote.free": {
+      "input": "1000,0,0,400",
+      "output": "ok:1000,400,0,600"
+    },
+    "synd.quote.over": {
+      "input": "1000,0,0,1200",
+      "output": "none"
+    },
+    "synd.release.restore": {
+      "input": "1000,0,400",
+      "output": "ok:1000,0,0,1000"
     }
   }
 }

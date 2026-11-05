@@ -21,7 +21,8 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         unit-evidence unit-oracle unit-claim-lifecycle unit-claim-refusals unit-settlement \
         unit-shortfall unit-conservation unit-behavior unit-generality unit-share-reuse \
         integration-rcash integration-rgen integration-rshare unit-all \
-        lean-build lean-check vectors check-flows check-flows-strict formal-check \
+        lean-build lean-check vectors check-flows check-flows-strict check-claims \
+        formal-check \
         audit-check audit-trace audit-trace-check check-audit check-arm-inventory audit-dynamic \
         check-concurrency-audit check-composition-audit audit-scan \
         client-lint client-test client-wasm client-wasm-smoke client-gates client-check \
@@ -158,7 +159,10 @@ check-flows:
 check-flows-strict:
 	$(PY) tools/check_flows.py --strict
 
-formal-check: lean-check vectors check-flows check-flows-strict
+check-claims:
+	$(PY) tools/check_claims.py --check --strict-audit
+
+formal-check: lean-check vectors check-flows check-flows-strict check-claims
 
 audit-check: check-audit check-arm-inventory audit-trace-check check-concurrency-audit check-composition-audit
 
