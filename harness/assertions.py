@@ -14,6 +14,38 @@ import deploy as node  # noqa: E402
 
 MANIFEST = ROOT / "deployments" / "devnet.json"
 
+_STATE = {"passed": 0, "failed": 0, "covered": []}
+
+
+def cover(arm: str, scenario: str) -> None:
+    """Record that a suite asserted a component arm in a behaviour category."""
+    key = f"{arm}:{scenario}"
+    if key not in _STATE["covered"]:
+        _STATE["covered"].append(key)
+
+
+def _record(label: str, ok: bool, message: str = "") -> None:
+    if ok:
+        _STATE["passed"] += 1
+        print(f"  ok {label}")
+    else:
+        _STATE["failed"] += 1
+        detail = f"{label}: {message}" if message else label
+        print(f"  FAIL {detail}", file=sys.stderr)
+        raise AssertionError(detail)
+
+
+def summary() -> dict:
+    return {"assertions": _STATE["passed"] + _STATE["failed"],
+            "passed": _STATE["passed"], "failed": _STATE["failed"],
+            "covered_arms": list(_STATE["covered"])}
+
+
+def finish(suite: str) -> int:
+    payload = summary()
+    print("RSURE_RESULT " + json.dumps({"suite": suite, **payload}, sort_keys=True))
+    return 1 if payload["failed"] else 0
+
 
 def decode(value):
     if isinstance(value, list):
@@ -114,19 +146,24 @@ def root_call(binding: str, body: str | None = None) -> str:
 
 
 def expect(label: str, actual, expected) -> None:
-    if actual != expected:
-        raise AssertionError(f"{label}: expected {expected!r}, got {actual!r}")
-    print(f"  ok {label}")
+    _record(label, actual == expected,
+            f"expected {expected!r}, got {actual!r}")
 
 
 def expect_refusal(label: str, actual, reason: str) -> None:
-    if not (isinstance(actual, tuple) and len(actual) >= 2
-            and actual[0] is False and actual[1] == reason):
-        raise AssertionError(f"{label}: expected (false, {reason!r}), got {actual!r}")
-    print(f"  ok {label}")
+    ok = (isinstance(actual, tuple) and len(actual) >= 2
+          and actual[0] is False and actual[1] == reason)
+    _record(label, ok, f"expected (false, {reason!r}), got {actual!r}")
 
 
 def expect_ok(label: str, actual) -> None:
-    if not (isinstance(actual, tuple) and len(actual) >= 1 and actual[0] is True):
-        raise AssertionError(f"{label}: expected (true, ...), got {actual!r}")
-    print(f"  ok {label}")
+    ok = isinstance(actual, tuple) and len(actual) >= 1 and actual[0] is True
+    _record(label, ok, f"expected (true, ...), got {actual!r}")
+
+
+def expect_closed(label: str, actual, reason: str = "closed") -> None:
+    expect_refusal(label, actual, reason)
+
+
+def expect_delta(label: str, actual, expected) -> None:
+    expect(label, actual, expected)

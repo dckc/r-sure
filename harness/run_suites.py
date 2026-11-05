@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -16,6 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "deployments" / "suite-results.json"
+TIMEOUT = 900
+TRAILER = re.compile(r"^RSURE_RESULT (\{.*\})$", re.M)
 
 SUITES = {
     "root": "unit_root.py",
@@ -60,20 +63,52 @@ DEFAULT = list(SUITES)
 
 def run(name: str) -> dict:
     script = ROOT / "harness" / SUITES[name]
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    started = time.time()
     if not script.is_file():
         print(f"--- {name}: not_run (missing {script.name}) ---")
         return {"suite": name, "script": SUITES[name], "status": "not_run",
-                "returncode": 2, "seconds": 0, "output": "missing script"}
-    started = time.time()
-    proc = subprocess.run([sys.executable, str(script)], cwd=ROOT, text=True,
-                          capture_output=True)
-    output = (proc.stdout or "") + (proc.stderr or "")
-    status = "pass" if proc.returncode == 0 else "not_run" if proc.returncode == 2 else "fail"
-    print(f"--- {name}: {status} ({proc.returncode}) ---")
+                "returncode": 2, "seconds": 0, "output": "missing script",
+                "started_at": started_at, "assertions": 0, "covered_arms": [],
+                "env_reason": "missing suite script"}
+    try:
+        proc = subprocess.run([sys.executable, str(script)], cwd=ROOT, text=True,
+                              capture_output=True, timeout=TIMEOUT)
+        output = (proc.stdout or "") + (proc.stderr or "")
+        returncode = proc.returncode
+    except subprocess.TimeoutExpired as exc:
+        output = ((exc.stdout or "") if isinstance(exc.stdout, str) else "") + \
+                 ((exc.stderr or "") if isinstance(exc.stderr, str) else "")
+        returncode = 1
+        output += f"\ntimeout after {TIMEOUT}s"
+    trailer = None
+    match = TRAILER.search(output)
+    if match:
+        try:
+            trailer = json.loads(match.group(1))
+        except json.JSONDecodeError:
+            trailer = None
+    assertions = int(trailer.get("assertions", 0)) if trailer else 0
+    covered = list(trailer.get("covered_arms", [])) if trailer else []
+    env_reason = None
+    if returncode == 2:
+        reason = re.search(r"not_run:\s*(.+)", output)
+        env_reason = reason.group(1).strip() if reason else "suite reported not_run"
+    if returncode == 2:
+        status = "not_run"
+    elif returncode == 0 and trailer and assertions > 0 and trailer.get("failed", 0) == 0:
+        status = "pass"
+    else:
+        status = "fail"
+        if returncode == 0 and (not trailer or assertions == 0):
+            env_reason = "zero assertions (missing RSURE_RESULT trailer or empty suite)"
+    print(f"--- {name}: {status} ({returncode}) ---")
     print(output.rstrip())
     return {"suite": name, "script": SUITES[name], "status": status,
-            "returncode": proc.returncode, "seconds": round(time.time() - started, 3),
-            "output": output[-4000:]}
+            "returncode": returncode, "seconds": round(time.time() - started, 3),
+            "output": output[-4000:], "started_at": started_at,
+            "assertions": assertions, "covered_arms": covered,
+            "env_reason": env_reason}
 
 
 def main(argv: list[str] | None = None) -> int:

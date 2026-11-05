@@ -187,7 +187,7 @@ in {
     }
   } |
 
-  contract slipRefund(@s, purse, brand, ret) = {
+  contract slipRefund(@s, @purse, @brand, ret) = {
     if (s.get("funded") < 1) {
       ret!((true, Nil))
     } else {
@@ -202,7 +202,7 @@ in {
                   match f {
                     (true, facet) => {
                       new wCh in {
-                        purse!("withdraw", (*brand, s.get("funded")), *wCh) |
+                        @purse!("withdraw", (brand, s.get("funded")), *wCh) |
                         for (@w <- wCh) {
                           match w {
                             (true, payment) => {
@@ -313,7 +313,7 @@ in {
     }
   } |
 
-  contract slipFundDeposit(@s, @payment, purse, ret) = {
+  contract slipFundDeposit(@s, @payment, @purse, ret) = {
     new iCh2 in {
       slipResolve!("component:payments", *iCh2) |
       for (@p <- iCh2) {
@@ -333,7 +333,7 @@ in {
                               ret!((false, "amount"))
                             } else {
                               new dCh in {
-                                purse!("deposit", payment, *dCh) |
+                                @purse!("deposit", payment, *dCh) |
                                 for (@d <- dCh) {
                                   match d {
                                     (true, _) => { ret!((true, amount)) }
@@ -360,7 +360,7 @@ in {
   } |
 
   contract slipBindPolicy(@s, @keys, @policyId, slipToken, policyToken, claimToken,
-                          purse, brand, ret) = {
+                          @purse, @brand, ret) = {
     new tCh in {
       slipResolve!("component:terms", *tCh) |
       for (@t <- tCh) {
@@ -401,7 +401,7 @@ in {
                                            "termsHash": s.get("termsHash"),
                                            "premiumTotal": s.get("premiumTotal"),
                                            "lines": lines},
-                                          *purse, *brand, *policyToken, *claimToken, *pCh) |
+                                          purse, brand, *policyToken, *claimToken, *pCh) |
                                         for (@pr <- pCh) {
                                           match pr {
                                             (true, policyUri) => {
@@ -447,21 +447,20 @@ in {
     }
   } |
 
-  contract slipMake(@ownerId, @brokerId, @sid, @req, purse, brand, issuer,
+  contract slipMake(@ownerId, @brokerId, @sid, @req, @purse, @brand,
                     slipToken, policyToken, claimToken, ret) = {
-  new cfgOwnerId, cfgBrokerId, cfgSid, cfgReq, cfgPurse, cfgBrand, cfgIssuer,
+  new cfgOwnerId, cfgBrokerId, cfgSid, cfgReq, cfgPurse, cfgBrand,
       cfgSlipToken, cfgPolicyToken, cfgClaimToken in {
     cfgOwnerId!(ownerId) |
     cfgBrokerId!(brokerId) |
     cfgSid!(sid) |
     cfgReq!(req) |
-    cfgPurse!(*purse) |
-    cfgBrand!(*brand) |
-    cfgIssuer!(*issuer) |
+    cfgPurse!(purse) |
+    cfgBrand!(brand) |
     cfgSlipToken!(*slipToken) |
     cfgPolicyToken!(*policyToken) |
     cfgClaimToken!(*claimToken) |
-    for (@ownerIdV <- cfgOwnerId; @brokerIdV <- cfgBrokerId; @sidV <- cfgSid; @reqV <- cfgReq; purseV <- cfgPurse; brandV <- cfgBrand; issuerV <- cfgIssuer; slipTokenV <- cfgSlipToken; policyTokenV <- cfgPolicyToken; claimTokenV <- cfgClaimToken) {
+    for (@ownerIdV <- cfgOwnerId; @brokerIdV <- cfgBrokerId; @sidV <- cfgSid; @reqV <- cfgReq; @purseV <- cfgPurse; @brandV <- cfgBrand; slipTokenV <- cfgSlipToken; policyTokenV <- cfgPolicyToken; claimTokenV <- cfgClaimToken) {
 
     new Slip, slipState, uriCh in {
       slipState!({
@@ -577,7 +576,7 @@ in {
                 slipState!(s) | ret2!((false, "not insured"))
               } else {
                 new fCh in {
-                  slipFundDeposit!(s, payment, *purseV, *fCh) |
+                  slipFundDeposit!(s, payment, purseV, *fCh) |
                   for (@r <- fCh) {
                     match r {
                       (true, amount) => {
@@ -616,7 +615,7 @@ in {
                           policyId => {
                             new bCh in {
                               slipBindPolicy!(s, keys, policyId, *slipTokenV, *policyTokenV,
-                                              *claimTokenV, *purseV, *brandV, *bCh) |
+                                              *claimTokenV, purseV, brandV, *bCh) |
                               for (@r <- bCh) {
                                 match r {
                                   (true, policyUri) => {
@@ -661,7 +660,7 @@ in {
                             slipExpireQuotes!(keys, 0, s.get("shares"), *eqCh) |
                             for (@eq <- eqCh) {
                               new refCh in {
-                                slipRefund!(s, *purseV, *brandV, *refCh) |
+                                slipRefund!(s, purseV, brandV, *refCh) |
                                 for (@ref <- refCh) {
                                   match ref {
                                     (true, Nil) => {
@@ -767,41 +766,31 @@ in {
                                                     new iCh in {
                                                       @Payments!("issuer",
                                                         req.get("terms").get("assetId"), *iCh) |
-                                                      for (@i <- iCh) {
-                                                        match i {
-                                                          (true, brand, issuer) => {
-                                                            new puCh in {
-                                                              @issuer!("makeEmptyPurse", *puCh) |
-                                                              for (@pu <- puCh) {
-                                                                match pu {
-                                                                  (true, purse) => {
-                                                                    new slipToken, policyToken, claimToken, sidCh in {
-                                                                      nowHeight!(*sidCh) |
-                                                                      for (@h2 <- sidCh) {
-                                                                        match h2 {
-                                                                          (true, now) => {
-                                                                            match "slp:" ++ brokerId ++ ":" ++ now.toString() {
-                                                                              sid => {
-                                                                                slipMake!(ownerId, brokerId, sid,
-                                                                                  req.set("termsHash", termsHash)
-                                                                                     .set("class", req.get("class")),
-                                                                                  *purse, *brand, *issuer,
-                                                                                  *slipToken, *policyToken,
-                                                                                  *claimToken, *ret)
-                                                                              }
-                                                                            }
-                                                                          }
-                                                                          _ => { ret!(h2) }
-                                                                        }
+                                                      for (@(true, brand, issuer) <- iCh) {
+                                                        new puCh in {
+                                                          @issuer!("makeEmptyPurse", *puCh) |
+                                                          for (@(true, purse) <- puCh) {
+                                                            new slipToken, policyToken, claimToken, sidCh in {
+                                                              nowHeight!(*sidCh) |
+                                                              for (@h2 <- sidCh) {
+                                                                match h2 {
+                                                                  (true, now) => {
+                                                                    match "slp:" ++ brokerId ++ ":" ++ now.toString() {
+                                                                      sid => {
+                                                                        slipMake!(ownerId, brokerId, sid,
+                                                                          req.set("termsHash", termsHash)
+                                                                             .set("class", req.get("class")),
+                                                                          purse, brand,
+                                                                          *slipToken, *policyToken,
+                                                                          *claimToken, *ret)
                                                                       }
                                                                     }
                                                                   }
-                                                                  _ => { ret!(pu) }
+                                                                  _ => { ret!(h2) }
                                                                 }
                                                               }
                                                             }
                                                           }
-                                                          _ => { ret!(i) }
                                                         }
                                                       }
                                                     }

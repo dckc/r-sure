@@ -125,14 +125,14 @@ in {
     }
   } |
 
-  contract policyMake(@req, purse, brand, policyToken, claimToken, ret) = {
+  contract policyMake(@req, @purse, @brand, policyToken, claimToken, ret) = {
   new cfgReq, cfgPurse, cfgBrand, cfgPolicyToken, cfgClaimToken in {
     cfgReq!(req) |
-    cfgPurse!(*purse) |
-    cfgBrand!(*brand) |
+    cfgPurse!(purse) |
+    cfgBrand!(brand) |
     cfgPolicyToken!(*policyToken) |
     cfgClaimToken!(*claimToken) |
-    for (@reqV <- cfgReq; purseV <- cfgPurse; brandV <- cfgBrand; policyTokenV <- cfgPolicyToken; claimTokenV <- cfgClaimToken) {
+    for (@reqV <- cfgReq; @purseV <- cfgPurse; @brandV <- cfgBrand; policyTokenV <- cfgPolicyToken; claimTokenV <- cfgClaimToken) {
 
     new Policy, policyState, uriCh in {
       policyState!({
@@ -257,8 +257,8 @@ in {
                                                   match d {
                                                     (true, DistributionFactory) => {
                                                       new cCh in {
-                                                        @DistributionFactory!("create", *purseV,
-                                                          *brandV, s.get("assetId"),
+                                                        @DistributionFactory!("create", purseV,
+                                                          brandV, s.get("assetId"),
                                                           s.get("id"), s.get("premiumTotal"),
                                                           fullPlan, *policyTokenV, *cCh) |
                                                         for (@cr <- cCh) {
@@ -570,13 +570,13 @@ in {
   }
 } |
 
-  contract PolicyFactory(@"create", @req, purse, brand, policyToken, claimToken, ret) = {
+  contract PolicyFactory(@"create", @req, @purse, @brand, policyToken, claimToken, ret) = {
     new okCh in {
       policyReqOk!(req, *okCh) |
       for (@ok <- okCh) {
         match ok {
           (false, reason) => { ret!((false, reason)) }
-          (true, Nil) => { policyMake!(req, *purse, *brand, *policyToken, *claimToken, *ret) }
+          (true, Nil) => { policyMake!(req, purse, brand, *policyToken, *claimToken, *ret) }
         }
       }
     }
