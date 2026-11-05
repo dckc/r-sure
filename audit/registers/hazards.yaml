@@ -675,7 +675,7 @@ hazards:
   - kind: contributing
     cause: No regression test decoded a deeply nested Par, so the codec limit was never
       exercised on the RSpace path.
-    evidence: ../RNodeRust/rholang/tests/deep_par_codec.rs
+    evidence: audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   - kind: direct
     cause: The harness timed out the Pooled deploy and called manual propose, which raced
       the node proposer and hid the internal decode error.
@@ -821,7 +821,7 @@ hazards:
     evidence: ../RNodeRust/models/src/wire.rs
   - kind: contributing
     cause: The parser/normalizer depth contract was not documented in the codec layer.
-    evidence: ../RNodeRust/rholang/tests/deep_par_codec.rs
+    evidence: audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   consequences:
   - a valid deploy term can encode but not be read back
   - node proposer stalls on the next block
@@ -839,7 +839,7 @@ hazards:
   owner: platform-node
   evidence:
   - ../RNodeRust/models/Cargo.toml
-  - ../RNodeRust/rholang/tests/deep_par_codec.rs
+  - audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   arm: install@"codec"
 - id: HZ-033
   node: N18

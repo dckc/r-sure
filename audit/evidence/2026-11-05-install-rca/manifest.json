@@ -185,6 +185,20 @@
       "sha256": "af1e4eed88e8dd3428e76100d86667850787776341b1a24c80562153a07a36ef",
       "bytes": 326,
       "description": "Baseline node status: autopropose true, manualPropose false."
+    },
+    {
+      "path": "node/deep_par_codec.rs",
+      "role": "source",
+      "sha256": "786bb3aeca2e286cc347aab1b510b2327f4d8ca64c9a6244bb41c31757a55bc4",
+      "bytes": 1383,
+      "description": "Snapshot of the 130-deep Par codec regression added to the RNodeRust checkout; absent from the upstream commit CI checks out."
+    },
+    {
+      "path": "node/README.md",
+      "role": "source",
+      "sha256": "a768924564511db000229f8787d59022a346aae06d1fc83b0bd28a05947b411e",
+      "bytes": 664,
+      "description": "Provenance for the node evidence snapshot."
     }
   ],
   "commands": [

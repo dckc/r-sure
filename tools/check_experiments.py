@@ -30,7 +30,16 @@ def resolve(path_text: str) -> Path:
     candidate = Path(path_text)
     if candidate.is_absolute():
         return candidate
-    return ROOT / candidate
+    direct = ROOT / candidate
+    if direct.exists():
+        return direct
+    # Locally the node is a sibling checkout; CI checks it out inside the workspace.
+    parts = candidate.parts
+    if len(parts) >= 2 and parts[0] == ".." and parts[1] == "RNodeRust":
+        inside = ROOT.joinpath("RNodeRust", *parts[2:])
+        if inside.exists():
+            return inside
+    return direct
 
 
 def manifest_artifacts() -> set[Path]:

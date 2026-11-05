@@ -66,7 +66,7 @@ records:
       - event: no regression decoded a deep Par on the RSpace path
         gate: LEAF
         evidence:
-        - ../RNodeRust/rholang/tests/deep_par_codec.rs
+        - audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
     - event: the 12_risk deploy is rejected
       gate: AND
       evidence:
@@ -262,7 +262,7 @@ records:
         RNodeRust tree; this evidence set has no test execution log.
       evidence:
       - ../RNodeRust/models/Cargo.toml
-      - ../RNodeRust/rholang/tests/deep_par_codec.rs
+      - audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
     rcash_rail:
       result: partial
       detail: account factory installed; 51_pool refused with parse depth exceeded.
@@ -300,4 +300,4 @@ records:
   - contracts/src/deploy/13_slip.rho
   - ../RNodeRust/models/Cargo.toml
   - ../RNodeRust/models/src/wire.rs
-  - ../RNodeRust/rholang/tests/deep_par_codec.rs
+  - audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs

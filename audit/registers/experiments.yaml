@@ -56,8 +56,8 @@ experiments:
   rca: RCA-001
   question: Is there a regression test that exercises decode past the old limit?
   method: Inspect the added deep Par codec test and the builder it uses.
-  command: sed -n '1,80p' ../RNodeRust/rholang/tests/deep_par_codec.rs
-  artifact: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  command: sed -n '1,80p' audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
+  artifact: audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   result: pass
   observed: The test builds a 130-deep Par, above prost's default limit of 100, encodes
     it and asserts that decode succeeds.

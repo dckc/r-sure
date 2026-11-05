@@ -651,7 +651,7 @@ findings:
   - kind: source
     ref: ../RNodeRust/models/src/wire.rs
   - kind: test
-    ref: ../RNodeRust/rholang/tests/deep_par_codec.rs
+    ref: audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   - kind: rca
     ref: audit/registers/rca.yaml#RCA-001
   description: >-

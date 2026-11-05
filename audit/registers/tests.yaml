@@ -189,7 +189,7 @@ tests:
     assertion is claimed from it.'
 - id: T-038
   name: deep_par_codec
-  file: ../RNodeRust/rholang/tests/deep_par_codec.rs
+  file: audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
   status: not_run
   focus: 130-deep Par encode/decode round-trip added with prost no-recursion-limit.
     The test source is in the tree; its execution log is not part of this evidence
