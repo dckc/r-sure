@@ -2,7 +2,9 @@
 __pycache__/
 *.pyc
 .devnet/
+.demo/
 deployments/*.json
+deployments/.suite-results.lock
 !deployments/.gitkeep
 !deployments/catalogue.json
 .pytest_cache/

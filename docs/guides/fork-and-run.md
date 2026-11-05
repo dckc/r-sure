@@ -1,8 +1,9 @@
 # Fork and run
 
-> **Status:** Implemented (static gates); the devnet campaign is not run here.
+> **Status:** Implemented; the full suite passes on devnet. See
+> [Project status](../orientation/project-status.md).
 
-Prerequisites: Docker, Python 3.12+, Node 22 (for the web scaffold), an r-cash checkout at
+Prerequisites: Docker, Python 3.12+, Node 22 (for the web client), an r-cash checkout at
 `~/Rholphin` and r-gen at `~/RGen`.
 
 ```sh
@@ -14,7 +15,10 @@ make devnet
 make rcash-keys rcash-bootstrap
 make keys install
 make unit-all
+make web-install web-build
 ```
+
+The web client is described in [Use the web client](use-the-web-client.md).
 
 `RCASH_DIR`, `RGEN_DIR`, `RHOLO_DIR` and `NODE` override the defaults. The install order is in
 `configs/devnet.json` and `reference/install-order-and-keys.md`.

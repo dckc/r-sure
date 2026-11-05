@@ -3,5 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  build: { target: "es2022" },
+  server: { port: 5173 },
+  // The wasm module is emitted by wasm-pack into src/wasm/pkg.
+  optimizeDeps: { exclude: ["rsure_wasm"] },
 });

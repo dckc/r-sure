@@ -1,15 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { App } from "./App";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HashRouter } from "react-router-dom";
+import App from "./App";
 import "./styles.css";
 
-const root = document.getElementById("root");
-if (!root) {
-  throw new Error("missing #root");
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 4_000, refetchOnWindowFocus: false },
+  },
+});
 
-ReactDOM.createRoot(root).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("missing #root element");
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </QueryClientProvider>
   </React.StrictMode>,
 );

@@ -27,6 +27,7 @@
 # Guides
 
 - [Fork and run](guides/fork-and-run.md)
+- [Use the web client](guides/use-the-web-client.md)
 - [Place a risk](guides/place-a-risk.md)
 - [Bind a policy](guides/bind-a-policy.md)
 - [Notify and settle a claim](guides/notify-a-claim.md)
