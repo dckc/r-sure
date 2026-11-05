@@ -72,7 +72,8 @@ are assembled at runtime.
 
 `make local-reducer` goes one step further: it installs all 17 built terms in the node's
 own in-memory runtime, drives a syndicate, broker, risk, slip, bind, claim and settlement,
-and fails on a reduction error, a refusal or an unexpected state. It needs an RNodeRust
+runs 22 refusal vectors and fails on a reduction error, a wrong refusal or an unexpected
+state. It needs an RNodeRust
 checkout and `protoc`; see [Local reducer](local-reducer.md) for its fixtures and limits.
 
 The suite inventory is in `harness/run_suites.py`. A suite that has not been run must report

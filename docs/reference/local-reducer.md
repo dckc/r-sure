@@ -13,6 +13,13 @@ install order, then drives:
 4. subscribe, accept, fund the premium and bind;
 5. claim open, classify, assess, agree, settle and close.
 
+It then runs 22 refusal vectors and asserts the exact reason: bind one-shot, settle and
+classify after close, terminal agree and evidence, unknown component, duplicate register,
+non-installer register, duplicate syndicate and broker, admin replay and below-threshold,
+non-insured claim, loss outside the window, zero claim, blank and asset-less terms, settle
+before agreement, assess before classification, non-lead agree, and unknown policy/book
+claims.
+
 ## What it catches
 
 - Install-time normalizer failures: free variables, name/data sort errors, wildcard or
@@ -20,6 +27,8 @@ install order, then drives:
 - Registry and install wiring: every component must register under its key.
 - Call-shape and lifecycle errors: every step asserts a `true` reply and the expected
   state at the end (21 components, claim `closed`, `paid` 800).
+- Refusal drift: a changed guard or reason string fails the run, so the negative paths are
+  checked before the devnet campaign sees them.
 
 It caught the funding term's missing `wdCh` binder class of defect before any deploy, and
 it is the first place a malformed install term or a deadlocked arm fails without bringing
@@ -44,6 +53,8 @@ local-reducer: resolve component:clock -> (true, `rho:id:…`, 1)
 local-reducer: suremath share(1000, 250) -> (true, 25, 975)
 local-reducer: bound slp:… -> (true, `rho:id:…`)
 local-reducer: claim … settled and closed
+local-reducer: refused bind is one-shot -> closed
+local-reducer: refused non-lead agree -> not lead
 local-reducer: root keys -> 21 components
 ```
 

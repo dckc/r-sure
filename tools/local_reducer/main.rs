@@ -58,6 +58,10 @@ const ADMINS: [&str; 3] = [
 const PLATFORM: &str = "11112VYAt8rUGNRRZX3eJdgagaAhtWTK8Js7F7X5iqddMVqyDTtYau";
 
 fn deployer_key() -> Vec<u8> {
+    deployer_key_of(0)
+}
+
+fn deployer_key_of(index: usize) -> Vec<u8> {
     fn nibble(ch: char) -> u8 {
         match ch {
             '0'..='9' => ch as u8 - b'0',
@@ -66,7 +70,7 @@ fn deployer_key() -> Vec<u8> {
             _ => 0,
         }
     }
-    let hex = ADMINS[0].as_bytes();
+    let hex = ADMINS[index].as_bytes();
     hex.chunks(2)
         .map(|pair| (nibble(pair[0] as char) << 4) | nibble(pair[1] as char))
         .collect()
@@ -77,6 +81,7 @@ type Error = Box<dyn std::error::Error>;
 struct Reducer {
     runtime: RhoRuntime,
     deploy: usize,
+    deployer: Vec<u8>,
 }
 
 impl Reducer {
@@ -99,7 +104,15 @@ impl Reducer {
             seq_num: SeqNum::zero(),
             timestamp: 0,
         });
-        Ok(Self { runtime, deploy: 0 })
+        Ok(Self {
+            runtime,
+            deploy: 0,
+            deployer: deployer_key(),
+        })
+    }
+
+    fn set_deployer(&mut self, key: Vec<u8>) {
+        self.deployer = key;
     }
 
     /// Resolve a component key through the root and call one arm.
@@ -117,6 +130,18 @@ impl Reducer {
              for (Root <- rootCh) {{ Root!(\"resolve\", \"{key}\", 1, *resolveCh) }} | \
              for (@(true, uri, _) <- resolveCh) {{ \
                rl!(uri, *capCh) | for (Cap <- capCh) {{ Cap!(\"{arm}\"{args}, *reply) }} }} | \
+             for (@r <- reply) {{ deployId!(r) }} }}"
+        );
+        Ok(self.deploy(&term).await?.join(" "))
+    }
+
+    /// Call one arm on the root by URI.
+    async fn root_call(&mut self, root: &str, arm: &str, args: &str) -> Result<String, Error> {
+        let term = format!(
+            "new rl(`rho:registry:lookup`), rootCh, reply, \
+             dId(`rho:rchain:deployerId`), deployId(`rho:rchain:deployId`) in {{ \
+             rl!(`{root}`, *rootCh) | \
+             for (Root <- rootCh) {{ Root!(\"{arm}\"{args}, *reply) }} | \
              for (@r <- reply) {{ deployId!(r) }} }}"
         );
         Ok(self.deploy(&term).await?.join(" "))
@@ -141,7 +166,7 @@ impl Reducer {
         let mut env = BTreeMap::new();
         env.insert(
             "rho:rchain:deployerId".to_string(),
-            RhoDeployerId::apply(deployer_key()),
+            RhoDeployerId::apply(self.deployer.clone()),
         );
         env.insert(
             "rho:rchain:deployId".to_string(),
@@ -184,6 +209,18 @@ fn render(source: &str, root: &str, rcash: &str) -> String {
     .fold(source.to_string(), |text, (key, value)| {
         text.replace(key, value)
     })
+}
+
+fn expect_refusal(label: &str, reply: &str, reason: &str) -> Result<(), Error> {
+    let expected = format!("(false, \"{reason}\"");
+    if !reply.contains(&expected) {
+        return Err(std::io::Error::other(format!(
+            "{label}: expected refusal {reason:?}, got {reply}"
+        ))
+        .into());
+    }
+    println!("local-reducer: refused {label} -> {reason}");
+    Ok(())
 }
 
 fn first_quoted(text: &str) -> Option<String> {
@@ -465,6 +502,179 @@ async fn run() -> Result<(), Error> {
         return Err(std::io::Error::other(format!("claim info: {claim_info}")).into());
     }
     println!("local-reducer: claim settled and closed");
+
+    let rebind = reducer.uri_call(&slip_uri, "bind", "").await?;
+    expect_refusal("bind is one-shot", &rebind, "closed")?;
+
+    let late_settle = reducer.uri_call(&claim_uri, "settle", "").await?;
+    expect_refusal("settle after close", &late_settle, "not agreed")?;
+
+    let late_classify = reducer
+        .uri_call(&claim_uri, "classify", r#", *dId, "standard""#)
+        .await?;
+    expect_refusal("classify after close", &late_classify, "closed")?;
+
+    let unknown = reducer
+        .root_call(&root, "resolve", r#", "component:missing", 1"#)
+        .await?;
+    expect_refusal("unknown component", &unknown, "unknown component")?;
+
+    let duplicate = reducer
+        .root_call(
+            &root,
+            "register",
+            r#", "component:clock", "rho:id:local-duplicate", 1, "probe", *dId"#,
+        )
+        .await?;
+    expect_refusal("duplicate register", &duplicate, "duplicate")?;
+
+    reducer.set_deployer(deployer_key_of(1));
+    let unauthorised = reducer
+        .root_call(
+            &root,
+            "register",
+            r#", "probe:unauthorised", "rho:id:local-probe", 1, "probe", *dId"#,
+        )
+        .await?;
+    expect_refusal("non-installer register", &unauthorised, "not installer")?;
+    reducer.set_deployer(deployer_key());
+
+    let duplicate_syndicate = reducer
+        .component_call(&root, "component:syndicate-book", "create", syndicate_args)
+        .await?;
+    expect_refusal(
+        "duplicate syndicate",
+        &duplicate_syndicate,
+        "duplicate owner",
+    )?;
+
+    let duplicate_broker = reducer
+        .component_call(&root, "component:broker-book", "register", broker_args)
+        .await?;
+    expect_refusal("duplicate broker", &duplicate_broker, "duplicate owner")?;
+
+    let replay = reducer
+        .component_call(
+            &root,
+            "component:admin",
+            "admin",
+            r#", 0, "pauseAll", [], []"#,
+        )
+        .await?;
+    expect_refusal("admin replay", &replay, "replay")?;
+
+    let below_threshold = reducer
+        .component_call(
+            &root,
+            "component:admin",
+            "admin",
+            r#", 1, "pauseAll", [], []"#,
+        )
+        .await?;
+    expect_refusal("admin below threshold", &below_threshold, "below threshold")?;
+
+    let blank_terms = reducer
+        .component_call(&root, "component:terms", "validate", ", {}")
+        .await?;
+    expect_refusal("blank terms", &blank_terms, "class")?;
+
+    let assetless_terms = reducer
+        .component_call(
+            &root,
+            "component:terms",
+            "validate",
+            r#", {"coverageClass": "property"}"#,
+        )
+        .await?;
+    expect_refusal("terms without asset", &assetless_terms, "asset")?;
+
+    reducer.set_deployer(deployer_key_of(1));
+    let not_insured = reducer
+        .uri_call(&policy_uri, "openClaim", r#", *dId, {}"#)
+        .await?;
+    expect_refusal("non-insured claim", &not_insured, "not insured")?;
+    reducer.set_deployer(deployer_key());
+
+    let late_loss = reducer
+        .uri_call(
+            &policy_uri,
+            "openClaim",
+            r#", *dId, {"lossHeight": 1010000, "claimedAmount": 100, "evidence": []}"#,
+        )
+        .await?;
+    expect_refusal("loss after period", &late_loss, "notice")?;
+
+    let zero_claim = reducer
+        .uri_call(
+            &policy_uri,
+            "openClaim",
+            r#", *dId, {"lossHeight": 0, "claimedAmount": 0, "evidence": []}"#,
+        )
+        .await?;
+    expect_refusal("zero claim", &zero_claim, "amount")?;
+
+    let second = reducer
+        .uri_call(
+            &policy_uri,
+            "openClaim",
+            r#", *dId, {"lossHeight": 0, "claimedAmount": 500, "evidence": [{"kind": "loss", "hash": "loss:second"}]}"#,
+        )
+        .await?;
+    if !second.contains("true") {
+        return Err(std::io::Error::other(format!("second claim: {second}")).into());
+    }
+    let second_uri = find_uri(&second)
+        .ok_or_else(|| std::io::Error::other(format!("second claim: {second}")))?;
+    println!("local-reducer: second claim {second_uri}");
+
+    let early_settle = reducer.uri_call(&second_uri, "settle", "").await?;
+    expect_refusal("settle before agreement", &early_settle, "not agreed")?;
+
+    let early_assess = reducer
+        .uri_call(
+            &second_uri,
+            "assess",
+            r#", *dId, {"recommendedAmount": 500, "basisHash": "assessment"}"#,
+        )
+        .await?;
+    expect_refusal("assess before classify", &early_assess, "not manager")?;
+
+    let classified_second = reducer
+        .uri_call(&second_uri, "classify", r#", *dId, "standard""#)
+        .await?;
+    if !classified_second.contains("true") {
+        return Err(std::io::Error::other(format!("classify second: {classified_second}")).into());
+    }
+    reducer.set_deployer(deployer_key_of(1));
+    let non_lead = reducer
+        .uri_call(&second_uri, "agree", r#", *dId, 500, "agreement""#)
+        .await?;
+    expect_refusal("non-lead agree", &non_lead, "not lead")?;
+    reducer.set_deployer(deployer_key());
+
+    let terminal_agree = reducer
+        .uri_call(&claim_uri, "agree", r#", *dId, 100, "basis""#)
+        .await?;
+    expect_refusal("terminal agree", &terminal_agree, "closed")?;
+
+    let terminal_evidence = reducer
+        .uri_call(&claim_uri, "addEvidence", r#", *dId, []"#)
+        .await?;
+    expect_refusal("terminal evidence", &terminal_evidence, "closed")?;
+
+    let unknown_policy_claim = reducer
+        .uri_call(&policy_uri, "claim", r#", "clm:missing""#)
+        .await?;
+    expect_refusal(
+        "unknown policy claim",
+        &unknown_policy_claim,
+        "unknown claim",
+    )?;
+
+    let unknown_book_claim = reducer
+        .component_call(&root, "component:claim-book", "claim", r#", "clm:missing""#)
+        .await?;
+    expect_refusal("unknown book claim", &unknown_book_claim, "unknown claim")?;
     let keys = reducer.deploy(&keys).await?.join(" ");
     let registered = keys.matches("component:").count();
     if !keys.contains("true") || registered != 21 {
