@@ -1,23 +1,47 @@
-# r-sure — Lloyd's-style insurance primitives for rholo
+# r-sure — open insurance market rules for rholo
 
-**Devnet-only, unaudited, no real value. Not an insurer, not regulated, not affiliated with
-Lloyd's of London.**
+> **Experimental, devnet-only, no real money.** r-sure is not an insurer, is not regulated,
+> and is not affiliated with Lloyd's of London. The contracts are unaudited and the devnet
+> install is still blocked by an open bundle defect.
 
-r-sure is a suite of Rholang smart-contract primitives for the Lloyd's subscription market:
-syndicates with capacity, brokers, placing slips, lead and following subscriptions, policies,
-premium allocation, standard and complex claims, and pro-rata settlement. It settles premiums
-and payouts through [r-cash](https://github.com/rhovision-org/r-cash) (`~/Rholphin`) and
-consumes engineering evidence and adjudication from
-[r-gen](https://github.com/rhovision-org/r-gen) (`~/RGen`).
+## What is r-sure, in plain language
 
-The repository is a sibling of r-gen, r-share and r-cash. It follows their conventions:
-Rholang contracts with one state cell per object, a Rust client stack, a Python devnet
-harness, a Lean model, audit registers and an mdBook.
+r-sure is a set of open-source building blocks for running an insurance market on a
+blockchain. It is modelled on how Lloyd's of London works: a group of backers (called
+**syndicates**) put up capital, a **broker** places a risk for a customer, several backers
+share that risk, and the resulting **policy** pays out if a covered loss happens.
 
-**New to the domain?** Read the primer first: [insurance
-basics](docs/primer/insurance-basics.md), [Lloyd's for
-dummies](docs/primer/lloyds-for-dummies.md), and the [NAIC/CIPR design
-philosophy](docs/primer/design-philosophy.md).
+The code covers the whole insurance journey:
+
+- backers join a syndicate and reserve capacity;
+- a broker prepares a placing slip and the customer accepts it;
+- syndicates subscribe for a share of the risk;
+- the policy collects the premium and splits it between the broker, a central fund and the
+  syndicates;
+- a claim is reported, assessed and agreed, and each syndicate pays its share exactly once;
+- an optional independent evidence service can decide disputed engineering claims.
+
+It is designed to work with three sibling projects:
+
+- [r-cash](https://github.com/rhovision-org/r-cash) handles deposits and payments;
+- [r-gen](https://github.com/rhovision-org/r-gen) supplies engineering evidence, credentials
+  and dispute decisions;
+- [r-share](https://github.com/rhovision-org/r-share) can reuse r-sure's payment and policy
+  pieces for rentals and other cash-flow products.
+
+## Summary
+
+| Question | Answer |
+|---|---|
+| **What is it?** | Open-source insurance primitives written in Rholang for the rholo stack. |
+| **Who is it for?** | Developers, researchers and auditors exploring on-chain insurance. |
+| **What works today?** | Contracts, static/parser gates, Lean proofs of the core economics and internal audit registers. |
+| **What is not ready?** | No production deployment, no real funds, no independent audit; the devnet install is still blocked by an open bundle defect. |
+| **Where do I start?** | [Insurance basics](docs/primer/insurance-basics.md), then [Lloyd's for dummies](docs/primer/lloyds-for-dummies.md), then the [design philosophy](docs/primer/design-philosophy.md). |
+
+The repository follows the conventions of r-gen, r-share and r-cash: Rholang contracts with
+one state cell per object, a Rust client stack, a Python devnet harness, a Lean model, audit
+registers and an mdBook.
 
 ## What is here
 
