@@ -11,6 +11,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "pretest": "node scripts/build-wasm.mjs",
     "test:e2e": "npm run build && playwright test",
     "test:wasm": "node scripts/build-wasm.mjs && node tests/wasm-smoke.mjs",
     "wasm:build": "node scripts/build-wasm.mjs",
