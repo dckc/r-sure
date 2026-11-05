@@ -1,9 +1,5 @@
 # r-sure — open insurance market rules for rholo
 
-> **Experimental, devnet-only, no real money.** r-sure is not an insurer, is not regulated,
-> and is not affiliated with Lloyd's of London. The contracts are unaudited and the devnet
-> install is still blocked by an open bundle defect.
-
 ## What is r-sure, in plain language
 
 r-sure is a set of open-source building blocks for running an insurance market on a
@@ -35,13 +31,13 @@ It is designed to work with three sibling projects:
 |---|---|
 | **What is it?** | Open-source insurance primitives written in Rholang for the rholo stack. |
 | **Who is it for?** | Developers, researchers and auditors exploring on-chain insurance. |
-| **What works today?** | Contracts, static/parser gates, Lean proofs of the core economics and internal audit registers. |
-| **What is not ready?** | No production deployment, no real funds, no independent audit; the devnet install is still blocked by an open bundle defect. |
+| **What does it cover?** | Syndicate capital, broker placing, subscriptions, policies, premiums, claims and settlement. |
+| **How is it built?** | Rholang contracts, a Rust client stack, a React web client, a Python devnet harness, a Lean model and an mdBook. |
 | **Where do I start?** | [Insurance basics](docs/primer/insurance-basics.md), then [Lloyd's for dummies](docs/primer/lloyds-for-dummies.md), then the [design philosophy](docs/primer/design-philosophy.md). |
 
 The repository follows the conventions of r-gen, r-share and r-cash: Rholang contracts with
-one state cell per object, a Rust client stack, a Python devnet harness, a Lean model, audit
-registers and an mdBook.
+one state cell per object, a Rust client stack, a Python devnet harness, a Lean model and an
+mdBook.
 
 ## What is here
 
@@ -51,9 +47,8 @@ registers and an mdBook.
 | Rust workspace | `crates/rsure-core`, `rsure-keystore`, `rsure-sdk`, `rsure-cli`, `rsure-wasm` |
 | Web client | `web/` |
 | Devnet harness | `harness/` |
-| Static gates and tools | `tools/` |
+| Tools and checks | `tools/` |
 | Spec, flows and Lean | `spec/` |
-| Audit registers | `audit/` |
 | Book | `docs/` |
 
 ## Core primitives
@@ -76,31 +71,6 @@ registers and an mdBook.
 - **SureFund** — central fund levies and 2-of-3-gated, capped shortfall cover.
 - **PolicyBook / ClaimBook** — discovery indexes.
 
-## Status
-
-| Gate | State |
-|---|---|
-| Contracts build, measure, parse | 17 terms, 30 components, 19 state cells, all within the 56 KiB budget |
-| Static gates | `make spec-check`, `parse-check`, `docs-check`, `formal-check`, `audit-check` green |
-| Behavioural suites | 36 suites mapped; most are `not_run` until the devnet campaign |
-| Rust client | core/keystore/sdk/cli/wasm crates compile; 6 unit tests pass; SDK/CLI are scaffolds |
-| Web client | React/Vite scaffold; not installed or built here |
-| Lean model | 108 kernel-checked theorems over a shallow component model; 33 vectors; 11 proved-model flow rules; claims register 13 covered, 1 partial, 1 deferred, 1 tool |
-| Audit | 30/30 component concurrency reviews, 42 interfaces, 27 hazards, 21 findings; 1 of 2 P0s fixed; all 12 P1s fixed; tabletop HAZOP is internal |
-
-"Do not use real funds." The chain is pre-testnet and the contracts are unaudited.
-
-### Known install blocker
-
-A local devnet install reaches `16_fund.rho`; `10_syndicate.rho` is refused at deploy time
-with `Bundle's content must not have free variables or wildcards`. The 2026-11-05 audit found
-nine affected instance types (`LineGrant`, `Syndicate`, `Line`, `Slip`, `Policy`, `Claim`,
-`Distribution`, `Broker`, `Risk`), not just `Syndicate`/`LineGrant`. The fix is a closed
-publication/init pattern; it is recorded as open finding F-002 in `audit/registers/findings.yaml`
-and `audit/report.md`. The audit also fixed a P0 take-await-take defect in eight cornerstone
-arms. Static build/measure/parse and the Rust core/keystore tests pass; the devnet campaign is
-not green yet. The tabletop HAZOP is an internal simulation, not an independent audit.
-
 ## Integrations
 
 - **r-cash**: premiums are funded from an r-cash account into a policy-owned purse; claim
@@ -112,16 +82,10 @@ not green yet. The tabletop HAZOP is an internal simulation, not an independent 
   damage waiver can layer an r-sure policy above r-share's deposit/escrow flow. r-share is not
   modified by this repository.
 
-## Quickstart
+## Documentation
 
-```sh
-make venv
-make build-check measure-check spec-check parse-check
-make devnet rcash-keys rcash-bootstrap keys install
-make unit-all
-```
-
-See `docs/` for the book and `AGENTS.md` for the operating rules.
+The book in `docs/` covers the insurance primer, the Lloyd's model, placement, binding,
+claims and the contract reference. Developer notes are in `AGENTS.md`.
 
 ## License
 
