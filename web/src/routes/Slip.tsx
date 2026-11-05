@@ -16,7 +16,7 @@ export default function Slip() {
   const info = useUriRead<SlipState>(decoded, "info");
   const premium = useUriRead(decoded, "premium");
   const subs = useUriRead(decoded, "subscriptions");
-  const policy = useUriRead(decoded, "policy");
+  const policy = useUriRead<string | undefined>(decoded, "policy");
   const action = useAction("slip", decoded);
   const [syndicate, setSyndicate] = useState("");
   const [share, setShare] = useState("10000");
@@ -26,6 +26,7 @@ export default function Slip() {
   if (info.isLoading) return <Panel><p className="muted">Reading slip…</p></Panel>;
   if (info.error) return <Panel><p className="error">{String(info.error)}</p></Panel>;
   const entity = info.data ?? {};
+  const policyUri = typeof policy.data === "string" ? policy.data : undefined;
   const role = slipRole(entity, address);
   const write = (summary: string, arm: string, args: unknown[], ownerFirst = true) =>
     action.run(summary, () => client!.write_uri_json(decoded, arm, JSON.stringify(args), ownerFirst), [["read-uri", decoded]]);
@@ -105,7 +106,7 @@ export default function Slip() {
       </Panel>
 
       <Panel title={<h2>Policy</h2>}>
-        {policy.data ? <Link className="button ghost" to={`/policies/${encodeURIComponent(String(policy.data))}`}>Open policy</Link> : <p className="muted">Not bound yet.</p>}
+        {policyUri ? <Link className="button ghost" to={`/policies/${encodeURIComponent(policyUri)}`}>Open policy</Link> : <p className="muted">Not bound yet.</p>}
       </Panel>
 
       <Panel title={<h2>Raw state</h2>}><Json value={entity} /></Panel>

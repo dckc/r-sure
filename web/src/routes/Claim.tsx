@@ -6,7 +6,7 @@ import { Field, Json, Panel } from "../components/ui";
 import { claimManager } from "../lib/capabilities";
 import { useUriRead } from "../lib/chain";
 import { useWallet } from "../lib/store";
-import type { ClaimState } from "../lib/types";
+import type { ClaimState, State } from "../lib/types";
 import { useAction } from "../lib/useAction";
 
 export default function Claim() {
@@ -15,6 +15,10 @@ export default function Claim() {
   const { client, address } = useWallet();
   const info = useUriRead<ClaimState>(decoded, "info");
   const evidence = useUriRead(decoded, "evidence");
+  // Until classify runs, the claim has no stored managers. The contract derives them
+  // from the policy lines (line 0 is lead, line 1 is second), so read the same source.
+  const policyUri = typeof info.data?.policyUri === "string" ? info.data.policyUri : undefined;
+  const lines = useUriRead<State[]>(policyUri, "lines", [], { enabled: Boolean(policyUri) });
   const action = useAction("claim", decoded);
   const [kind, setKind] = useState("standard");
   const [recommended, setRecommended] = useState("1000");
@@ -27,7 +31,16 @@ export default function Claim() {
   if (info.isLoading) return <Panel><p className="muted">Reading claim…</p></Panel>;
   if (info.error) return <Panel><p className="error">{String(info.error)}</p></Panel>;
   const entity = info.data ?? {};
-  const manager = claimManager(entity, address);
+  const lineManagers = (Array.isArray(lines.data) ? lines.data : [])
+    .map((line) => (typeof line.manager === "string" ? line.manager : undefined))
+    .filter((manager): manager is string => Boolean(manager));
+  const manager = claimManager(
+    {
+      leadManager: entity.leadManager ?? lineManagers[0],
+      secondManager: entity.secondManager ?? lineManagers[1],
+    },
+    address,
+  );
   const write = (summary: string, arm: string, args: unknown[], ownerFirst = true) =>
     action.run(summary, () => client!.write_uri_json(decoded, arm, JSON.stringify(args), ownerFirst), [["read-uri", decoded]]);
 

@@ -6,6 +6,7 @@ import { networkForNode } from "./network";
 describe("chain reply helpers", () => {
   it("unwraps the protocol success tuple", () => {
     expect(unwrap([true, { id: "syn:1" }])).toEqual({ id: "syn:1" });
+    expect(unwrap([true])).toBeUndefined();
     expect(unwrap("bare")).toBe("bare");
   });
 

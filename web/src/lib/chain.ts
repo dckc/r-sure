@@ -6,7 +6,9 @@ import type { State, WriteEnvelope } from "./types";
 
 /** Contract arms usually reply `(true, value)`; peel that wrapper for state views. */
 export function unwrap<T = State>(data: unknown): T {
-  if (Array.isArray(data) && data[0] === true && data.length === 2) {
+  // `(true, value)` replies decode as `[true, value]`; `(true, Nil)` decodes as `[true]`,
+  // so the value slot is absent rather than a null placeholder.
+  if (Array.isArray(data) && data[0] === true && data.length <= 2) {
     return data[1] as T;
   }
   return data as T;

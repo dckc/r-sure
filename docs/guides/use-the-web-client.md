@@ -82,8 +82,10 @@ The pages follow the contract lifecycle, and each step links to the next:
 
 A policy page opens a claim (`openClaim`) with a loss height, amount and evidence hash.
 The claim page classifies, assesses, agrees, disputes, settles and closes; the lead and
-second managers are the only addresses allowed to act. Settlement pays each line exactly
-once and draws any shortfall from the central fund under its cap.
+second managers are the only addresses allowed to act. Before classification the claim has
+no stored managers, so the page reads them from the policy lines (the first line manager is
+lead, the second is second). Settlement pays each line exactly once and draws any shortfall
+from the central fund under its cap.
 
 The **Fund** page reads the fund balance and shortfalls and contributes REV. Fund cover
 and admin actions are 2-of-3 gated.

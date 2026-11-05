@@ -27,7 +27,7 @@ async function createWalletAndFund(page: Page) {
   await expect(page.getByText("Funded the r-cash account")).toBeVisible(FINALITY);
 }
 
-test("places a risk, binds a policy and reads it back", async ({ page }) => {
+test("places a risk, binds a policy and settles a claim", async ({ page }) => {
   await createWalletAndFund(page);
 
   await page.locator(".tabs").getByRole("link", { name: "Syndicates", exact: true }).click();
@@ -85,4 +85,26 @@ test("places a risk, binds a policy and reads it back", async ({ page }) => {
   await page.getByRole("link", { name: "Open policy" }).click();
   await expect(page).toHaveURL(/#\/policies\/rho%3Aid%3A/, FINALITY);
   await expect(page.getByRole("heading", { name: /Policy|pol:/ })).toBeVisible();
+
+  // A loss must fall inside the policy period and inside the notice window.
+  const status = await page.request.get("http://localhost:40403/api/v1/status");
+  const height = (await status.json()).latestBlockNumber as number;
+  await page.getByLabel("Loss height").fill(String(height));
+  await page.getByRole("button", { name: "Open claim" }).click();
+  await waitForReceipt(page);
+
+  await page.getByRole("link", { name: "open", exact: true }).click();
+  await expect(page).toHaveURL(/#\/claims\/rho%3Aid%3A/, FINALITY);
+
+  await page.getByRole("button", { name: "Classify" }).click();
+  await waitForReceipt(page);
+  await page.getByRole("button", { name: "Assess" }).click();
+  await waitForReceipt(page);
+  await page.getByRole("button", { name: "Agree" }).click();
+  await waitForReceipt(page);
+  await page.getByRole("button", { name: "Settle" }).click();
+  await waitForReceipt(page);
+  await page.getByRole("button", { name: "Close" }).click();
+  await waitForReceipt(page);
+  await expect(page.getByText(/closed/i).first()).toBeVisible(FINALITY);
 });
