@@ -3,6 +3,9 @@ import RSure.Model.Math
 import RSure.Model.Terms
 import RSure.Model.Types
 import RSure.Model.Boundary
+import RSure.Model.Root
+import RSure.Model.Admin
+import RSure.Model.Payments
 import RSure.Model.Grant
 import RSure.Model.Syndicate
 import RSure.Model.Line

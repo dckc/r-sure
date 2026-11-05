@@ -122,4 +122,108 @@ theorem line_invariant (s s' : LineState) (claimId amount : Nat) (tokenOk : Bool
     (hwf : LineWF s) (h : pay s claimId amount tokenOk = some s') :
     s'.paid ≤ s'.exposure := (line_pay_bounded s s' claimId amount tokenOk hwf h).1
 
+/-- `LineCredit@"credit"` deposits premium into the syndicate purse and records the local
+    credit. The local counter is proved; the native move is `ertp.native_total`. -/
+def credit (s : LineState) (tokenOk : Bool) (amount : Nat) :
+    Option (LineState × Nat) :=
+  if tokenOk then
+    if s.status = LineStatus.bound then
+      if amount < 1 then none
+      else
+        some ({ s with
+                 credited := s.credited + amount
+                 nonce := s.nonce + 1 }, amount)
+    else none
+  else none
+
+theorem line_credit_sound (s s' : LineState) (tokenOk : Bool) (amount paid : Nat)
+    (hwf : LineWF s) (h : credit s tokenOk amount = some (s', paid)) :
+    LineWF s' ∧ paid = amount ∧ s'.credited = s.credited + amount
+      ∧ s'.paid = s.paid ∧ s'.exposure = s.exposure := by
+  by_cases ht : tokenOk
+  · by_cases hs : s.status = LineStatus.bound
+    · by_cases ha : amount < 1
+      · simp [credit, ht, hs, ha] at h
+      · simp [credit, ht, hs, ha] at h
+        rcases h with ⟨rfl, rfl⟩
+        refine ⟨hwf, rfl, rfl, rfl, rfl⟩
+    · simp [credit, ht, hs] at h
+  · simp [credit, ht] at h
+
+/-- The credit conservation is conditional on the native total assumption. `nativeTotal`
+    is the caller-supplied proposition that the ERTP move behind the credit conserved
+    value; the local credited counter then moves by exactly the deposited amount. -/
+theorem line_credit_conserves (nativeTotal : Prop) (hn : nativeTotal)
+    (s s' : LineState) (tokenOk : Bool) (amount paid : Nat)
+    (h : credit s tokenOk amount = some (s', paid)) :
+    nativeTotal ∧ s'.credited = s.credited + amount ∧ paid = amount := by
+  by_cases ht : tokenOk
+  · by_cases hs : s.status = LineStatus.bound
+    · by_cases ha : amount < 1
+      · simp [credit, ht, hs, ha] at h
+      · simp [credit, ht, hs, ha] at h
+        rcases h with ⟨rfl, rfl⟩
+        exact ⟨hn, rfl, rfl⟩
+    · simp [credit, ht, hs] at h
+  · simp [credit, ht] at h
+
+theorem line_credit_refuses_token (s : LineState) (amount : Nat)
+    (h : tokenOk = false) : credit s tokenOk amount = none := by
+  simp [credit, h]
+
+theorem line_credit_refuses_released (s : LineState) (tokenOk : Bool) (amount : Nat)
+    (h : s.status = LineStatus.released) : credit s tokenOk amount = none := by
+  by_cases ht : tokenOk
+  · simp [credit, ht, h]
+  · simp [credit, ht]
+
+theorem line_credit_refuses_amount (s : LineState) (tokenOk : Bool) (amount : Nat)
+    (h : amount < 1) : credit s tokenOk amount = none := by
+  by_cases ht : tokenOk
+  · by_cases hs : s.status = LineStatus.bound
+    · simp [credit, ht, hs, h]
+    · simp [credit, ht, hs]
+  · simp [credit, ht]
+
+theorem line_pay_sound (s s' : LineState) (claimId amount : Nat) (tokenOk : Bool)
+    (hwf : LineWF s) (h : pay s claimId amount tokenOk = some s') :
+    LineWF s' ∧ s'.paid = s.paid + amount ∧ amount ≤ s.exposure - s.paid := by
+  have hp := line_pay_fields s s' claimId amount tokenOk h
+  exact ⟨line_pay_bounded s s' claimId amount tokenOk hwf h, hp.paid_eq, hp.amount_le⟩
+
+theorem line_pay_refuses_token (s : LineState) (claimId amount : Nat)
+    (h : tokenOk = false) : pay s claimId amount tokenOk = none := by
+  simp [pay, h]
+
+theorem line_pay_refuses_claim (s : LineState) (claimId amount : Nat) (tokenOk : Bool)
+    (h : lookup claimId s.paidFor ≠ none) :
+    pay s claimId amount tokenOk = none := by
+  by_cases ht : tokenOk
+  · by_cases hs : s.status = LineStatus.bound
+    · simp [pay, ht, hs, h]
+    · simp [pay, ht, hs]
+  · simp [pay, ht]
+
+theorem line_release_refuses_token (s : LineState)
+    (h : tokenOk = false) : release s tokenOk = none := by
+  simp [release, h]
+
+def payableLine : LineState where
+  exposure := 500
+  paid := 0
+  credited := 0
+  paidFor := []
+  nonce := 0
+  status := LineStatus.bound
+
+theorem line_pay_reachable :
+    ∃ s', pay payableLine 7 100 true = some s' ∧ s'.paid = 100 := by
+  refine ⟨{ payableLine with paid := 100, paidFor := [(7, 100)], nonce := 1 }, ?_, rfl⟩
+  simp [pay, payableLine, lookup]
+
+theorem line_credit_reachable :
+    ∃ s' paid, credit payableLine true 100 = some (s', paid) ∧ paid = 100 := by
+  refine ⟨{ payableLine with credited := 100, nonce := 1 }, 100, ?_, rfl⟩
+  simp [credit, payableLine]
+
 end RSure.Model.Line

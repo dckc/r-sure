@@ -170,4 +170,54 @@ theorem math_lineExposures_sums (aggregate : Nat) (bpses : List Nat)
     sumNat (alloc aggregate bpses) = aggregate :=
   math_alloc_sums aggregate bpses h
 
+/-! The deployed `SureMath@"payable"` arm has two refusal branches: a negative-input
+    branch and an `aggregate` branch that fires when the computed payable exceeds the
+    remaining aggregate. On the model's non-negative `Nat` inputs the second branch is
+    unreachable, and the arm agrees with `payable`. -/
+
+def payableGuarded (badInput : Bool) (agreed perClaim aggregate deductible : Nat) :
+    Option Nat :=
+  if badInput then none
+  else if payable agreed perClaim aggregate deductible > aggregate then none
+  else some (payable agreed perClaim aggregate deductible)
+
+theorem math_payableGuarded_agrees (agreed perClaim aggregate deductible p : Nat)
+    (h : payableGuarded false agreed perClaim aggregate deductible = some p) :
+    p = payable agreed perClaim aggregate deductible := by
+  by_cases hgt : payable agreed perClaim aggregate deductible > aggregate
+  · simp [payableGuarded, hgt] at h
+  · simp [payableGuarded, hgt] at h
+    exact h.symm
+
+theorem math_payableGuarded_refuses_bad (agreed perClaim aggregate deductible : Nat)
+    (h : badInput = true) :
+    payableGuarded badInput agreed perClaim aggregate deductible = none := by
+  simp [payableGuarded, h]
+
+/-- The `aggregate` refusal branch is unreachable for non-negative inputs: the payable is
+    by construction at most the remaining aggregate. -/
+theorem math_payableGuarded_aggregate_unreachable (agreed perClaim aggregate deductible : Nat)
+    (h : payable agreed perClaim aggregate deductible > aggregate) : False := by
+  have hle := math_payable_le_aggregate agreed perClaim aggregate deductible
+  omega
+
+theorem math_payableGuarded_accepts (agreed perClaim aggregate deductible : Nat) :
+    payableGuarded false agreed perClaim aggregate deductible
+      = some (payable agreed perClaim aggregate deductible) := by
+  have hle := math_payable_le_aggregate agreed perClaim aggregate deductible
+  simp [payableGuarded, hle]
+
+theorem math_payableGuarded_sound (agreed perClaim aggregate deductible p : Nat)
+    (h : payableGuarded false agreed perClaim aggregate deductible = some p) :
+    p ≤ agreed ∧ p ≤ perClaim ∧ p ≤ aggregate := by
+  have hp := math_payableGuarded_agrees agreed perClaim aggregate deductible p h
+  constructor
+  · rw [hp]
+    exact math_payable_le_agreed _ _ _ _
+  constructor
+  · rw [hp]
+    exact math_payable_le_perClaim _ _ _ _
+  · rw [hp]
+    exact math_payable_le_aggregate _ _ _ _
+
 end RSure.Model.Math

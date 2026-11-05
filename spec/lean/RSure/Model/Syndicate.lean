@@ -209,4 +209,118 @@ theorem synd_capacity_invariant (s s' : SyndicateState) (a : QuoteArgs)
     (hwf : SyndicateWF s) (h : quote s a = some s') : SyndicateWF s' :=
   (synd_quote_WF s s' a hwf h).1
 
+theorem synd_quote_sound (s s' : SyndicateState) (a : QuoteArgs)
+    (hwf : SyndicateWF s) (h : quote s a = some s') :
+    SyndicateWF s' ∧ free s' = free s - a.exposure := by
+  have hq := synd_quote_WF s s' a hwf h
+  exact ⟨hq.1, hq.2.2.2⟩
+
+theorem synd_quote_refuses_manager (s : SyndicateState) (a : QuoteArgs)
+    (h : a.manager = false) : quote s a = none := by
+  simp [quote, h]
+
+theorem synd_quote_refuses_inactive (s : SyndicateState) (a : QuoteArgs)
+    (h : s.status ≠ SyndicateStatus.active) : quote s a = none := by
+  by_cases hm : a.manager
+  · simp [quote, hm, h]
+  · simp [quote, hm]
+
+theorem synd_openLine_sound (s s' : SyndicateState) (exposure : Nat) (grantOk : Bool)
+    (hwf : SyndicateWF s) (h : openLine s exposure grantOk = some s') :
+    SyndicateWF s' ∧ s'.written = s.written + exposure := by
+  have ho := synd_openLine_WF s s' exposure grantOk hwf h
+  exact ⟨ho.1, ho.2.2.1⟩
+
+theorem synd_openLine_refuses_grant (s : SyndicateState) (exposure : Nat)
+    (h : grantOk = false) : openLine s exposure grantOk = none := by
+  simp [openLine, h]
+
+theorem synd_openLine_refuses_range (s : SyndicateState) (exposure : Nat) (grantOk : Bool)
+    (h : exposure < 1 ∨ exposure > s.committed) :
+    openLine s exposure grantOk = none := by
+  by_cases hg : grantOk
+  · have hb : (exposure < 1 || exposure > s.committed) = true := by
+      rcases h with h | h
+      · simp [h]
+      · simp [h]
+    simp [openLine, hg, hb]
+  · simp [openLine, hg]
+
+structure Quote where
+  grantId : Nat
+  exposure : Nat
+  expiryHeight : Nat
+  deriving DecidableEq, Repr
+
+structure QuoteBook where
+  committed : Nat
+  quotes : List Quote
+  nowHeight : Nat
+  nonce : Nat
+  deriving DecidableEq, Repr
+
+def lookupQuote (grantId : Nat) : List Quote → Option Quote
+  | [] => none
+  | q :: rest => if grantId = q.grantId then some q else lookupQuote grantId rest
+
+def QuoteBookWF (s : QuoteBook) : Prop := ∀ q, q ∈ s.quotes → 0 < q.exposure
+
+/-- `Syndicate@"expireQuote"` releases the reserved exposure when the quote window has
+    passed. The model proves the release can never increase `committed`. -/
+def expireQuote (s : QuoteBook) (grantId : Nat) : Option QuoteBook :=
+  match lookupQuote grantId s.quotes with
+  | none => none
+  | some q =>
+      if s.nowHeight ≤ q.expiryHeight then none
+      else some { s with
+        committed := s.committed - q.exposure
+        nonce := s.nonce + 1 }
+
+theorem synd_expireQuote_sound (s s' : QuoteBook) (grantId : Nat)
+    (hwf : QuoteBookWF s) (h : expireQuote s grantId = some s') :
+    QuoteBookWF s' ∧ s'.committed ≤ s.committed ∧ s'.nonce = s.nonce + 1
+      ∧ s'.quotes = s.quotes := by
+  cases hq : lookupQuote grantId s.quotes with
+  | none => simp [expireQuote, hq] at h
+  | some q =>
+      by_cases he : s.nowHeight ≤ q.expiryHeight
+      · simp [expireQuote, hq, he] at h
+      · simp [expireQuote, hq, he] at h
+        subst s'
+        refine ⟨?_, Nat.sub_le _ _, rfl, rfl⟩
+        simpa using hwf
+
+theorem synd_expireQuote_refuses_unknown (s : QuoteBook) (grantId : Nat)
+    (h : lookupQuote grantId s.quotes = none) : expireQuote s grantId = none := by
+  simp [expireQuote, h]
+
+theorem synd_expireQuote_refuses_live (s : QuoteBook) (grantId : Nat) (q : Quote)
+    (h : lookupQuote grantId s.quotes = some q) (he : s.nowHeight ≤ q.expiryHeight) :
+    expireQuote s grantId = none := by
+  simp [expireQuote, h, he]
+
+def freshSyndicate : SyndicateState where
+  capital := 1000
+  committed := 0
+  written := 0
+  premiums := 0
+  claimsPaid := 0
+  nonce := 0
+  status := SyndicateStatus.active
+
+def freshQuoteArgs : QuoteArgs where
+  manager := true
+  classOk := true
+  shareBps := 5000
+  exposure := 400
+  expiryHeight := 100
+  nowHeight := 1
+
+theorem synd_reachable :
+    ∃ s', quote freshSyndicate freshQuoteArgs = some s' ∧ free s' = 600 := by
+  refine ⟨{ freshSyndicate with committed := 400, nonce := 1 }, ?_⟩
+  constructor
+  · simp [quote, freshQuoteArgs, freshSyndicate, free, BPS]
+  · simp [free, freshSyndicate]
+
 end RSure.Model.Syndicate

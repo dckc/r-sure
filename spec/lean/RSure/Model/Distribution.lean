@@ -86,4 +86,37 @@ theorem distribution_run_sums (s s' : DistributionState) (base : Nat) (bpses : L
   rw [distribution_run_preserves_plan s s' h, hp]
   exact distribution_plan_sums base bpses hfit
 
+theorem distribution_plan_sound (s : DistributionState) (base : Nat) (bpses : List Nat)
+    (hp : s.plan = buildPlan base bpses) (hfit : allocFits base bpses 0) :
+    sumPlan s.plan = base := by
+  rw [hp]
+  exact distribution_plan_sums base bpses hfit
+
+theorem distribution_run_sound (s s' : DistributionState)
+    (h : run s = some s') :
+    s'.status = DistributionStatus.paid ∧ s'.plan = s.plan
+      ∧ s'.nonce = s.nonce + 1 := by
+  by_cases hp : s.status = DistributionStatus.paid
+  · simp [run, hp] at h
+  · simp [run, hp] at h
+    subst s'
+    exact ⟨rfl, rfl, rfl⟩
+
+theorem distribution_run_refuses (s : DistributionState)
+    (h : s.status = DistributionStatus.paid) : run s = none := by
+  simp [run, h]
+
+def achievableDistribution : DistributionState where
+  base := 1000
+  plan := buildPlan 1000 [4000, 6000]
+  status := DistributionStatus.planned
+  nonce := 0
+
+theorem distribution_reachable :
+    ∃ s', run achievableDistribution = some s'
+      ∧ s'.status = DistributionStatus.paid := by
+  refine ⟨{ achievableDistribution with status := DistributionStatus.paid, nonce := 1 },
+    ?_, rfl⟩
+  simp [run, achievableDistribution]
+
 end RSure.Model.Distribution

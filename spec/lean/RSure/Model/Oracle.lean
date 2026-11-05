@@ -1,4 +1,5 @@
 import RSure.Model.Types
+import RSure.Model.Claim
 
 namespace RSure.Model.Oracle
 
@@ -93,5 +94,115 @@ theorem oracle_close_requires_finished (s s' : OracleState)
   by_cases he : s.status = OracleStatus.executed
   · exact he
   · simp [close, he] at h
+
+/-! CP-14 OracleDecision. `RgenAdapter` verifies a credential or claim URI before the
+    claim's `applyCap` can execute a decision. The adapter stores allow-listed URIs; the
+    model proves the negative path (disabled or unregistered refuses) and the positive
+    path (a verified decision is bound to the claim's oracle case). The r-gen truth of a
+    credential is the `rgen.oracle_binding` boundary. -/
+
+structure AdapterState where
+  enabled : Bool
+  strict : Bool
+  credentials : List Nat
+  claims : List Nat
+  nonce : Nat
+  deriving DecidableEq, Repr
+
+def contains (k : Nat) : List Nat → Bool
+  | [] => false
+  | k' :: ks => if k = k' then true else contains k ks
+
+def verifyCredential (s : AdapterState) (uri : Nat) : Option Nat :=
+  if s.enabled = false then none
+  else if s.strict then
+    if contains uri s.credentials then some uri else none
+  else some uri
+
+def verifyClaim (s : AdapterState) (uri : Nat) : Option Nat :=
+  if s.enabled = false then none
+  else if s.strict then
+    if contains uri s.claims then some uri else none
+  else some uri
+
+theorem adapter_verifyCredential_sound (s : AdapterState) (uri verified : Nat)
+    (h : verifyCredential s uri = some verified) :
+    s.enabled = true ∧ (s.strict = true → contains uri s.credentials = true) := by
+  by_cases he : s.enabled = false
+  · simp [verifyCredential, he] at h
+  · have hen : s.enabled = true := by
+      cases hb : s.enabled <;> simp_all
+    refine ⟨hen, ?_⟩
+    intro hstrict
+    by_cases hc : contains uri s.credentials
+    · exact hc
+    · simp [verifyCredential, he, hstrict, hc] at h
+
+theorem adapter_verifyClaim_sound (s : AdapterState) (uri verified : Nat)
+    (h : verifyClaim s uri = some verified) :
+    s.enabled = true ∧ (s.strict = true → contains uri s.claims = true) := by
+  by_cases he : s.enabled = false
+  · simp [verifyClaim, he] at h
+  · have hen : s.enabled = true := by
+      cases hb : s.enabled <;> simp_all
+    refine ⟨hen, ?_⟩
+    intro hstrict
+    by_cases hc : contains uri s.claims
+    · exact hc
+    · simp [verifyClaim, he, hstrict, hc] at h
+
+theorem adapter_refuses_disabled (s : AdapterState) (uri : Nat)
+    (h : s.enabled = false) : verifyClaim s uri = none := by
+  simp [verifyClaim, h]
+
+theorem adapter_refuses_disabled_credential (s : AdapterState) (uri : Nat)
+    (h : s.enabled = false) : verifyCredential s uri = none := by
+  simp [verifyCredential, h]
+
+theorem adapter_refuses_unregistered (s : AdapterState) (uri : Nat)
+    (h : s.strict = true) (hc : contains uri s.claims = false) :
+    verifyClaim s uri = none := by
+  by_cases he : s.enabled = false
+  · simp [verifyClaim, he]
+  · simp [verifyClaim, he, h, hc]
+
+theorem adapter_refuses_unregistered_credential (s : AdapterState) (uri : Nat)
+    (h : s.strict = true) (hc : contains uri s.credentials = false) :
+    verifyCredential s uri = none := by
+  by_cases he : s.enabled = false
+  · simp [verifyCredential, he]
+  · simp [verifyCredential, he, h, hc]
+
+/-- `applyCap@"applyDecision"` is exactly the claim adjudication step. -/
+def applyCap (s : Claim.ClaimState) (caseId : Nat) (outcome : Claim.DecisionOutcome)
+    (amount : Nat) : Option Claim.ClaimState :=
+  Claim.applyDecision s caseId outcome amount
+
+theorem oracle_applyCap_sound (s s' : Claim.ClaimState) (caseId : Nat)
+    (outcome : Claim.DecisionOutcome) (amount : Nat)
+    (hwf : Claim.ClaimWF s) (h : applyCap s caseId outcome amount = some s') :
+    Claim.ClaimWF s' ∧ s.oracleCase = some caseId :=
+  Claim.claim_applyDecision_sound s s' caseId outcome amount hwf h
+
+theorem oracle_decision_sound (a : AdapterState) (uri verified : Nat)
+    (s s' : Claim.ClaimState) (caseId : Nat) (outcome : Claim.DecisionOutcome)
+    (amount : Nat) (hv : verifyClaim a uri = some verified)
+    (hwf : Claim.ClaimWF s) (h : applyCap s caseId outcome amount = some s') :
+    a.enabled = true ∧ s.oracleCase = some caseId := by
+  have ha := adapter_verifyClaim_sound a uri verified hv
+  have hc := oracle_applyCap_sound s s' caseId outcome amount hwf h
+  exact ⟨ha.1, hc.2⟩
+
+def rgenAdapter : AdapterState where
+  enabled := true
+  strict := true
+  credentials := [11]
+  claims := [22]
+  nonce := 0
+
+theorem adapter_reachable :
+    ∃ verified, verifyClaim rgenAdapter 22 = some verified := by
+  refine ⟨22, ?_⟩
+  simp [verifyClaim, rgenAdapter, contains]
 
 end RSure.Model.Oracle

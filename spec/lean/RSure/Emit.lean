@@ -42,8 +42,8 @@ def showLine : Option Model.Line.LineState → String
       s!"ok:{s.paid},{st}"
 
 def slip (prem funded : Nat) (shares : List Nat) : Model.Slip.SlipState :=
-  { premiumTotal := prem, funded := funded, shares := shares, insuredAccepted := true,
-    status := SlipStatus.subscribed, nonce := 0 }
+  { premiumTotal := prem, funded := funded, shares := shares, insured := 1,
+    insuredAccepted := true, status := SlipStatus.subscribed, nonce := 0 }
 
 def showSlip : Option Model.Slip.SlipState → String
   | none => "none"
@@ -78,7 +78,8 @@ def showPolicy : Option Model.Policy.PolicyState → String
   | some s => s!"ok:{s.aggregateRemaining}"
 
 def fund (bal cap : Nat) : Model.Fund.FundState :=
-  { balance := bal, maxCover := cap, covers := [], govNonce := 0 }
+  { balance := bal, maxCover := cap, covers := [], contributions := [], admins := 3,
+    threshold := 2, nonce := 0, govNonce := 0 }
 
 def showFund : Option (Model.Fund.FundState × Nat) → String
   | none => "none"

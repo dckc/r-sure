@@ -1,0 +1,288 @@
+# Critical-path arm -> Lean flow manifest. One rule per critical arm named in
+# spec/critical-path.yaml. Every target is a theorem about the shallow component model;
+# none is a Rholang refinement.
+schema: rsure.flows/v1
+source_globs:
+  - contracts/src/deploy
+
+rules:
+  - id: C-001
+    arm: 'SureRoot@"register"'
+    source: contracts/src/deploy/00_root.rho
+    lean: RSure.Model.Root.root_register_sound
+    lean_status: proved-model
+    invariants: []
+    note: installer gate, non-frozen, unique key, positive version
+  - id: C-002
+    arm: 'SureRoot@"rotate"'
+    source: contracts/src/deploy/00_root.rho
+    lean: RSure.Model.Root.root_rotate_sound
+    lean_status: proved-model
+    invariants: []
+    note: fresh governance nonce, verified admin, expected version
+  - id: C-003
+    arm: 'SureRoot@"freeze"'
+    source: contracts/src/deploy/00_root.rho
+    lean: RSure.Model.Root.root_freeze_sound
+    lean_status: proved-model
+    invariants: []
+    note: freeze is authority-gated and terminal for registration
+  - id: C-004
+    arm: 'SureRoot@"admin"'
+    source: contracts/src/deploy/00_root.rho
+    lean: RSure.Model.Root.root_admin_sound
+    lean_status: proved-model
+    invariants: []
+    note: quorum rotation preserves the RootWF quorum invariant
+  - id: C-005
+    arm: 'AdminGuard@"verify"'
+    source: contracts/src/deploy/02_admin.rho
+    lean: RSure.Model.Admin.admin_verify_sound
+    lean_status: proved-model
+    invariants: [INV-12]
+    note: verification requires the threshold signature count
+  - id: C-006
+    arm: 'SureAdmin@"admin"'
+    source: contracts/src/deploy/02_admin.rho
+    lean: RSure.Model.Admin.admin_sound
+    lean_status: proved-model
+    invariants: [INV-12]
+    note: fresh nonce, threshold, quorum-preserving action
+  - id: C-007
+    arm: 'SureAdmin@"isPaused"'
+    source: contracts/src/deploy/02_admin.rho
+    lean: RSure.Model.Admin.admin_isPaused_truthful
+    lean_status: proved-model
+    invariants: [INV-12]
+    note: pause is a truthful projection of admin state
+  - id: C-008
+    arm: 'Payments@"issuer"'
+    source: contracts/src/deploy/40_payments.rho
+    lean: RSure.Model.Payments.payments_issuer_sound
+    lean_status: proved-model
+    invariants: [INV-6]
+    note: only an allow-listed asset resolves to an issuer
+  - id: C-009
+    arm: 'Payments@"depositFacet"'
+    source: contracts/src/deploy/40_payments.rho
+    lean: RSure.Model.Payments.payments_depositFacet_sound
+    lean_status: proved-model
+    invariants: [INV-6]
+    note: facet only for an allowed asset and a registered account
+  - id: C-010
+    arm: 'Payments@"ensureAccount"'
+    source: contracts/src/deploy/40_payments.rho
+    lean: RSure.Model.Payments.payments_ensureAccount_sound
+    lean_status: proved-model
+    invariants: [INV-6]
+    note: non-zero owner, registered once, idempotent
+  - id: C-011
+    arm: 'Syndicate@"quote"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean: RSure.Model.Syndicate.synd_quote_sound
+    lean_status: proved-model
+    invariants: [INV-1, INV-7]
+    note: capacity reservation
+  - id: C-012
+    arm: 'Syndicate@"openLine"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean: RSure.Model.Syndicate.synd_openLine_sound
+    lean_status: proved-model
+    invariants: [INV-1, INV-7]
+    note: committed -> written, free unchanged
+  - id: C-013
+    arm: 'Syndicate@"expireQuote"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean: RSure.Model.Syndicate.synd_expireQuote_sound
+    lean_status: proved-model
+    invariants: [INV-1]
+    note: release cannot increase committed
+  - id: C-014
+    arm: 'LineGrant@"consume"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean: RSure.Model.Grant.grant_consume_sound
+    lean_status: proved-model
+    invariants: [INV-2, INV-8]
+    note: holder and term binding, one-shot
+  - id: C-015
+    arm: 'Slip@"accept"'
+    source: contracts/src/deploy/13_slip.rho
+    lean: RSure.Model.Slip.slip_accept_sound
+    lean_status: proved-model
+    invariants: [INV-2]
+    note: insured-only acceptance before binding
+  - id: C-016
+    arm: 'Slip@"subscribe"'
+    source: contracts/src/deploy/13_slip.rho
+    lean: RSure.Model.Slip.slip_subscribe_sound
+    lean_status: proved-model
+    invariants: [INV-2]
+    note: bounded share, grant-gated
+  - id: C-017
+    arm: 'Slip@"fundPremium"'
+    source: contracts/src/deploy/13_slip.rho
+    lean: RSure.Model.Slip.slip_fund_sound
+    lean_status: proved-model
+    invariants: [INV-2]
+    note: insured-only local funding
+  - id: C-018
+    arm: 'Slip@"expire"'
+    source: contracts/src/deploy/13_slip.rho
+    lean: RSure.Model.Slip.slip_expire_sound
+    lean_status: proved-model
+    invariants: [INV-10]
+    note: bound slips cannot expire; credit equals funded
+  - id: C-019
+    arm: 'Slip@"bind"'
+    source: contracts/src/deploy/13_slip.rho
+    lean: RSure.Model.Slip.slip_bind_sound
+    lean_status: proved-model
+    invariants: [INV-2, INV-3, INV-4]
+    note: accepted, fully funded, shares sum to 10000 bps
+  - id: C-020
+    arm: 'Line@"pay"'
+    source: contracts/src/deploy/14_line.rho
+    lean: RSure.Model.Line.line_pay_sound
+    lean_status: proved-model
+    invariants: [INV-7, INV-8]
+    note: bounded and once per claim
+  - id: C-021
+    arm: 'Line@"release"'
+    source: contracts/src/deploy/14_line.rho
+    lean: RSure.Model.Line.line_release_restores
+    lean_status: proved-model
+    invariants: [INV-7]
+    note: unpaid exposure returned, line terminal
+  - id: C-022
+    arm: 'Line@"credit"'
+    source: contracts/src/deploy/14_line.rho
+    lean: RSure.Model.Line.line_credit_sound
+    lean_status: proved-model
+    invariants: [INV-6]
+    note: local credit counter
+  - id: C-023
+    arm: 'LineCredit@"credit"'
+    source: contracts/src/deploy/10_syndicate.rho
+    lean: RSure.Model.Line.line_credit_conserves
+    lean_status: proved-model-bounded
+    invariants: [INV-6]
+    note: conditional on ertp.native_total
+  - id: C-024
+    arm: 'Distribution@"plan"'
+    source: contracts/src/deploy/15_distribution.rho
+    lean: RSure.Model.Distribution.distribution_plan_sound
+    lean_status: proved-model
+    invariants: [INV-3, INV-4]
+    note: plan sums to base
+  - id: C-025
+    arm: 'Distribution@"run"'
+    source: contracts/src/deploy/15_distribution.rho
+    lean: RSure.Model.Distribution.distribution_run_sound
+    lean_status: proved-model
+    invariants: [INV-4, INV-6]
+    note: one-shot run preserving the plan
+  - id: C-026
+    arm: 'Policy@"distribute"'
+    source: contracts/src/deploy/17_policy.rho
+    lean: RSure.Model.Policy.policy_distribute_conserves
+    lean_status: proved-model
+    invariants: [INV-3, INV-4]
+    note: premium conservation
+  - id: C-027
+    arm: 'Policy@"settleClaim"'
+    source: contracts/src/deploy/17_policy.rho
+    lean: RSure.Model.Policy.policy_settle_sound
+    lean_status: proved-model
+    invariants: [INV-6, INV-8, INV-9]
+    note: aggregate conservation and once per claim
+  - id: C-028
+    arm: 'Policy@"expire"'
+    source: contracts/src/deploy/17_policy.rho
+    lean: RSure.Model.Policy.policy_expire_sound
+    lean_status: proved-model
+    invariants: [INV-10]
+    note: terminal after period end plus run-off
+  - id: C-029
+    arm: 'Policy@"payable"'
+    source: contracts/src/deploy/17_policy.rho
+    lean: RSure.Model.Math.math_payableGuarded_sound
+    lean_status: proved-model
+    invariants: [INV-5]
+    note: policy payable is the guarded SureMath result
+  - id: C-030
+    arm: 'SureMath@"payable"'
+    source: contracts/src/deploy/04_math.rho
+    lean: RSure.Model.Math.math_payableGuarded_agrees
+    lean_status: proved-model
+    invariants: [INV-5]
+    note: guarded arm agrees with payable; aggregate refusal unreachable
+  - id: C-031
+    arm: 'Claim@"agree"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_agree_sound
+    lean_status: proved-model
+    invariants: [INV-10]
+    note: lead/follow agreement preserves claim lifecycle
+  - id: C-032
+    arm: 'Claim@"assess"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_assess_sound
+    lean_status: proved-model
+    invariants: [INV-10]
+    note: manager assessment, terminal refused
+  - id: C-033
+    arm: 'Claim@"dispute"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_dispute_sound
+    lean_status: proved-model
+    invariants: [INV-8, INV-10]
+    note: binds the claim to the oracle case
+  - id: C-034
+    arm: 'Claim@"settle"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Claim.claim_settle_sound
+    lean_status: proved-model
+    invariants: [INV-8, INV-10]
+    note: settled is terminal and paid at most agreed
+  - id: C-035
+    arm: 'SureFund@"cover"'
+    source: contracts/src/deploy/16_fund.rho
+    lean: RSure.Model.Fund.fund_cover_sound
+    lean_status: proved-model
+    invariants: [INV-6, INV-8]
+    note: capped, one-shot, balance-conserving
+  - id: C-036
+    arm: 'SureFund@"contribute"'
+    source: contracts/src/deploy/16_fund.rho
+    lean: RSure.Model.Fund.fund_contribute_sound
+    lean_status: proved-model
+    invariants: [INV-6]
+    note: paused/native guards, local ledger credit
+  - id: C-037
+    arm: 'SureFund@"admin"'
+    source: contracts/src/deploy/16_fund.rho
+    lean: RSure.Model.Fund.fund_admin_sound
+    lean_status: proved-model
+    invariants: []
+    note: fresh nonce and threshold; quorum preserved
+  - id: C-038
+    arm: 'RgenAdapter@"verifyClaim"'
+    source: contracts/src/deploy/05_rgen.rho
+    lean: RSure.Model.Oracle.adapter_verifyClaim_sound
+    lean_status: proved-model
+    invariants: [INV-8]
+    note: enabled and, in strict mode, registered
+  - id: C-039
+    arm: 'RgenAdapter@"verifyCredential"'
+    source: contracts/src/deploy/05_rgen.rho
+    lean: RSure.Model.Oracle.adapter_verifyCredential_sound
+    lean_status: proved-model
+    invariants: [INV-8]
+    note: enabled and, in strict mode, registered
+  - id: C-040
+    arm: 'applyCap@"applyDecision"'
+    source: contracts/src/deploy/18_claim.rho
+    lean: RSure.Model.Oracle.oracle_applyCap_sound
+    lean_status: proved-model
+    invariants: [INV-8, INV-10]
+    note: case-bound decision, claim lifecycle preserved

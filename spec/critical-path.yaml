@@ -1,0 +1,341 @@
+# Critical-path manifest for the 14 primitives that must carry Lean 4 model soundness
+# before the campaign is complete. `status: covered` means: a model statement exists, a
+# substantive soundness theorem is proved and axiom-audited, every arm is mapped to a
+# `proved-model` flow rule, and at least one behavioural suite is mapped.
+schema: rsure.critical-path/v1
+review_date: 2026-11-05
+tie:
+  status: model-only
+  note: >-
+    These are proofs about the shallow state-machine models in spec/lean, not refinements
+    of the Rholang contracts. Every primitive records its refinement_gap in claims.yaml.
+
+primitives:
+  - id: CP-01
+    name: RootAuthority
+    status: covered
+    arms:
+      - 'SureRoot@"register"'
+      - 'SureRoot@"rotate"'
+      - 'SureRoot@"freeze"'
+      - 'SureRoot@"admin"'
+    source:
+      - contracts/src/deploy/00_root.rho
+    model: spec/lean/RSure/Model/Root.lean
+    soundness: RSure.Model.Root.root_register_sound
+    theorems:
+      - RSure.Model.Root.root_register_sound
+      - RSure.Model.Root.root_rotate_sound
+      - RSure.Model.Root.root_freeze_sound
+      - RSure.Model.Root.root_admin_sound
+      - RSure.Model.Root.root_register_refuses_frozen
+      - RSure.Model.Root.root_register_reachable
+    required_classes: [authority]
+    invariants: []
+    assumptions: [crypto.authority, deploy.atomicity]
+    suite: [unit_root, unit_factory_auth, unit_replay]
+    hazards: [HZ-008]
+  - id: CP-02
+    name: AdminAuthority
+    status: covered
+    arms:
+      - 'AdminGuard@"verify"'
+      - 'SureAdmin@"admin"'
+      - 'SureAdmin@"isPaused"'
+    source:
+      - contracts/src/deploy/02_admin.rho
+    model: spec/lean/RSure/Model/Admin.lean
+    soundness: RSure.Model.Admin.admin_sound
+    theorems:
+      - RSure.Model.Admin.admin_sound
+      - RSure.Model.Admin.admin_pause_sound
+      - RSure.Model.Admin.admin_verify_sound
+      - RSure.Model.Admin.admin_refuses_replay
+      - RSure.Model.Admin.admin_reachable
+    required_classes: [authority]
+    invariants: [INV-12]
+    assumptions: [crypto.authority, pause.contract]
+    suite: [unit_admin, unit_admin_keys, unit_pause, unit_pause_scope]
+    hazards: [HZ-008]
+  - id: CP-03
+    name: PaymentsRail
+    status: covered
+    arms:
+      - 'Payments@"issuer"'
+      - 'Payments@"depositFacet"'
+      - 'Payments@"ensureAccount"'
+    source:
+      - contracts/src/deploy/40_payments.rho
+    model: spec/lean/RSure/Model/Payments.lean
+    soundness: RSure.Model.Payments.payments_deposit_sound
+    theorems:
+      - RSure.Model.Payments.payments_issuer_sound
+      - RSure.Model.Payments.payments_ensureAccount_sound
+      - RSure.Model.Payments.payments_depositFacet_sound
+      - RSure.Model.Payments.payments_deposit_conserves
+      - RSure.Model.Payments.payments_refuses_native
+      - RSure.Model.Payments.payments_reachable
+    required_classes: [authority, conservation]
+    invariants: [INV-6, INV-11]
+    assumptions: [ertp.native_total]
+    suite: [unit_payments, unit_conservation]
+    hazards: [HZ-022]
+  - id: CP-04
+    name: SyndicateCapacity
+    status: covered
+    arms:
+      - 'Syndicate@"quote"'
+      - 'Syndicate@"openLine"'
+      - 'Syndicate@"expireQuote"'
+    source:
+      - contracts/src/deploy/10_syndicate.rho
+    model: spec/lean/RSure/Model/Syndicate.lean
+    soundness: RSure.Model.Syndicate.synd_quote_sound
+    theorems:
+      - RSure.Model.Syndicate.synd_quote_sound
+      - RSure.Model.Syndicate.synd_openLine_sound
+      - RSure.Model.Syndicate.synd_expireQuote_sound
+      - RSure.Model.Syndicate.synd_quote_refuses_manager
+      - RSure.Model.Syndicate.synd_expireQuote_refuses_unknown
+      - RSure.Model.Syndicate.synd_reachable
+    required_classes: [capacity]
+    invariants: [INV-1, INV-7]
+    assumptions: [deploy.atomicity]
+    suite: [unit_syndicate, unit_capital, unit_expiry]
+    hazards: [HZ-001]
+  - id: CP-05
+    name: LineGrant
+    status: covered
+    arms:
+      - 'LineGrant@"consume"'
+    source:
+      - contracts/src/deploy/10_syndicate.rho
+    model: spec/lean/RSure/Model/Grant.lean
+    soundness: RSure.Model.Grant.grant_consume_sound
+    theorems:
+      - RSure.Model.Grant.grant_consume_sound
+      - RSure.Model.Grant.grant_binding
+      - RSure.Model.Grant.grant_consume_once_bound
+      - RSure.Model.Grant.grant_consume_refuses_closed
+      - RSure.Model.Grant.grant_reachable
+    required_classes: [binding, exactly-once]
+    invariants: [INV-2, INV-8]
+    assumptions: [crypto.authority]
+    suite: [unit_subscription, unit_share_reuse]
+    hazards: [HZ-001, HZ-007]
+  - id: CP-06
+    name: SlipSubscription
+    status: covered
+    arms:
+      - 'Slip@"accept"'
+      - 'Slip@"subscribe"'
+    source:
+      - contracts/src/deploy/13_slip.rho
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_accept_sound
+    theorems:
+      - RSure.Model.Slip.slip_accept_sound
+      - RSure.Model.Slip.slip_subscribe_sound
+      - RSure.Model.Slip.slip_accept_refuses_owner
+      - RSure.Model.Slip.slip_subscribe_refuses_share
+      - RSure.Model.Slip.slip_reachable
+    required_classes: [authority, binding]
+    invariants: [INV-2]
+    assumptions: [crypto.authority]
+    suite: [unit_slip, unit_subscription]
+    hazards: [HZ-002, HZ-018]
+  - id: CP-07
+    name: SlipFunding
+    status: covered
+    arms:
+      - 'Slip@"fundPremium"'
+      - 'Slip@"expire"'
+    source:
+      - contracts/src/deploy/13_slip.rho
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_fund_sound
+    theorems:
+      - RSure.Model.Slip.slip_fund_sound
+      - RSure.Model.Slip.slip_expire_sound
+      - RSure.Model.Slip.slip_expire_refund
+      - RSure.Model.Slip.slip_fund_refuses_owner
+      - RSure.Model.Slip.slip_fund_reachable
+    required_classes: [conservation, terminal]
+    invariants: [INV-2, INV-10]
+    assumptions: [ertp.native_total]
+    suite: [unit_slip, unit_expiry, unit_shortfall]
+    hazards: [HZ-012, HZ-016]
+  - id: CP-08
+    name: SlipBinding
+    status: covered
+    arms:
+      - 'Slip@"bind"'
+    source:
+      - contracts/src/deploy/13_slip.rho
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_bind_sound
+    theorems:
+      - RSure.Model.Slip.slip_bind_sound
+      - RSure.Model.Slip.slip_bind_requires_subscription
+      - RSure.Model.Slip.slip_bind_refuses_unaccepted
+      - RSure.Model.Slip.slip_bind_refuses_funding
+      - RSure.Model.Slip.slip_reachable
+    required_classes: [binding]
+    invariants: [INV-2, INV-3, INV-4]
+    assumptions: [deploy.atomicity]
+    suite: [unit_binding, unit_slip]
+    hazards: [HZ-002, HZ-018]
+  - id: CP-09
+    name: LineSettlement
+    status: covered
+    arms:
+      - 'Line@"pay"'
+      - 'Line@"release"'
+      - 'Line@"credit"'
+      - 'LineCredit@"credit"'
+    source:
+      - contracts/src/deploy/14_line.rho
+      - contracts/src/deploy/10_syndicate.rho
+    model: spec/lean/RSure/Model/Line.lean
+    soundness: RSure.Model.Line.line_pay_sound
+    theorems:
+      - RSure.Model.Line.line_pay_sound
+      - RSure.Model.Line.line_pay_once
+      - RSure.Model.Line.line_release_restores
+      - RSure.Model.Line.line_credit_sound
+      - RSure.Model.Line.line_credit_conserves
+      - RSure.Model.Line.line_pay_refuses_claim
+      - RSure.Model.Line.line_pay_reachable
+      - RSure.Model.Line.line_credit_reachable
+    required_classes: [conservation, exactly-once, terminal]
+    invariants: [INV-6, INV-7, INV-8]
+    assumptions: [ertp.native_total]
+    suite: [unit_line, unit_settlement, unit_conservation]
+    hazards: [HZ-017, HZ-019]
+  - id: CP-10
+    name: PremiumDistribution
+    status: covered
+    arms:
+      - 'Distribution@"plan"'
+      - 'Distribution@"run"'
+      - 'Policy@"distribute"'
+    source:
+      - contracts/src/deploy/15_distribution.rho
+      - contracts/src/deploy/17_policy.rho
+    model: spec/lean/RSure/Model/Distribution.lean
+    soundness: RSure.Model.Distribution.distribution_run_sound
+    theorems:
+      - RSure.Model.Distribution.distribution_plan_sound
+      - RSure.Model.Distribution.distribution_run_sound
+      - RSure.Model.Distribution.distribution_run_sums
+      - RSure.Model.Policy.policy_distribute_conserves
+      - RSure.Model.Distribution.distribution_run_refuses
+      - RSure.Model.Distribution.distribution_reachable
+    required_classes: [conservation, exactly-once]
+    invariants: [INV-3, INV-4]
+    assumptions: [ertp.native_total, arithmetic.no_overflow]
+    suite: [unit_distribution, unit_premium, unit_policy]
+    hazards: [HZ-003, HZ-005, HZ-025]
+  - id: CP-11
+    name: PolicySettlement
+    status: covered
+    arms:
+      - 'Policy@"settleClaim"'
+      - 'Policy@"expire"'
+      - 'Policy@"payable"'
+      - 'SureMath@"payable"'
+    source:
+      - contracts/src/deploy/17_policy.rho
+      - contracts/src/deploy/04_math.rho
+    model: spec/lean/RSure/Model/Policy.lean
+    soundness: RSure.Model.Policy.policy_settle_sound
+    theorems:
+      - RSure.Model.Policy.policy_settle_sound
+      - RSure.Model.Policy.policy_settle_once
+      - RSure.Model.Policy.policy_expire_sound
+      - RSure.Model.Policy.policy_expire_terminal
+      - RSure.Model.Math.math_payableGuarded_accepts
+      - RSure.Model.Math.math_payableGuarded_sound
+      - RSure.Model.Math.math_payableGuarded_refuses_bad
+      - RSure.Model.Policy.policy_settle_reachable
+    required_classes: [conservation, exactly-once, terminal]
+    invariants: [INV-5, INV-6, INV-8, INV-9, INV-10]
+    assumptions: [ertp.native_total, deploy.atomicity, arithmetic.no_overflow]
+    suite: [unit_policy, unit_settlement, unit_shortfall]
+    hazards: [HZ-003, HZ-011, HZ-026]
+  - id: CP-12
+    name: ClaimStateMachine
+    status: covered
+    arms:
+      - 'Claim@"agree"'
+      - 'Claim@"assess"'
+      - 'Claim@"dispute"'
+      - 'Claim@"settle"'
+    source:
+      - contracts/src/deploy/18_claim.rho
+    model: spec/lean/RSure/Model/Claim.lean
+    soundness: RSure.Model.Claim.claim_agree_sound
+    theorems:
+      - RSure.Model.Claim.claim_agree_sound
+      - RSure.Model.Claim.claim_assess_sound
+      - RSure.Model.Claim.claim_dispute_sound
+      - RSure.Model.Claim.claim_applyDecision_sound
+      - RSure.Model.Claim.claim_settle_sound
+      - RSure.Model.Claim.claim_settle_once
+      - RSure.Model.Claim.claim_refuses_terminal_assess
+      - RSure.Model.Claim.claim_assess_reachable
+    required_classes: [binding, terminal, exactly-once]
+    invariants: [INV-8, INV-10]
+    assumptions: [rgen.oracle_binding]
+    suite: [unit_claim_lifecycle, unit_claim_refusals, unit_evidence]
+    hazards: [HZ-004, HZ-023, HZ-027]
+  - id: CP-13
+    name: FundCover
+    status: covered
+    arms:
+      - 'SureFund@"cover"'
+      - 'SureFund@"contribute"'
+      - 'SureFund@"admin"'
+    source:
+      - contracts/src/deploy/16_fund.rho
+    model: spec/lean/RSure/Model/Fund.lean
+    soundness: RSure.Model.Fund.fund_cover_sound
+    theorems:
+      - RSure.Model.Fund.fund_cover_sound
+      - RSure.Model.Fund.fund_conserves
+      - RSure.Model.Fund.fund_cover_once
+      - RSure.Model.Fund.fund_contribute_sound
+      - RSure.Model.Fund.fund_admin_sound
+      - RSure.Model.Fund.fund_cover_refuses_signatures
+      - RSure.Model.Fund.fund_reachable
+    required_classes: [conservation, exactly-once, authority]
+    invariants: [INV-6, INV-8]
+    assumptions: [ertp.native_total, crypto.authority]
+    suite: [unit_fund, unit_shortfall, unit_replay]
+    hazards: [HZ-009]
+  - id: CP-14
+    name: OracleDecision
+    status: covered
+    arms:
+      - 'RgenAdapter@"verifyClaim"'
+      - 'RgenAdapter@"verifyCredential"'
+      - 'Claim@"dispute"'
+      - 'applyCap@"applyDecision"'
+    source:
+      - contracts/src/deploy/05_rgen.rho
+      - contracts/src/deploy/18_claim.rho
+    model: spec/lean/RSure/Model/Oracle.lean
+    soundness: RSure.Model.Oracle.oracle_decision_sound
+    theorems:
+      - RSure.Model.Oracle.adapter_verifyClaim_sound
+      - RSure.Model.Oracle.adapter_verifyCredential_sound
+      - RSure.Model.Oracle.adapter_refuses_disabled
+      - RSure.Model.Oracle.adapter_refuses_unregistered
+      - RSure.Model.Oracle.oracle_applyCap_sound
+      - RSure.Model.Oracle.oracle_decision_sound
+      - RSure.Model.Oracle.adapter_reachable
+    required_classes: [binding, exactly-once, terminal]
+    invariants: [INV-8, INV-10]
+    assumptions: [rgen.oracle_binding, crypto.authority]
+    suite: [unit_oracle, unit_claim_refusals, unit_evidence, integration_rgen]
+    hazards: [HZ-023]

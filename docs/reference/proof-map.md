@@ -75,10 +75,46 @@
 
 | Capability | Model theorem | Status |
 |---|---|---|
-| `LineCredit` | none; deposit is an ERTP move | deferred |
+| `LineCredit` | `Line.line_credit_sound`, `Line.line_credit_conserves` (conditional on `ertp.native_total`) | covered |
 | `LineSettle` | `Line.line_pay_once`, `Line.line_pay_bounded` | covered |
 | `LineRelease` | `Line.line_release_restores` | covered |
 | `applyCap` | `Oracle.oracle_execute_once`, `Claim.claim_apply_case_bound` | covered |
+
+## Critical path
+
+The campaign gate is `spec/critical-path.yaml`; `tools/check_critical_path.py` joins it to
+`claims.yaml`, the Lean declarations and axiom audit, the flow rules, the arm register and
+the suite register. All 14 primitives are `covered` as model-only proofs.
+
+| ID | Primitive | Arms | Model | Soundness theorem | Classes |
+|---|---|---|---|---|---|
+| CP-01 | RootAuthority | `SureRoot` register/rotate/freeze/admin | `Model/Root.lean` | `root_register_sound` | authority |
+| CP-02 | AdminAuthority | `AdminGuard@"verify"`, `SureAdmin` admin/isPaused | `Model/Admin.lean` | `admin_sound` | authority |
+| CP-03 | PaymentsRail | `Payments` issuer/depositFacet/ensureAccount | `Model/Payments.lean` | `payments_deposit_sound` | authority, conservation |
+| CP-04 | SyndicateCapacity | `Syndicate` quote/openLine/expireQuote | `Model/Syndicate.lean` | `synd_quote_sound` | capacity |
+| CP-05 | LineGrant | `LineGrant@"consume"` | `Model/Grant.lean` | `grant_consume_sound` | binding, exactly-once |
+| CP-06 | SlipSubscription | `Slip` accept/subscribe | `Model/Slip.lean` | `slip_accept_sound` | authority, binding |
+| CP-07 | SlipFunding | `Slip` fundPremium/expire | `Model/Slip.lean` | `slip_fund_sound` | conservation, terminal |
+| CP-08 | SlipBinding | `Slip@"bind"` | `Model/Slip.lean` | `slip_bind_sound` | binding |
+| CP-09 | LineSettlement | `Line` pay/release/credit, `LineCredit` | `Model/Line.lean` | `line_pay_sound` | conservation, exactly-once, terminal |
+| CP-10 | PremiumDistribution | `Distribution` plan/run, `Policy@"distribute"` | `Model/Distribution.lean` | `distribution_run_sound` | conservation, exactly-once |
+| CP-11 | PolicySettlement | `Policy` settleClaim/expire/payable, `SureMath@"payable"` | `Model/Policy.lean` | `policy_settle_sound` | conservation, exactly-once, terminal |
+| CP-12 | ClaimStateMachine | `Claim` agree/assess/dispute/settle | `Model/Claim.lean` | `claim_agree_sound` | binding, terminal, exactly-once |
+| CP-13 | FundCover | `SureFund` cover/contribute/admin | `Model/Fund.lean` | `fund_cover_sound` | conservation, exactly-once, authority |
+| CP-14 | OracleDecision | `RgenAdapter` verifyClaim/verifyCredential, `Claim@"dispute"`, `applyCap@"applyDecision"` | `Model/Oracle.lean` | `oracle_decision_sound` | binding, exactly-once, terminal |
+
+The composed settlement path `Claim -> Policy -> lines -> Fund` is modelled in
+`Model/System.lean` by `EngineState`/`settleEngine`. It calls the component
+`Policy.settleClaim`, `Claim.settleExact` and `Fund.cover` functions and proves
+`system_composition_sound` (claim paid = payable, line book paid, fund balance
+conservation, aggregate decrease, payable bounds) and `system_composition_once`
+(a settled claim refuses a second settlement).
+
+`Model/Math.lean` also models the deployed `SureMath@"payable"` refusal arm as
+`payableGuarded`: `math_payableGuarded_accepts` proves the non-negative path returns
+`payable`, `math_payableGuarded_agrees` proves the guarded result agrees with the model,
+and `math_payableGuarded_aggregate_unreachable` proves the aggregate refusal branch cannot
+fire on non-negative inputs.
 
 ## Maintenance
 
@@ -89,4 +125,5 @@ flow manifest and `RSure/Audit.lean` in the same change. Run:
 python3 tools/check_claims.py --check --strict-audit
 python3 tools/check_flows.py --strict
 python3 tools/check_audit.py
+python3 tools/check_critical_path.py --check
 ```

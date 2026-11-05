@@ -194,27 +194,449 @@ invariants:
     theorems: []
 
 primitives:
-  LineSettle:
-    statement: A line settles one claim and never pays more than its exposure.
+  CP-01:
+    name: RootAuthority
+    statement: >-
+      SureRoot register, rotate, freeze and admin only move the component directory
+      through the installer or a verified admin quorum with a strictly increasing
+      governance nonce, and preserve the directory/admin authority invariant.
     status: covered
+    model: spec/lean/RSure/Model/Root.lean
+    soundness: RSure.Model.Root.root_register_sound
+    arms:
+      - 'SureRoot@"register"'
+      - 'SureRoot@"rotate"'
+      - 'SureRoot@"freeze"'
+      - 'SureRoot@"admin"'
+    classes: [authority]
+    invariants: []
+    assumptions: [crypto.authority, deploy.atomicity]
+    tie:
+      status: model-only
+      note: shallow Lean component model; not a refinement of 00_root.rho
+    refinement_gap: >-
+      Deployer pubkey lookup, 2-of-3 signature verification and node rollback are the
+      crypto.authority/deploy.atomicity boundary. The model adds `1 ≤ newVersion` to
+      rotate, which the deployed arm does not check; that is a stronger model guard.
     theorems:
-      - {name: RSure.Model.Line.line_pay_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Root.root_register_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Root.root_rotate_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Root.root_freeze_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Root.root_admin_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Root.root_register_refuses_frozen, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Root.root_register_refuses_duplicate, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Root.root_rotate_refuses_replay, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Root.root_register_reachable, strength: substantive, kind: reachability}
+  CP-02:
+    name: AdminAuthority
+    statement: >-
+      AdminGuard.verify and SureAdmin.admin accept only a fresh nonce and a threshold
+      of signatures; the pause flag is a truthful projection of admin state and only a
+      permitted admin step can set it.
+    status: covered
+    model: spec/lean/RSure/Model/Admin.lean
+    soundness: RSure.Model.Admin.admin_sound
+    arms:
+      - 'AdminGuard@"verify"'
+      - 'SureAdmin@"admin"'
+      - 'SureAdmin@"isPaused"'
+    classes: [authority]
+    invariants: [INV-12]
+    assumptions: [crypto.authority, pause.contract]
+    tie:
+      status: model-only
+      note: shallow Lean component model; the pause wiring is source-checked by unit_pause_scope
+    refinement_gap: >-
+      secp256k1 verification and distinct-key counting are assumed. The model does not
+      prove that every new-risk Rholang arm consults isPaused; that is the pause.contract
+      boundary and tools/check_pause_scope.py.
+    theorems:
+      - {name: RSure.Model.Admin.admin_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Admin.admin_verify_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Admin.admin_pause_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Admin.admin_isPaused_truthful, strength: substantive, kind: binding}
+      - {name: RSure.Model.Admin.admin_pause_blocks_new_risk, strength: substantive, kind: invariant}
+      - {name: RSure.Model.Admin.admin_refuses_replay, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Admin.admin_refuses_threshold, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Admin.admin_reachable, strength: substantive, kind: reachability}
+  CP-03:
+    name: PaymentsRail
+    statement: >-
+      Payments.issuer returns only allow-listed assets, ensureAccount registers a
+      non-zero owner once and is idempotent, depositFacet is exposed only for a
+      registered account on an allowed asset, and native deposits move the ledger by
+      exactly the deposited amount.
+    status: covered
+    model: spec/lean/RSure/Model/Payments.lean
+    soundness: RSure.Model.Payments.payments_deposit_conserves
+    arms:
+      - 'Payments@"issuer"'
+      - 'Payments@"depositFacet"'
+      - 'Payments@"ensureAccount"'
+    classes: [authority, conservation]
+    invariants: [INV-6, INV-11]
+    assumptions: [ertp.native_total]
+    tie:
+      status: model-only
+      note: shallow Lean component model; ERTP custody is not refined
+    refinement_gap: >-
+      Purse custody, issuer trust and ERTP native conservation are the
+      ertp.native_total boundary. The ledger model proves local balance movement.
+    theorems:
+      - {name: RSure.Model.Payments.payments_issuer_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Payments.payments_ensureAccount_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Payments.payments_ensureAccount_idempotent, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Payments.payments_depositFacet_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Payments.payments_deposit_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Payments.payments_deposit_conserves, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Payments.payments_issuer_refuses, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Payments.payments_refuses_native, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Payments.payments_reachable, strength: substantive, kind: reachability}
+  CP-04:
+    name: SyndicateCapacity
+    statement: >-
+      A quote reserves capacity only when the manager, class and capacity guards pass;
+      openLine moves reserved exposure to written without changing free capacity; and
+      expireQuote only releases reserved capacity.
+    status: covered
+    model: spec/lean/RSure/Model/Syndicate.lean
+    soundness: RSure.Model.Syndicate.synd_quote_sound
+    arms:
+      - 'Syndicate@"quote"'
+      - 'Syndicate@"openLine"'
+      - 'Syndicate@"expireQuote"'
+    classes: [capacity]
+    invariants: [INV-1, INV-7]
+    assumptions: [deploy.atomicity]
+    tie:
+      status: model-only
+      note: shallow Lean component model; not a refinement of 10_syndicate.rho
+    refinement_gap: >-
+      Purse custody and manager identity come from ERTP/authority boundaries. The model
+      treats quotes as an exposure book and does not model the Rholang quote map.
+    theorems:
+      - {name: RSure.Model.Syndicate.synd_quote_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_quote_requires_capacity, strength: substantive, kind: bound}
+      - {name: RSure.Model.Syndicate.synd_openLine_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_openLine_moves, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_expireQuote_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Syndicate.synd_quote_refuses_manager, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Syndicate.synd_quote_refuses_inactive, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Syndicate.synd_openLine_refuses_range, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Syndicate.synd_expireQuote_refuses_unknown, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Syndicate.synd_reachable, strength: substantive, kind: reachability}
+  CP-05:
+    name: LineGrant
+    statement: >-
+      LineGrant.consume succeeds only for an open grant, the holder token and the
+      bound slip id, share and exposure; it moves the grant to consumed exactly once.
+    status: covered
+    model: spec/lean/RSure/Model/Grant.lean
+    soundness: RSure.Model.Grant.grant_consume_sound
+    arms:
+      - 'LineGrant@"consume"'
+    classes: [binding, exactly-once]
+    invariants: [INV-2, INV-8]
+    assumptions: [crypto.authority]
+    tie:
+      status: model-only
+      note: shallow Lean component model; grant URI resolution is assumed
+    refinement_gap: >-
+      The model represents the slip token as a Boolean holder check. Token identity
+      and URI resolution are assumed.
+    theorems:
+      - {name: RSure.Model.Grant.grant_consume_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Grant.grant_binding, strength: substantive, kind: binding}
+      - {name: RSure.Model.Grant.grant_consume_once_bound, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Grant.grant_consume_refuses_closed, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Grant.grant_consume_refuses_holder, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Grant.grant_consume_refuses_mismatch, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Grant.grant_reachable, strength: substantive, kind: reachability}
+  CP-06:
+    name: SlipSubscription
+    statement: >-
+      Slip.accept is owner-gated to an open or subscribed slip; Slip.subscribe appends a
+      bounded share only when a grant accepted the subscription.
+    status: covered
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_accept_sound
+    arms:
+      - 'Slip@"accept"'
+      - 'Slip@"subscribe"'
+    classes: [authority, binding]
+    invariants: [INV-2]
+    assumptions: [crypto.authority]
+    tie:
+      status: model-only
+      note: shallow Lean component model; the syndicate grant is abstracted
+    refinement_gap: >-
+      The model keeps share rates, not syndicate URIs, and abstracts the grant returned
+      by Slip.subscribe into a Boolean acceptance.
+    theorems:
+      - {name: RSure.Model.Slip.slip_accept_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_subscribe_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_accept_refuses_owner, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_subscribe_refuses_share, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_reachable, strength: substantive, kind: reachability}
+  CP-07:
+    name: SlipFunding
+    statement: >-
+      Slip.fundPremium credits the insured's premium locally and Slip.expire refunds
+      exactly the funded amount; a bound slip cannot expire.
+    status: covered
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_fund_sound
+    arms:
+      - 'Slip@"fundPremium"'
+      - 'Slip@"expire"'
+    classes: [conservation, terminal]
+    invariants: [INV-2, INV-10]
+    assumptions: [ertp.native_total]
+    tie:
+      status: model-only
+      note: shallow Lean component model; the refund move is ERTP
+    refinement_gap: >-
+      The native deposit and refund moves are the ertp.native_total boundary. The model
+      records the funded counter and refund credit.
+    theorems:
+      - {name: RSure.Model.Slip.slip_fund_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_expire_refund, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Slip.slip_expire_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_fund_refuses_owner, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_fund_refuses_amount, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_expire_refuses_bound, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_fund_reachable, strength: substantive, kind: reachability}
+  CP-08:
+    name: SlipBinding
+    statement: >-
+      Slip.bind succeeds only when the insured has accepted, the premium is fully
+      funded, at least one share exists and the shares sum to 10000 bps; a bound slip
+      carries that subscription invariant.
+    status: covered
+    model: spec/lean/RSure/Model/Slip.lean
+    soundness: RSure.Model.Slip.slip_bind_sound
+    arms:
+      - 'Slip@"bind"'
+    classes: [binding]
+    invariants: [INV-2, INV-3, INV-4]
+    assumptions: [deploy.atomicity]
+    tie:
+      status: model-only
+      note: shallow Lean component model; policy/line creation is not refined
+    refinement_gap: >-
+      The model proves the bind guards and status move, not the Rholang creation of the
+      policy, lines and distribution; those are covered separately by CP-09/CP-10/CP-11.
+    theorems:
+      - {name: RSure.Model.Slip.slip_bind_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Slip.slip_bind_requires_subscription, strength: substantive, kind: binding}
+      - {name: RSure.Model.Slip.slip_bind_refuses_unaccepted, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_bind_refuses_funding, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_bind_refuses_shares, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Slip.slip_reachable, strength: substantive, kind: reachability}
+  CP-09:
+    name: LineSettlement
+    statement: >-
+      Line.pay pays a claim at most once per line and never beyond exposure;
+      Line.release returns the unpaid exposure; Line.credit records a local credit whose
+      native conservation is conditional on ertp.native_total.
+    status: covered
+    model: spec/lean/RSure/Model/Line.lean
+    soundness: RSure.Model.Line.line_pay_sound
+    arms:
+      - 'Line@"pay"'
+      - 'Line@"release"'
+      - 'Line@"credit"'
+      - 'LineCredit@"credit"'
+    classes: [conservation, exactly-once, terminal]
+    invariants: [INV-6, INV-7, INV-8]
+    assumptions: [ertp.native_total]
+    tie:
+      status: model-only
+      note: shallow Lean component model; the settlement capability is abstracted
+    refinement_gap: >-
+      LineSettle/LineRelease capability dispatch and the ERTP deposit behind credit are
+      assumed. LineCredit is now covered by the local credit model conditional on
+      ertp.native_total rather than deferred.
+    theorems:
+      - {name: RSure.Model.Line.line_pay_sound, strength: substantive, kind: preservation}
       - {name: RSure.Model.Line.line_pay_bounded, strength: substantive, kind: preservation}
-  LineRelease:
-    statement: Release returns the unpaid exposure and marks the line released.
-    status: covered
-    theorems:
+      - {name: RSure.Model.Line.line_pay_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Line.line_pay_once_per_claim, strength: substantive, kind: rejection}
       - {name: RSure.Model.Line.line_release_restores, strength: substantive, kind: preservation}
-  LineCredit:
-    statement: The credit capability deposits premium into the syndicate purse.
-    status: deferred
-    deferral:
-      phase: 5
-      reason: the deposit is an ERTP move; only the local credited counter is modelled.
-    theorems: []
-  ApplyCap:
-    statement: The r-gen applyDecision capability applies one case decision.
+      - {name: RSure.Model.Line.line_credit_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Line.line_credit_conserves, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Line.line_pay_refuses_claim, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Line.line_credit_refuses_released, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Line.line_pay_reachable, strength: substantive, kind: reachability}
+      - {name: RSure.Model.Line.line_credit_reachable, strength: substantive, kind: reachability}
+  CP-10:
+    name: PremiumDistribution
+    statement: >-
+      Distribution.plan sums to the base; Distribution.run pays the plan exactly once;
+      Policy.distribute conserves commission + levy + line credits = premiumTotal.
     status: covered
+    model: spec/lean/RSure/Model/Distribution.lean
+    soundness: RSure.Model.Distribution.distribution_run_sound
+    arms:
+      - 'Distribution@"plan"'
+      - 'Distribution@"run"'
+      - 'Policy@"distribute"'
+    classes: [conservation, exactly-once]
+    invariants: [INV-3, INV-4]
+    assumptions: [ertp.native_total, arithmetic.no_overflow]
+    tie:
+      status: model-only
+      note: shallow Lean component model; native payment of the plan is ERTP
+    refinement_gap: >-
+      The model proves the arithmetic plan and one-shot status move. Native payment of
+      each plan entry is the ertp.native_total boundary; signed-integer bounds are
+      arithmetic.no_overflow.
     theorems:
-      - {name: RSure.Model.Oracle.oracle_execute_once, strength: substantive, kind: rejection}
-      - {name: RSure.Model.Claim.claim_apply_case_bound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Distribution.distribution_plan_sound, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Distribution.distribution_run_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Distribution.distribution_run_sums, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Distribution.distribution_run_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Policy.policy_distribute_conserves, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Distribution.distribution_run_refuses, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Distribution.distribution_reachable, strength: substantive, kind: reachability}
+  CP-11:
+    name: PolicySettlement
+    statement: >-
+      Policy.settleClaim pays the guarded payable and decreases aggregateRemaining by
+      exactly that amount at most once per claim; Policy.expire is terminal after period
+      end plus run-off; the deployed SureMath payable refusal branch agrees with payable.
+    status: covered
+    model: spec/lean/RSure/Model/Policy.lean
+    soundness: RSure.Model.Policy.policy_settle_sound
+    arms:
+      - 'Policy@"settleClaim"'
+      - 'Policy@"expire"'
+      - 'Policy@"payable"'
+      - 'SureMath@"payable"'
+    classes: [conservation, exactly-once, terminal]
+    invariants: [INV-5, INV-6, INV-8, INV-9, INV-10]
+    assumptions: [ertp.native_total, deploy.atomicity, arithmetic.no_overflow]
+    tie:
+      status: model-only
+      note: shallow Lean component model; fund lookup and line payment are abstracted here
+    refinement_gap: >-
+      The model proves the policy-side arithmetic and guards. Fund lookup is composed in
+      Model.System. The Rholang `payable - cover.get("amount") < 0` branch is modelled by
+      the `cover ≤ payable` guard; the `pay > aggregateRemaining` branch is proved
+      unreachable on non-negative inputs.
+    theorems:
+      - {name: RSure.Model.Policy.policy_settle_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_settle_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Policy.policy_settle_aggregate, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Policy.policy_settle_guard, strength: substantive, kind: bound}
+      - {name: RSure.Model.Policy.policy_expire_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Policy.policy_expire_terminal, strength: substantive, kind: terminal}
+      - {name: RSure.Model.Policy.policy_expire_refuses_terminal, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Math.math_payableGuarded_accepts, strength: substantive, kind: binding}
+      - {name: RSure.Model.Math.math_payableGuarded_agrees, strength: substantive, kind: binding}
+      - {name: RSure.Model.Math.math_payableGuarded_sound, strength: substantive, kind: bound}
+      - {name: RSure.Model.Math.math_payableGuarded_refuses_bad, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Policy.policy_settle_reachable, strength: substantive, kind: reachability}
+      - {name: RSure.Model.Policy.policy_expire_reachable, strength: substantive, kind: reachability}
+  CP-12:
+    name: ClaimStateMachine
+    statement: >-
+      Claim.agree, assess, dispute, applyDecision and settle preserve the claim lifecycle
+      invariant; terminal states cannot be re-opened; settlement pays at most the agreed
+      amount exactly once and binds adjudication to the named oracle case.
+    status: covered
+    model: spec/lean/RSure/Model/Claim.lean
+    soundness: RSure.Model.Claim.claim_agree_sound
+    arms:
+      - 'Claim@"agree"'
+      - 'Claim@"assess"'
+      - 'Claim@"dispute"'
+      - 'Claim@"settle"'
+    classes: [binding, terminal, exactly-once]
+    invariants: [INV-8, INV-10]
+    assumptions: [rgen.oracle_binding]
+    tie:
+      status: model-only
+      note: shallow Lean component model; r-gen truth and case execution are assumed
+    refinement_gap: >-
+      The model proves the local claim state machine and case binding. r-gen OracleCase
+      truth and execute-once are the rgen.oracle_binding boundary.
+    theorems:
+      - {name: RSure.Model.Claim.claim_agree_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Claim.claim_assess_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Claim.claim_dispute_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Claim.claim_applyDecision_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Claim.claim_settle_sound, strength: substantive, kind: terminal}
+      - {name: RSure.Model.Claim.claim_settleExact_sound, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Claim.claim_settle_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_agree_terminal, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_applyDecision_terminal, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_refuses_terminal_assess, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Claim.claim_agree_standard_lead, strength: substantive, kind: binding}
+      - {name: RSure.Model.Claim.claim_apply_uphold, strength: substantive, kind: binding}
+      - {name: RSure.Model.Claim.claim_assess_reachable, strength: substantive, kind: reachability}
+      - {name: RSure.Model.Claim.claim_settle_reachable, strength: substantive, kind: reachability}
+  CP-13:
+    name: FundCover
+    statement: >-
+      SureFund.cover is capped by balance and per-claim limit, one per claim, and
+      conserves fund balance; contribute credits the ledger locally; admin changes are
+      quorum-gated and nonce-ordered.
+    status: covered
+    model: spec/lean/RSure/Model/Fund.lean
+    soundness: RSure.Model.Fund.fund_cover_sound
+    arms:
+      - 'SureFund@"cover"'
+      - 'SureFund@"contribute"'
+      - 'SureFund@"admin"'
+    classes: [conservation, exactly-once, authority]
+    invariants: [INV-6, INV-8]
+    assumptions: [ertp.native_total, crypto.authority]
+    tie:
+      status: model-only
+      note: shallow Lean component model; 2-of-3 signatures and ERTP transfer are assumed
+    refinement_gap: >-
+      The fund's signature check is a numeric threshold. The native withdraw/deposit
+      pair and node rollback are the ertp.native_total/deploy.atomicity boundaries.
+    theorems:
+      - {name: RSure.Model.Fund.fund_cover_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Fund.fund_conserves, strength: substantive, kind: conservation}
+      - {name: RSure.Model.Fund.fund_cover_once, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Fund.fund_contribute_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Fund.fund_admin_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Fund.fund_cover_refuses_signatures, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Fund.fund_contribute_refuses_paused, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Fund.fund_admin_refuses_replay, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Fund.fund_reachable, strength: substantive, kind: reachability}
+      - {name: RSure.Model.Fund.fund_contribute_reachable, strength: substantive, kind: reachability}
+  CP-14:
+    name: OracleDecision
+    statement: >-
+      RgenAdapter.verifyClaim and verifyCredential refuse when disabled or (in strict
+      mode) unregistered; Claim.dispute binds the claim to a case; applyCap applies that
+      case decision and is exactly-once on a terminal claim.
+    status: covered
+    model: spec/lean/RSure/Model/Oracle.lean
+    soundness: RSure.Model.Oracle.oracle_decision_sound
+    arms:
+      - 'RgenAdapter@"verifyClaim"'
+      - 'RgenAdapter@"verifyCredential"'
+      - 'Claim@"dispute"'
+      - 'applyCap@"applyDecision"'
+    classes: [binding, exactly-once, terminal]
+    invariants: [INV-8, INV-10]
+    assumptions: [rgen.oracle_binding, crypto.authority]
+    tie:
+      status: model-only
+      note: shallow Lean component model; r-gen credential truth and execute are assumed
+    refinement_gap: >-
+      The adapter model is an allow-list, not a cryptographic credential proof. The
+      claim-side binding is proved; r-gen OracleCase.execute-once is assumed.
+    theorems:
+      - {name: RSure.Model.Oracle.adapter_verifyClaim_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Oracle.adapter_verifyCredential_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Oracle.adapter_refuses_disabled, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Oracle.adapter_refuses_unregistered, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Oracle.oracle_applyCap_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Oracle.oracle_decision_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Oracle.adapter_reachable, strength: substantive, kind: reachability}
