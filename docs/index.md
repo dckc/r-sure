@@ -9,7 +9,7 @@ rata by the subscribing lines. Premiums and payouts settle in r-cash; engineerin
 comes from r-gen.
 
 > **This is not an insurer and carries no regulatory approval.** Do not use it with real
-> funds. Read [Status and scope](orientation/status-and-scope.md) first.
+> funds. Read [Project status](orientation/project-status.md) first.
 
 New to insurance or Lloyd's? Start with the primer:
 

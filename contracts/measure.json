@@ -42,19 +42,19 @@
       "contracts": 23
     },
     "11_broker.rho": {
-      "bytes": 5811,
+      "bytes": 5810,
       "depth": 19,
       "contracts": 7
     },
     "12_risk.rho": {
-      "bytes": 8848,
+      "bytes": 8847,
       "depth": 17,
       "contracts": 11
     },
     "13_slip.rho": {
-      "bytes": 14807,
+      "bytes": 16649,
       "depth": 43,
-      "contracts": 16
+      "contracts": 19
     },
     "14_line.rho": {
       "bytes": 3417,

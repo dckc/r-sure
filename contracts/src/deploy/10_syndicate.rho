@@ -160,6 +160,7 @@ in {
       for (@paused <- pauseCh) {
         if (paused) { ret!((false, "paused")) }
         else {
+
     new aCh, pkCh, prCh, purseCh, dupCh in {
       authOwner!(*dId, *aCh) |
       dops!("pubKeyBytes", *dId, *pkCh) |
@@ -194,6 +195,7 @@ in {
         }
       }
     }
+
 
         }
       }
@@ -653,6 +655,7 @@ in {
       for (@paused <- pauseCh) {
         if (paused) { ret2!((false, "paused")) }
         else {
+
                       new a2Ch, hCh in {
                         authOwner!(*dId2, *a2Ch) |
                         nowHeight!(*hCh) |
@@ -800,6 +803,7 @@ in {
                         }
                       }
 
+
         }
       }
     }
@@ -880,6 +884,7 @@ in {
       for (@paused <- pauseCh) {
         if (paused) { ret2!((false, "paused")) }
         else {
+
                       for (@s <- syndicateState) {
                         match s.get("quotes").get(grantId) {
                           Nil => { syndicateState!(s) | ret2!((false, "unknown quote")) }
@@ -997,6 +1002,7 @@ in {
                           }
                         }
                       }
+
 
         }
       }

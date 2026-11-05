@@ -4,12 +4,15 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOGUE = ROOT / "contracts" / "components.json"
 DEPLOY = ROOT / "contracts" / "src" / "deploy"
+ARM = re.compile(r'contract\s+([A-Za-z0-9_]+)\s*\(\s*@"([^"]+)"')
 
 
 def main() -> int:
@@ -31,9 +34,25 @@ def main() -> int:
             if cell in cells:
                 errors.append(f"state cell {cell} owned by both {cells[cell]} and {name}")
             cells[cell] = name
+
+    for name, entry in components.items():
+        file = entry.get("file")
+        if not file or not (DEPLOY / file).is_file():
+            continue
         for dep in entry.get("depends_on", []):
             if dep not in components:
                 errors.append(f"{name}: unknown dependency {dep}")
+        for cell in entry.get("cross_cell_writers", []):
+            if cell not in cells:
+                errors.append(f"{name}: unknown cross-cell writer target {cell}")
+            elif cells[cell] == name:
+                errors.append(f"{name}: cross-cell writer points at its own cell {cell}")
+        text = (DEPLOY / file).read_text()
+        counts = Counter((contract, arm) for contract, arm in ARM.findall(text))
+        overloaded = set(entry.get("overloaded_arms", []))
+        for (contract, arm), count in counts.items():
+            if contract == name and count > 1 and arm not in overloaded:
+                errors.append(f"{name}: overloaded arm {arm} is not declared")
 
     for path in DEPLOY.glob("*.rho"):
         if path.name not in files:

@@ -115,6 +115,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--dev-single-key", action="store_true",
                     help="allow a 2-of-3 set built from one devnet key (never for production)")
+    ap.add_argument("--only", default="",
+                    help="comma-separated deploy terms to install (debugging)")
     args = ap.parse_args(argv)
 
     if args.node:
@@ -168,7 +170,8 @@ def main(argv: list[str] | None = None) -> int:
     root_uri = "rho:id:dryrun" if args.dry_run else None
     secret = keys["deployer"]["secret"]
 
-    for name in ORDER:
+    order = [n.strip() for n in args.only.split(",") if n.strip()] or ORDER
+    for name in order:
         source = build / name
         if not source.is_file():
             raise SystemExit(f"install: missing {source}; run `make build`")

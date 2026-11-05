@@ -122,6 +122,12 @@ def deploy_result(deploy_id: str, timeout: float = 180.0):
 
 def deploy_and_wait(term: str, secret: str, **kwargs):
     deploy_id = deploy(term, secret, **kwargs)
+    # The pinned devnet does not always include a fresh deploy in its next
+    # autopropose block; force one when the admin endpoint is available.
+    try:
+        propose()
+    except Exception:
+        pass
     return deploy_id, deploy_result(deploy_id)
 
 

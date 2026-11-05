@@ -267,7 +267,6 @@ components:
   evidence:
   - contracts/src/deploy/10_syndicate.rho
   findings:
-  - F-002
   - F-009
   - F-015
 - component: Syndicate
@@ -275,7 +274,8 @@ components:
   kind: per-object
   state_cells:
   - syndicateState
-  cross_cell_writers: []
+  cross_cell_writers:
+  - syndicateBookState
   writers:
   - setManager
   - contribute
@@ -304,7 +304,7 @@ components:
   - contribute
   - withdrawCapital
   - lineSettleCap.pay
-  bundle_publication: 'bundle+{*Syndicate} unclosed: captures syndicateState'
+  bundle_publication: bundle+{*Syndicate} closed (rebind)
   replay_guard: nonce/quotes
   verdict: finding
   review: reviews/Syndicate.md
@@ -316,7 +316,6 @@ components:
   - contracts/src/deploy/10_syndicate.rho
   findings:
   - F-001
-  - F-002
   - F-015
 - component: LineGrant
   file: 10_syndicate.rho
@@ -333,7 +332,7 @@ components:
   awaits_while_holding_state:
   - 'expire: Clock'
   value_moves: []
-  bundle_publication: 'bundle+{*LineGrant} unclosed: captures grantState/slipToken'
+  bundle_publication: bundle+{*LineGrant} closed (rebind)
   replay_guard: one-shot status/token
   verdict: finding
   review: reviews/LineGrant.md
@@ -342,8 +341,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/10_syndicate.rho
-  findings:
-  - F-002
+  findings: []
 - component: LineFactory
   file: 14_line.rho
   kind: stateless
@@ -354,7 +352,7 @@ components:
   awaits_while_holding_state:
   - rs bundle publication
   value_moves: []
-  bundle_publication: publishes Line with unclosed bundle
+  bundle_publication: publishes Line with closed bundle
   replay_guard: none
   verdict: finding
   review: reviews/LineFactory.md
@@ -362,8 +360,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/14_line.rho
-  findings:
-  - F-002
+  findings: []
 - component: Line
   file: 14_line.rho
   kind: per-object
@@ -382,7 +379,7 @@ components:
   - 'credit/pay/release: capability call before lineState update'
   value_moves:
   - pay
-  bundle_publication: 'bundle+{*Line} unclosed: captures lineState/caps/token'
+  bundle_publication: bundle+{*Line} closed (rebind)
   replay_guard: policyToken/paidFor
   verdict: finding
   review: reviews/Line.md
@@ -392,7 +389,6 @@ components:
   evidence:
   - contracts/src/deploy/14_line.rho
   findings:
-  - F-002
   - F-012
 - component: BrokerBook
   file: 11_broker.rho
@@ -426,7 +422,8 @@ components:
   kind: per-object
   state_cells:
   - brokerState
-  cross_cell_writers: []
+  cross_cell_writers:
+  - brokerBookState
   writers:
   - addSlip
   - pause
@@ -437,7 +434,7 @@ components:
   - slips
   awaits_while_holding_state: []
   value_moves: []
-  bundle_publication: 'bundle+{*Broker} unclosed: captures brokerState'
+  bundle_publication: bundle+{*Broker} closed (rebind)
   replay_guard: none
   verdict: finding
   review: reviews/Broker.md
@@ -445,8 +442,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/11_broker.rho
-  findings:
-  - F-002
+  findings: []
 - component: RiskBook
   file: 12_risk.rho
   kind: singleton
@@ -481,7 +477,8 @@ components:
   kind: per-object
   state_cells:
   - riskState
-  cross_cell_writers: []
+  cross_cell_writers:
+  - riskBookState
   writers:
   - addEvidence
   - assess
@@ -494,7 +491,7 @@ components:
   awaits_while_holding_state:
   - 'expire: Clock'
   value_moves: []
-  bundle_publication: 'bundle+{*Risk} unclosed: captures riskState'
+  bundle_publication: bundle+{*Risk} closed (rebind)
   replay_guard: nonce
   verdict: finding
   review: reviews/Risk.md
@@ -504,7 +501,6 @@ components:
   evidence:
   - contracts/src/deploy/12_risk.rho
   findings:
-  - F-002
   - F-017
 - component: DistributionFactory
   file: 15_distribution.rho
@@ -516,7 +512,7 @@ components:
   awaits_while_holding_state:
   - rs bundle publication
   value_moves: []
-  bundle_publication: publishes Distribution with unclosed bundle
+  bundle_publication: publishes Distribution with closed bundle
   replay_guard: none
   verdict: finding
   review: reviews/DistributionFactory.md
@@ -524,8 +520,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/15_distribution.rho
-  findings:
-  - F-002
+  findings: []
 - component: Distribution
   file: 15_distribution.rho
   kind: per-object
@@ -544,7 +539,7 @@ components:
   - payAccount
   - payFund
   - payLine
-  bundle_publication: 'bundle+{*Distribution} unclosed: captures distState/purse/token'
+  bundle_publication: bundle+{*Distribution} closed (rebind)
   replay_guard: one-shot status/token
   verdict: finding
   review: reviews/Distribution.md
@@ -556,7 +551,6 @@ components:
   - contracts/src/deploy/15_distribution.rho
   findings:
   - F-001
-  - F-002
 - component: SureFund
   file: 16_fund.rho
   kind: singleton
@@ -598,7 +592,7 @@ components:
   awaits_while_holding_state:
   - 'open: broker/risk/terms/payments then slipMake'
   value_moves: []
-  bundle_publication: publishes Slip with unclosed bundle
+  bundle_publication: publishes Slip with closed bundle
   replay_guard: none
   verdict: finding
   review: reviews/SlipFactory.md
@@ -608,7 +602,6 @@ components:
   evidence:
   - contracts/src/deploy/13_slip.rho
   findings:
-  - F-002
   - F-015
 - component: Slip
   file: 13_slip.rho
@@ -633,7 +626,7 @@ components:
   - 'bind: lines/policy/distribution'
   value_moves:
   - fundPremium
-  bundle_publication: 'bundle+{*Slip} unclosed: captures slipState/purse/tokens'
+  bundle_publication: bundle+{*Slip} closed (rebind)
   replay_guard: nonce/tokens
   verdict: finding
   review: reviews/Slip.md
@@ -647,7 +640,6 @@ components:
   - contracts/src/deploy/13_slip.rho
   findings:
   - F-001
-  - F-002
   - F-007
   - F-011
   - F-013
@@ -661,7 +653,7 @@ components:
   awaits_while_holding_state:
   - rs bundle publication
   value_moves: []
-  bundle_publication: publishes Policy with unclosed bundle
+  bundle_publication: publishes Policy with closed bundle
   replay_guard: none
   verdict: finding
   review: reviews/PolicyFactory.md
@@ -669,8 +661,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/17_policy.rho
-  findings:
-  - F-002
+  findings: []
 - component: Policy
   file: 17_policy.rho
   kind: per-object
@@ -696,7 +687,7 @@ components:
   - 'settleClaim: SureFund/Line.pay'
   - 'expire: Clock'
   value_moves: []
-  bundle_publication: 'bundle+{*Policy} unclosed: captures policyState/purse/tokens'
+  bundle_publication: bundle+{*Policy} closed (rebind)
   replay_guard: policyToken/claimToken
   verdict: finding
   review: reviews/Policy.md
@@ -710,7 +701,6 @@ components:
   - contracts/src/deploy/17_policy.rho
   findings:
   - F-001
-  - F-002
   - F-006
   - F-010
   - F-014
@@ -724,7 +714,7 @@ components:
   awaits_while_holding_state:
   - rs bundle publication
   value_moves: []
-  bundle_publication: publishes Claim with unclosed bundle
+  bundle_publication: publishes Claim with closed bundle
   replay_guard: none
   verdict: finding
   review: reviews/ClaimFactory.md
@@ -732,8 +722,7 @@ components:
   - HZ-007
   evidence:
   - contracts/src/deploy/18_claim.rho
-  findings:
-  - F-002
+  findings: []
 - component: Claim
   file: 18_claim.rho
   kind: per-object
@@ -756,7 +745,7 @@ components:
   - 'dispute: RgenAdapter/OracleFactory'
   - 'settle: Policy.settleClaim'
   value_moves: []
-  bundle_publication: 'bundle+{*Claim} unclosed: captures claimState/token'
+  bundle_publication: bundle+{*Claim} closed (rebind)
   replay_guard: claimToken/status
   verdict: finding
   review: reviews/Claim.md
@@ -769,7 +758,6 @@ components:
   - contracts/src/deploy/18_claim.rho
   findings:
   - F-001
-  - F-002
   - F-014
   - F-018
 - component: PolicyBook

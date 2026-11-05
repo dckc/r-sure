@@ -27,8 +27,8 @@ improvements:
   hazards:
   - HZ-006
   - HZ-007
-  change: Close the remaining Slip bundle via a helper split; eight instance types
-    are already rebound and normalize cleanly.
+  change: Split the deep Slip arms into helpers and rebind all maker parameters before
+    bundle publication.
   type: design
   breaking: false
   migration: fresh devnet install
@@ -37,7 +37,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-003
   priority: P1
   findings:
@@ -210,23 +210,26 @@ improvements:
   - F-013
   hazards:
   - HZ-018
-  change: Recompute and compare termsHash at bind.
+  change: Recompute and compare termsHash in slipBindPolicy before opening lines or
+    creating the policy.
   type: design
   breaking: false
   migration: fresh devnet install
   compatibility_window: v1 only
   tests:
-  - T-003
+  - T-007
+  - T-009
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-014
   priority: P2
   findings:
   - F-014
   hazards:
   - HZ-019
-  change: Bind claimId to policy/line in the line pay path.
+  change: 'Accepted: policyToken plus the policy claims map is the claim-to-policy
+    binding boundary.'
   type: design
   breaking: false
   migration: fresh devnet install
@@ -235,15 +238,15 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: accepted
 - id: R-015
   priority: P2
   findings:
   - F-015
   hazards:
   - HZ-020
-  change: Declare cross-cell writers and overloaded arms; update the architecture
-    graph.
+  change: Declare cross-cell writers and overloaded arms in components.json; check_arch.py
+    enforces them.
   type: design
   breaking: false
   migration: fresh devnet install
@@ -252,7 +255,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: implemented
 - id: R-016
   priority: P3
   findings:
@@ -274,7 +277,8 @@ improvements:
   - F-017
   hazards:
   - HZ-021
-  change: Add a quality/evidence gate or document the presence-only limit.
+  change: 'Accepted: tri-test presence only; probability/cost quality is off-chain
+    underwriting.'
   type: design
   breaking: false
   migration: fresh devnet install
@@ -283,7 +287,7 @@ improvements:
   - T-003
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: accepted
 - id: R-018
   priority: P2
   findings:
@@ -291,16 +295,18 @@ improvements:
   hazards:
   - HZ-022
   - HZ-023
-  change: Add explicit reply-shape tests and health preflight.
+  change: 'Accepted: integration suites assert r-cash/r-gen reply shapes and health;
+    failures surface at the boundary.'
   type: design
   breaking: false
   migration: fresh devnet install
   compatibility_window: v1 only
   tests:
-  - T-003
+  - T-034
+  - T-035
   rollout_stage: devnet
   rollback: redeploy previous Root
-  status: planned
+  status: accepted
 - id: R-019
   priority: P3
   findings:

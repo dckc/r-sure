@@ -45,7 +45,7 @@ findings:
   title: Instance bundles capture state/capabilities
   severity: P0
   class: concurrency
-  status: confirmed
+  status: fixed
   confidence: high
   components:
   - Syndicate
@@ -72,9 +72,15 @@ findings:
   evidence_level: E1
   evidence:
   - kind: source
-    ref: contracts/src/deploy
-  description: Eight of nine instance types use the rebind pattern and normalize cleanly;
-    Slip remains open because the wrapper pushes the term past the parser depth limit.
+    ref: contracts/src/deploy/13_slip.rho
+  - kind: tool
+    ref: tools/check_bundle_closedness.py
+  - kind: tool
+    ref: tools/parse_check.sh
+  description: 'Fix: split the deep Slip arms into slipSubscribe/slipFundDeposit/slipBindPolicy
+    helpers, then rebind all maker parameters through cfg channels before publishing
+    bundle+{*Slip}. The bundle scanner and parser are clean; make install remains
+    the E2 check.'
   preconditions: A caller reaches the arm on the affected path.
   impact: Devnet install is blocked; no instance can be created.
   proposed_fix: R-002
@@ -355,7 +361,7 @@ findings:
   title: termsHash is not revalidated at bind
   severity: P2
   class: composition
-  status: deferred
+  status: fixed
   confidence: high
   components:
   - Slip
@@ -369,8 +375,11 @@ findings:
   evidence_level: E1
   evidence:
   - kind: source
-    ref: contracts/src/deploy
-  description: The slip computes termsHash at open and trusts it at bind.
+    ref: contracts/src/deploy/13_slip.rho
+  - kind: tool
+    ref: tools/check_invariant_guards.py
+  description: 'Fix: slipBindPolicy resolves CoverTerms, recomputes the terms hash
+    and refuses with (false, "terms") before opening lines or creating the policy.'
   preconditions: A caller reaches the arm on the affected path.
   impact: A changed or malformed terms map could diverge from the hash.
   proposed_fix: R-013
@@ -380,7 +389,7 @@ findings:
   title: Line.pay trusts a claimId without policy binding
   severity: P2
   class: composition
-  status: deferred
+  status: accepted
   confidence: high
   components:
   - Line
@@ -396,8 +405,9 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: The line checks paidFor[claimId] but not that claimId belongs to the
-    paying policy.
+  description: 'Accepted boundary: the policy token plus the policy claims map is
+    the claim-to-policy binding; Line.pay is only reachable through the policy token.
+    A leaked policy token is capability theft, outside this invariant.'
   preconditions: A caller reaches the arm on the affected path.
   impact: A cross-policy claimId could be paid if the policy token is leaked.
   proposed_fix: R-014
@@ -407,7 +417,7 @@ findings:
   title: Cross-cell writers and declared edges are incomplete
   severity: P2
   class: composition
-  status: deferred
+  status: fixed
   confidence: high
   components:
   - SyndicateBook
@@ -429,9 +439,11 @@ findings:
   evidence_level: E1
   evidence:
   - kind: source
-    ref: contracts/src/deploy
-  description: Instance makers write book cells; factories are declared as depending
-    on their products; overloaded arms are undercounted.
+    ref: contracts/components.json
+  - kind: tool
+    ref: tools/check_arch.py
+  description: 'Fix: components.json declares cross-cell writers and overloaded arms;
+    check_arch.py rejects an undeclared cross-cell writer or overloaded arm.'
   preconditions: A caller reaches the arm on the affected path.
   impact: The architecture graph and ownership model understate coupling.
   proposed_fix: R-015
@@ -464,7 +476,7 @@ findings:
   title: Risk tri-test checks presence only
   severity: P2
   class: composition
-  status: deferred
+  status: accepted
   confidence: high
   components:
   - Risk
@@ -478,8 +490,8 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: The four tri-test fields are non-empty strings; probability/cost quality
-    and evidence binding are not checked.
+  description: 'Accepted boundary: tri-test presence is the on-chain check; probability/cost
+    quality and evidence binding are off-chain underwriting duties. See docs/primer/design-philosophy.md.'
   preconditions: A caller reaches the arm on the affected path.
   impact: An uninsurable or weakly supported risk can be submitted.
   proposed_fix: R-017
@@ -489,7 +501,7 @@ findings:
   title: External reply shapes are assumed
   severity: P2
   class: composition
-  status: deferred
+  status: accepted
   confidence: high
   components:
   - Payments
@@ -508,8 +520,9 @@ findings:
   evidence:
   - kind: source
     ref: contracts/src/deploy
-  description: r-cash and r-gen reply shapes are matched by hand; a changed or missing
-    reply can hang or roll back.
+  description: 'Accepted integration boundary: r-cash/r-gen reply shapes are matched
+    by hand; the integration suites assert the shapes and a health preflight. A changed
+    reply surfaces as hang or rollback.'
   preconditions: A caller reaches the arm on the affected path.
   impact: Integration failures are not diagnosed at the boundary.
   proposed_fix: R-018

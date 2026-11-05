@@ -85,7 +85,8 @@ mdBook.
 ## Documentation
 
 The book in `docs/` covers the insurance primer, the Lloyd's model, placement, binding,
-claims and the contract reference. Developer notes are in `AGENTS.md`.
+claims and the contract reference. See [Project status](docs/orientation/project-status.md)
+for the current state. Developer notes are in `AGENTS.md`.
 
 ## License
 

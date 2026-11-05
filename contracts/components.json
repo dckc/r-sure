@@ -103,6 +103,12 @@
         "CoverTerms",
         "SureMath",
         "SyndicateBook"
+      ],
+      "cross_cell_writers": [
+        "syndicateBookState"
+      ],
+      "overloaded_arms": [
+        "quote"
       ]
     },
     "LineGrant": {
@@ -142,7 +148,10 @@
       "state_cells": [
         "brokerState"
       ],
-      "depends_on": []
+      "depends_on": [],
+      "cross_cell_writers": [
+        "brokerBookState"
+      ]
     },
     "RiskBook": {
       "file": "12_risk.rho",
@@ -161,6 +170,9 @@
       ],
       "depends_on": [
         "Clock"
+      ],
+      "cross_cell_writers": [
+        "riskBookState"
       ]
     },
     "DistributionFactory": {

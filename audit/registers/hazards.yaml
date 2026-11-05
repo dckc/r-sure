@@ -448,8 +448,9 @@ hazards:
   likelihood: medium
   risk: medium
   controls:
-  - review finding
-  - regression suite
+  - policyToken authority
+  - policy claims-map lookup
+  - accepted boundary note
   findings:
   - F-014
   tests:
@@ -496,13 +497,13 @@ hazards:
   likelihood: medium
   risk: medium
   controls:
-  - review finding
-  - regression suite
+  - tri-test presence check
+  - NAIC off-chain quality note
   findings:
   - F-017
   tests:
   - T-003
-  disposition: mitigate
+  disposition: accept
   owner: contracts
   evidence:
   - audit/concurrency/components.yaml
@@ -520,13 +521,13 @@ hazards:
   likelihood: medium
   risk: medium
   controls:
-  - review finding
-  - regression suite
+  - health preflight
+  - integration reply-shape assertion
   findings:
   - F-018
   tests:
   - T-003
-  disposition: mitigate
+  disposition: accept
   owner: contracts
   evidence:
   - audit/concurrency/components.yaml
@@ -544,13 +545,13 @@ hazards:
   likelihood: medium
   risk: medium
   controls:
-  - review finding
-  - regression suite
+  - health preflight
+  - integration reply-shape assertion
   findings:
   - F-018
   tests:
   - T-003
-  disposition: mitigate
+  disposition: accept
   owner: contracts
   evidence:
   - audit/concurrency/components.yaml

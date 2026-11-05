@@ -2,7 +2,7 @@
 
 > **Status:** Internal desk and tabletop review, 2026-11-05. This is not an independent audit
 > and does not certify the contracts, r-cash, r-gen or any deployment. Dynamic evidence is
-> `not_run` until the P0 instance-bundle defect is fixed.
+> `not_run` until the Slip binding and devnet proposer issues are resolved.
 
 This directory is the working audit record. The registers are the editable source of truth;
 the book chapters summarise them.
@@ -28,8 +28,8 @@ the book chapters summarise them.
 
 ## What to read for the verdict
 
-1. `report.md` — the P0 bundle defect is open; install is blocked.
-2. `findings.yaml` — F-001 (take-await-take) is fixed; F-002 (bundles) is open.
+1. `report.md` — the bundle defect is fixed statically; install is blocked by Slip binding and the proposer.
+2. `findings.yaml` — F-001 (take-await-take) and F-002 (bundles) are fixed in source.
 3. `concurrency/reviews/` — one review per component; no component is un-reviewed.
 4. `hazop/tabletop-2026-11-05.md` — decisions and the internal-only limitation.
 

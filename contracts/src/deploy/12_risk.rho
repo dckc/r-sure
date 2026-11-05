@@ -46,7 +46,7 @@ in {
               new cCh in {
                 rl!(uri, *cCh) |
                 for (SureAdmin <- cCh) {
-                  @SureAdmin!("isPaused", *pCh) |
+                  SureAdmin!("isPaused", *pCh) |
                   for (@p <- pCh) {
                     match p {
                       (true, paused) => { ret!(paused) }

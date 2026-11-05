@@ -108,13 +108,13 @@ status:
 	@curl -s $(NODE)/api/v1/status | $(PY) -m json.tool || echo "devnet not running"
 
 rcash-install:
-	$(PY) harness/rcash_bootstrap.py --wait
+	$(PY) harness/rcash_bootstrap.py
 
 rcash-keys:
-	$(PY) tools/keygen.py --out .devnet/keys.json --count 4
+	$(PY) tools/keygen.py --out .devnet/keys.json
 
 rcash-bootstrap:
-	$(PY) harness/rcash_bootstrap.py --wait
+	$(PY) harness/rcash_bootstrap.py
 
 rgen-install:
 	@echo "rgen-install: deploy r-gen at $(RGEN_DIR) and set rgen_root_uri in configs/devnet.json"
@@ -123,7 +123,7 @@ rgen-keys:
 	@echo "rgen-keys: r-gen uses its own devnet keys; see $(RGEN_DIR)/harness"
 
 keys:
-	$(PY) tools/keygen.py --out .devnet/keys.json --count 4
+	$(PY) tools/keygen.py --out .devnet/keys.json
 
 install:
 	$(PY) harness/install.py

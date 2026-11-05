@@ -4,7 +4,7 @@
 
 # Part I — Primer
 
-- [Status and scope](orientation/status-and-scope.md)
+- [Project status](orientation/project-status.md)
 - [Insurance basics](primer/insurance-basics.md)
 - [Lloyd's of London for dummies](primer/lloyds-for-dummies.md)
 - [Design philosophy: the NAIC/CIPR basis](primer/design-philosophy.md)

@@ -28,8 +28,9 @@ for unclosed bundles, take-await-take, reply shapes and pause scope.
 
 Current audit state: 30/30 component reviews, 42 interfaces, 27 hazards, 21 findings, 21
 improvements, 36 registered suites (`not_run`), and 108 registered theorems. The P0
-take-await-take finding is fixed; the P0 instance-bundle finding is open, so `make
-audit-scan` reports one bundle candidate (`Slip`) and the devnet install remains blocked.
+take-await-take and instance-bundle findings are fixed in source; `check_bundle_closedness.py`
+reports zero candidates. The devnet install is blocked by a SlipFactory name/data binding
+defect and a node proposer continuation failure.
 F-003 (narrow, fail-closed pause), F-020 (payable minimum and aggregate guard) and F-021
 (terminal claim guards) are fixed; INV-9 and INV-10 are now covered, and INV-12 is a
 source-gated tool check.
