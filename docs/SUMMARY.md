@@ -17,6 +17,7 @@
 - [Claims and adjudication](concepts/claims-and-adjudication.md)
 - [Settlement and the central fund](concepts/settlement.md)
 - [Evidence and r-gen](concepts/evidence.md)
+- [Variance is risk](concepts/variance-is-risk.md)
 - [Time, refusal and concurrency](concepts/time-and-refusal.md)
 
 # Case studies

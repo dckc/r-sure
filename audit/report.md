@@ -1,43 +1,41 @@
 # Audit report
 
-> **Status:** Internal desk, tabletop and install-RCA review, 2026-11-05. **Not an
-> independent audit.** The 17-term install is E2 green after the fixes recorded in
-> `rca.yaml#RCA-001`. The behavioural campaign is incomplete: the root suite passes while
-> the other registered suites are `not_run` or implemented; install evidence is not
-> behavioural coverage. No primitive is audited or production-safe.
+> **Status:** Internal desk, tabletop, install-RCA and behavioural review, 2026-11-06.
+> **Not an independent audit.** The 17-term install is E2 green after the fixes recorded in
+> `rca.yaml#RCA-001`. The campaign records 38 runs, 411 assertions and 0 assertion failures;
+> 37 of 40 registered suites pass and three process gates are `not_run`. Install evidence is
+> not behavioural coverage. No primitive is audited or production-safe.
 
 ## Verdict
 
-The review covered all 30 catalogue components and 42 cross-component interfaces. It found
+The review covered all 30 catalogue components and 46 cross-component interfaces. It found
 two systemic P0 source defects, three install-blocking defects, several P1
 composition/authorization gaps, and a set of P2 design limits. All P0 findings are fixed in
 source. The install now completes: `install-recursion-fix.log` shows all 17 terms deployed
 and processed. Three caveats bound that claim:
 
-1. the install RCA's dynamic evidence is the install only; a concurrent run records the
-   root suite passing, but the rest of the behavioural campaign did not run;
+1. the install RCA's dynamic evidence is the install only; the behavioural campaign and
+   the local reducer are separate evidence;
 2. the r-cash rail is partial — the account factory installed, but `51_pool` was refused
    with `parse depth exceeded`;
-3. `tools/check_audit.py` currently fails on Lean theorem-register drift (more than 100
-   source theorems are not in `theorems.yaml`) from concurrent work outside this RCA. The
-   install registers themselves pass.
+3. three registered process gates remain `not_run`; they are not claimed as passing.
 
 | Metric | Count |
 |---|---|
 | Catalogue components | 30 |
 | Components with a concurrency review | 30 |
-| Interfaces in the composition matrix | 42 |
+| Interfaces in the composition matrix | 46 |
 | HAZOP nodes | 19 |
-| Public arms registered | 162 |
-| Hazards | 35 |
+| Public arms registered | 168 |
+| Hazards | 36 |
 | Findings | 25 |
 | P0 findings | 5 (5 fixed; F-002/F-022/F-023/F-024 E2 install) |
 | P1 findings | 13 (13 fixed, 0 open) |
 | P2/P3 findings | 7 (4 fixed, 3 accepted) |
 | Improvements | 25 |
-| Tests registered | 39 (1 passing, 3 implemented, 35 `not_run`) |
-| Lean theorems registered | 108 (register; over 100 source theorems currently unregistered) |
-| Claims | 13 covered, 1 partial, 1 deferred, 1 tool |
+| Tests registered | 40 (37 passing, 3 `not_run`) |
+| Lean theorems registered | 285 (register and source agree; no unregistered theorem) |
+| Claims | 26 covered, 1 partial, 1 tool; 15 critical primitives covered |
 
 ## P0
 
@@ -113,7 +111,7 @@ gap.
 - `audit/composition/` — 42 interface rows, reply-shape inventory and assumed invariants.
 - `audit/hazop/` — 19-node catalogue, worksheet, install worksheet and the 2026-11-05
   tabletop.
-- `audit/registers/` — hazards, findings, improvements, 39 tests, RCA and experiments.
+- `audit/registers/` — hazards, findings, improvements, 40 tests, RCA and experiments.
 - `audit/rca/template.md` — RCA template.
 - `audit/evidence/2026-11-05-concurrency-tabletop/` — pre-fix scanner output and gate notes.
 - `audit/traceability/` — generated arm/hazard/finding/test matrix and coverage report.
@@ -126,18 +124,16 @@ gap.
   `python3 tools/check_experiments.py`.
 - They are not yet in `make audit-check`; the Makefile is owned by the lead. Proposed
   targets: `check-evidence`, `check-rca`, `check-experiments`, appended to `audit-check`.
-- `deployments/suite-results.json` records the root suite passing (11 assertions, 7
-  covered arms); the other registered suites are `not_run` or implemented.
+- `deployments/suite-results.json` records 38 runs, 411 assertions and no assertion
+  failure; the coverage report derives 37/40 suites and 126/151 public arms.
 
 ## Next steps
 
-1. Complete the behavioural campaign on the now-installed devnet and record honest
-   pass/fail/not_run.
-2. Resolve the r-cash `51_pool` parser-depth refusal with the r-cash owner; the r-sure
+1. Run the three `not_run` process gates as first-class campaign rows.
+2. Exercise the variance derivation against a live r-gen-approved K-Asset; the devnet test
+   uses a stub and the integration suite covers the read shape.
+3. Resolve the r-cash `51_pool` parser-depth refusal with the r-cash owner; the r-sure
    install does not depend on it.
-3. Reconcile the Lean source theorems with `audit/registers/theorems.yaml` (over 100
-   currently unregistered).
-4. Wire `check_evidence`, `check_rca` and `check_experiments` into `make audit-check`.
-5. Run an independent adversarial review and record evidence.
-6. Do not describe any primitive as audited until behavioural and independent review
+4. Run an independent adversarial review and record evidence.
+5. Do not describe any primitive as audited until behavioural and independent review
    evidence exists.

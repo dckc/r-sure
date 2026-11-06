@@ -18,18 +18,18 @@ the book chapters summarise them.
 | [report.md](report.md) | verdict, counts, P0/P1 status, install evidence and residual risk |
 | [concurrency/README.md](concurrency/README.md) | per-component concurrency review method |
 | [concurrency/components.yaml](concurrency/components.yaml) | one row per component (30) |
-| [composition/interfaces.yaml](composition/interfaces.yaml) | one row per interface (42) |
+| [composition/interfaces.yaml](composition/interfaces.yaml) | one row per interface (46) |
 | [hazop/nodes.yaml](hazop/nodes.yaml) | 19 nodes, guide words and parameters |
 | [hazop/tabletop-2026-11-05.md](hazop/tabletop-2026-11-05.md) | internal tabletop record |
 | [hazop/worksheet-install-2026-11-05.md](hazop/worksheet-install-2026-11-05.md) | install guide-word worksheet for N16–N19 |
 | [registers/findings.yaml](registers/findings.yaml) | 25 findings |
-| [registers/hazards.yaml](registers/hazards.yaml) | 35 hazards |
+| [registers/hazards.yaml](registers/hazards.yaml) | 36 hazards |
 | [registers/improvements.yaml](registers/improvements.yaml) | 25 fixes/deferred items |
-| [registers/tests.yaml](registers/tests.yaml) | 39 tests: 1 passing, 3 implemented, 35 `not_run` |
+| [registers/tests.yaml](registers/tests.yaml) | 40 tests: 37 passing, 3 `not_run` |
 | [registers/rca.yaml](registers/rca.yaml) | RCA-001 install root cause and corrective actions |
 | [registers/experiments.yaml](registers/experiments.yaml) | 10 RCA experiments with artifacts |
 | [rca/template.md](rca/template.md) | RCA template |
-| [registers/theorems.yaml](registers/theorems.yaml) | 108 registered Lean component-model theorems |
+| [registers/theorems.yaml](registers/theorems.yaml) | 285 registered Lean component-model theorems |
 | [traceability/matrix.md](traceability/matrix.md) | generated arm/hazard/finding/test matrix |
 | [evidence/2026-11-05-install-rca/rca.md](evidence/2026-11-05-install-rca/rca.md) | readable install RCA |
 | [evidence/2026-11-05-install-rca/manifest.json](evidence/2026-11-05-install-rca/manifest.json) | `rsure.evidence/v2` install evidence manifest |

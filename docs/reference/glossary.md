@@ -21,6 +21,18 @@ Insurance terms first, then r-sure terms.
 - **Deductible / excess**: the part of each loss the insured retains. It reduces small
   claims and moral hazard.
 - **Exposure**: what can be lost, and to whom.
+- **Variance rate**: `Var(value)/mean(value)^2`, expressed in basis points; the dimensionless
+  measure r-sure uses for both a K-Asset and the insurance policy. See
+  [Variance is risk](../concepts/variance-is-risk.md).
+- **Engineering variance**: the rate implied by the K-Asset's quality rubric, verdict and
+  approver liability, or supplied by a bound attestation.
+- **Insurer variance**: the underwriter's rate in the assessment. The signed difference from
+  the engineering estimate is the **gap**; a gap beyond the tolerance is **flagged** and
+  acknowledged by the insured at acceptance.
+- **Variance attestation**: an off-chain engineering variance record
+  `{source, kassetUri, varianceBps, evidenceHash}` bound to an `rgen:kasset` evidence entry.
+- **Loaded premium**: expected loss plus a variance-principle load; `Risk.assess` refuses a
+  quote below it.
 - **Indemnity**: restoring the insured to the financial position before the loss, subject
   to the policy terms.
 - **Insurable interest**: a real loss the insured would suffer if the event happened.

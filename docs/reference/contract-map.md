@@ -27,10 +27,10 @@
 ```
 SureRoot -> Clock/Verifier/Codec/AdminGuard/SureAdmin/CoverTerms/SureMath/Payments
 Payments -> r-cash Root
-RgenAdapter -> optional r-gen Root
+RgenAdapter -> optional r-gen Root, SureMath (varianceRate), KAsset (read-only get)
 SyndicateBook -> Payments -> Syndicate -> LineGrant
 BrokerBook -> Broker
-RiskBook -> Risk
+RiskBook -> Risk -> SureMath (varianceGap/loadedPremium), RgenAdapter (variance), Clock
 SlipFactory -> BrokerBook/CoverTerms/Payments -> Slip -> Syndicate/Risk
 LineFactory -> Line -> Syndicate capabilities
 DistributionFactory -> Distribution -> Payments/SureFund/Line

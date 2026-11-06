@@ -21,7 +21,15 @@
 - `BrokerBook`: `register`, `registerDone`, `brokerOf`, `brokers`.
 - `Broker`: `info`, `profile`, `slips`, `addSlip`, `pause`, `resume`.
 - `RiskBook`: `submit`, `risk`, `risks`, `byInsured`, `byBroker`.
-- `Risk`: `info`, `evidence`, `addEvidence`, `assess`, `accept`, `decline`, `expire`.
+- `Risk`: `info`, `evidence`, `addEvidence`, `assess`, `accept`, `decline`, `expire`,
+  `variance`.
+
+## Risk measure
+
+- `SureMath`: `bpsSum`, `share`, `lineExposures`, `premiumSplit`, `lineShares`, `payable`,
+  `settlePlan`, `varianceRate`, `varianceGap`, `loadedPremium`, `varianceStats`.
+- `RgenAdapter`: `health`, `config`, `oracleFactory`, `credentialFactory`, `claimFactory`,
+  `verifyCredential`, `verifyClaim`, `verifyProvenance`, `variance`, `admin`.
 
 ## Placing and policies
 

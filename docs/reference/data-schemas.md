@@ -19,9 +19,19 @@ The canonical state shapes are in the contract sources. The important fields:
 
 ## Risk
 
-`id`, `insured`, `broker`, `class`, `assetRef`, `declaredValue`, `requestedLimit`,
-`requestedDeductible`, `periodStart`, `periodEnd`, `evidence`, `triTest`, `assessment`,
-`status`.
+`id`, `insured`, `broker`, `class`, `assetRef` (`kind`, `hash`, optional `uri`),
+`declaredValue`, `requestedLimit`, `requestedDeductible`, `periodStart`, `periodEnd`,
+`evidence`, `triTest`, `varianceAttestation`, `variance`, `gapAcknowledged`, `assessment`,
+`status`, `nonce`.
+
+The optional submission `variance` attestation is
+`{source:"attested", kassetUri, varianceBps 0..10000, evidenceHash}` and must match an
+`rgen:kasset` evidence entry `{kind, uri, hash}`. The assessment (written by `Risk.assess`)
+carries `quotedPremium`, `expectedLoss`, `varianceBps`, `loadBps`, `basisHash`,
+`toleranceBps`, `engineering`, `gapBps`, `gapFlag`, `minimumPremium`, `by` and `at`. The
+`variance` read returns `{engineeringBps, insurerBps, gapBps, flagged, acknowledged, source,
+minimumPremium, expectedLoss}`; a flagged gap is visible before acceptance and acceptance
+sets `acknowledged`.
 
 ## Slip
 

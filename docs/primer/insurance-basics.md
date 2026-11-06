@@ -55,6 +55,10 @@ A premium is not a savings deposit. It is the price of accepting the risk, built
 - the cost of holding capital against unexpected losses;
 - a margin for uncertainty and profit.
 
+Uncertainty is variance, and the variance of the insured value is the insurer's risk; see
+[Variance is risk](../concepts/variance-is-risk.md) for how r-sure makes the engineering and
+insurer estimates and their gap visible.
+
 The insurer earns the premium over the policy period. If the policy is cancelled early, an
 **earned premium** calculation decides how much the insurer keeps and how much is returned.
 r-sure currently funds the full premium before binding and does not implement instalments or

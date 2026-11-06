@@ -14,9 +14,9 @@ make parse-check      # target node parser on built and rendered terms
 ```
 
 Recorded locally: 17 terms parse; 30 components; 19 state cells; acyclic; all terms within
-budget; 162 source arms registered; 261 Lean theorems, 33 vectors and 51 flow rules with 11
-`proved-model` core arms. The claims register reports 24 covered, 1 partial and 1 tool entry,
-with 161 substantive theorems, 1 weak and no unaudited theorem. The Rust core, keystore, SDK,
+budget; 168 source arms registered; 285 Lean theorems, 48 vectors and 58 flow rules with
+11 `proved-model` core arms. The claims register reports 26 covered, 1 partial and 1 tool
+entry, with 176 substantive theorems, 1 weak and no unaudited theorem. The Rust core, keystore, SDK,
 CLI and WASM crates compile; `cargo test --workspace` passes 13 tests (5 core, 3 keystore,
 4 SDK, 1 CLI). The web app typechecks, runs 8 Vitest tests, lints with no errors and builds;
 the three Playwright journeys (wallet and books, placement through claim and fund, admin
@@ -29,8 +29,8 @@ interface, the F-020/F-021 guard checks and the narrow pause scope, with no unre
 register IDs. `make audit-scan` runs the heuristic scanners for unclosed bundles,
 take-await-take, reply shapes and pause scope.
 
-Current audit state: 30/30 component reviews, 42 interfaces, 35 hazards, 25 findings (22
-fixed, 3 accepted boundaries), 25 improvements, 39 registered suites and 261 registered
+Current audit state: 30/30 component reviews, 46 interfaces, 36 hazards, 25 findings (22
+fixed, 3 accepted boundaries), 25 improvements, 40 registered suites and 285 registered
 theorems. `check_bundle_closedness.py` reports zero candidates. The devnet install completes
 all 17 terms and the node proposes blocks; the install root-cause analysis is recorded under
 `audit/evidence/2026-11-05-install-rca`. F-003 (narrow, fail-closed pause), F-020 (payable
@@ -51,18 +51,18 @@ make web-e2e          # Playwright, devnet-gated
 ```
 
 The behavioural campaign's current output is recorded in `deployments/suite-results.json`:
-37 runs, 375 assertions, 0 assertion failures. The coverage report derives 36/39 registered
-suites passing (three `not_run` process gates), 120/145 public arms, 133/162 all registered
+38 runs, 411 assertions, 0 assertion failures. The coverage report derives 37/40 registered
+suites passing (three `not_run` process gates), 126/151 public arms, 139/168 all registered
 arms and 8/11 core-flow arms asserted.
 
 The formal gate's current output:
 
 ```text
-lean: built, 261 axiom audits, 261 source theorems, no sorry/admit/axiom/native_decide
-vectors: 33 vectors current
-check-flows: 51 rules, 40 arms, 11 core arms proved-model, 0 proof-quality warnings
-claims: covered=24, partial=1, deferred=0, tool=1, substantive=161, weak=1, unaudited=0
-check-critical-path: 14 critical primitives covered, arms/flows/suites/hazards joined
+lean: built, 285 axiom audits, 285 source theorems, no sorry/admit/axiom/native_decide
+vectors: 48 vectors current
+check-flows: 58 rules, 47 arms, 11 core arms proved-model, 0 proof-quality warnings
+claims: covered=26, partial=1, deferred=0, tool=1, substantive=176, weak=1, unaudited=0
+check-critical-path: 15 critical primitives covered, arms/flows/suites/hazards joined
 ```
 
 `make client-terms-check` prints the read, resolve, write, funding and payment terms the
@@ -71,9 +71,9 @@ same gate in `make normalize-check`; the client terms are checked separately bec
 are assembled at runtime.
 
 `make local-reducer` goes one step further: it installs all 17 built terms in the node's
-own in-memory runtime, executes the 10 `math.*` model vectors against `SureMath`, drives a
-syndicate, broker, risk, slip, bind, claim and settlement, runs 22 refusal vectors and a
-signed pause/resume, and fails on a reduction error, a wrong refusal or an unexpected state. It needs an RNodeRust
+own in-memory runtime, executes the 10 `math.*` and 15 `variance.*` model vectors against
+`SureMath`, drives a syndicate, broker, risk, slip, bind, claim and settlement, runs 24
+refusal vectors and a signed pause/resume, and fails on a reduction error, a wrong refusal or an unexpected state. It needs an RNodeRust
 checkout and `protoc`; see [Local reducer](local-reducer.md) for its fixtures and limits.
 
 The suite inventory is in `harness/run_suites.py`. A suite that has not been run must report

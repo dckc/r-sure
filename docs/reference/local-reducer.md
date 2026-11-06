@@ -1,24 +1,28 @@
 # Local reducer
 
-> **Status:** Implemented. Installs all 17 terms and drives a placement and claim to
-> settlement; it is a development gate, not a replacement for the devnet campaign.
+> **Status:** Implemented. Installs all 17 terms, drives a placement and claim to
+> settlement, and exercises the variance conversion; it is a development gate, not a
+> replacement for the devnet campaign.
 
 `make local-reducer` runs the built contracts in the node's own in-memory `RhoRuntime`.
 No devnet, Docker or network is involved. The gate installs `contracts/build/*.rho` in the
 install order, then drives:
 
-1. `SureRoot.resolve` and every `math.*` model vector through `SureMath`;
+1. `SureRoot.resolve` and every `math.*` and `variance.*` model vector through `SureMath`;
 2. syndicate create, capital contribution and broker registration;
 3. risk submit and slip open;
 4. subscribe, accept, fund the premium and bind;
-5. claim open, classify, assess, agree, settle and close.
+5. claim open, classify, assess, agree, settle and close;
+6. a stub K-Asset through `RgenAdapter("variance")`, then a Risk assessment, signed gap and
+   acceptance acknowledgement.
 
-It then runs 22 refusal vectors and asserts the exact reason: bind one-shot, settle and
+It then runs 24 refusal vectors and asserts the exact reason: bind one-shot, settle and
 classify after close, terminal agree and evidence, unknown component, duplicate register,
 non-installer register, duplicate syndicate and broker, admin replay and below-threshold,
 non-insured claim, loss outside the window, zero claim, blank and asset-less terms, settle
-before agreement, assess before classification, non-lead agree, and unknown policy/book
-claims.
+before agreement, assess before classification, non-lead agree, unknown policy/book claims,
+variance above the bps range, a premium below the loaded floor, and an attestation bound to
+the wrong evidence.
 
 Finally it signs a canonical admin payload with two deterministic local admin keys, submits
 `pauseAll`, checks that a new syndicate is refused with `paused` while the root still
@@ -35,10 +39,10 @@ resolves, then submits `resumeAll` and checks that the write path is open again.
   checked before the devnet campaign sees them.
 - Signature and pause scope: the 2-of-3 payload is signed and verified by the deployed
   `AdminGuard`; pause blocks writes, leaves reads available and resumes cleanly.
-- Model/contract drift: the 10 `math.*` vectors emitted by the Lean model
-  (`spec/vectors/core.json`) are executed against the deployed `SureMath` and compared.
-  The sharing, split, payable and allocation arithmetic the model proves and the contract
-  runs must agree.
+- Model/contract drift: the 10 `math.*` and 15 `variance.*` vectors emitted by the Lean
+  model (`spec/vectors/core.json`) are executed against the deployed `SureMath` and
+  compared. Sharing, split, payable and allocation arithmetic, the derived variance rate,
+  the gap flag and the loaded premium must agree with the model.
 
 It caught the funding term's missing `wdCh` binder class of defect before any deploy, and
 it is the first place a malformed install term or a deadlocked arm fails without bringing
@@ -61,7 +65,10 @@ The output ends with:
 ```text
 local-reducer: resolve component:clock -> (true, `rho:id:…`, 1)
 local-reducer: suremath share(1000, 250) -> (true, 25, 975)
-local-reducer: 10 model vectors match SureMath
+local-reducer: 25 model vectors match SureMath
+local-reducer: kasset variance -> (true, {"varianceBps" : 4000, …})
+local-reducer: risk variance -> (true, {"gapBps" : 1000, "flagged" : false, …})
+local-reducer: variance acknowledged on accept
 local-reducer: bound slp:… -> (true, `rho:id:…`)
 local-reducer: claim … settled and closed
 local-reducer: refused bind is one-shot -> closed
@@ -77,6 +84,10 @@ local-reducer: root keys -> 21 components
   a stub r-cash root with those capabilities before the install. The stub returns 6000 for
   a capital contribution, 1000 for `"premium:1000"`, and the requested amount on
   `withdraw`; it does not model ERTP conservation, balances or authority.
+- **Stub K-Asset.** The variance path reads a small contract that answers
+  `KAsset("get")` with an approved K-Asset state (quantity, quality, verdict, liability).
+  It exercises the same read and derivation as r-gen without installing r-gen; it does not
+  prove that a real r-gen approval has that shape.
 - **Local admin keys.** The three admin keys are derived from deterministic secrets held in
   the reducer process. They are never used against a node; they exist so the 2-of-3 payload
   can be signed and verified locally. r-gen credentials and signatures are not modelled, so
