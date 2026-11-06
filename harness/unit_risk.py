@@ -12,8 +12,15 @@ import preflight
 REQ = {
     "class": "engineering",
     "broker": "broker-1",
-    "assetRef": {"kind": "property", "hash": "asset-hash"},
-    "evidence": [{"kind": "survey", "hash": "evidence-hash"}],
+    "assetRef": {"kind": "property", "hash": "asset-hash",
+                 "uri": "rho:id:risk-fixture-kasset"},
+    "evidence": [
+        {"kind": "survey", "hash": "evidence-hash"},
+        {"kind": "rgen:kasset", "uri": "rho:id:risk-fixture-kasset",
+         "hash": "kasset-hash"}],
+    "variance": {"source": "attested",
+                 "kassetUri": "rho:id:risk-fixture-kasset",
+                 "varianceBps": 1000, "evidenceHash": "kasset-hash"},
     "triTest": {
         "exposureRef": "exposure-ref",
         "probabilityBasis": "probability-basis",
@@ -92,11 +99,13 @@ def main() -> int:
         call(risk_uri, "addEvidence",
              ', *dId, [{"kind": "photo", "hash": "evidence-2"}]')
         A.expect("add evidence grows the list",
-                 len(call(risk_uri, "info")[1].get("evidence")), 2)
+                 len(call(risk_uri, "info")[1].get("evidence")), 3)
 
         A.cover('Risk@"assess"', "success")
         call(risk_uri, "assess",
-             ', *dId, {"quotedPremium": 1200, "terms": "standard"}')
+             ', *dId, {"quotedPremium": 1200, "expectedLoss": 1000, '
+             '"varianceBps": 2000, "loadBps": 2000, '
+             '"basisHash": "underwriting:risk", "toleranceBps": 2000}')
         A.expect("risk is assessed", call(risk_uri, "info")[1].get("status"), "assessed")
 
         A.cover('Risk@"accept"', "success")

@@ -24,7 +24,7 @@ def main() -> int:
                       '*dId, [{"kind": "survey", "hash": "risk-evidence-2"}]',
                       key=p.insured)
         A.expect("risk evidence appended",
-                 len(actors.invoke(p.risk_uri, "evidence")[1]), 2)
+                 len(actors.invoke(p.risk_uri, "evidence")[1]), 3)
 
         claim_id, claim_uri = p.open_claim(amount=100)
         A.cover('Claim@"evidence"', "success")

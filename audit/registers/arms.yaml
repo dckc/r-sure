@@ -842,3 +842,33 @@ arms:
   file: 40_payments.rho
   source: contracts/src/deploy/40_payments.rho
   visibility: internal
+- component: SureMath
+  arm: varianceRate
+  file: 04_math.rho
+  source: contracts/src/deploy/04_math.rho
+  visibility: public
+- component: SureMath
+  arm: varianceGap
+  file: 04_math.rho
+  source: contracts/src/deploy/04_math.rho
+  visibility: public
+- component: SureMath
+  arm: loadedPremium
+  file: 04_math.rho
+  source: contracts/src/deploy/04_math.rho
+  visibility: public
+- component: SureMath
+  arm: varianceStats
+  file: 04_math.rho
+  source: contracts/src/deploy/04_math.rho
+  visibility: public
+- component: RgenAdapter
+  arm: variance
+  file: 05_rgen.rho
+  source: contracts/src/deploy/05_rgen.rho
+  visibility: public
+- component: Risk
+  arm: variance
+  file: 12_risk.rho
+  source: contracts/src/deploy/12_risk.rho
+  visibility: public

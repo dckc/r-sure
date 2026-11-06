@@ -117,10 +117,8 @@ def _ping(name: str, min_phlo: int) -> tuple[bool, object]:
     return reply == 1, reply
 
 
-def ensure_vault(name: str, min_phlo: int = 6_000_000) -> None:
+def ensure_vault(name: str, min_phlo: int = 10_000_000) -> None:
     """Prove the key can precharge a race-sized deploy; drip the faucet if it cannot."""
-    if name == "deployer":
-        return
     ready, detail = _ping(name, min_phlo)
     if ready:
         return

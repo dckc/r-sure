@@ -38,6 +38,7 @@ SUITES = {
     "capital": "unit_capital.py",
     "broker": "unit_broker.py",
     "risk": "unit_risk.py",
+    "variance": "unit_variance.py",
     "slip": "unit_slip.py",
     "subscription": "unit_subscription.py",
     "binding": "unit_binding.py",

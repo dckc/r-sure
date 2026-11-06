@@ -1,13 +1,13 @@
 {
   "schema": "rshare.traceability/v1",
   "summary": {
-    "arms": 162,
+    "arms": 168,
     "arms_with_flow_rule": 11,
-    "arms_with_hazard": 24,
-    "hazards": 35,
+    "arms_with_hazard": 25,
+    "hazards": 36,
     "findings": 25,
     "improvements": 25,
-    "tests": 39
+    "tests": 40
   },
   "arms": [
     {
@@ -1137,10 +1137,15 @@
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,
-      "hazards": [],
+      "hazards": [
+        "HZ-036"
+      ],
       "findings": [],
       "improvements": [],
-      "tests": []
+      "tests": [
+        "T-035",
+        "T-040"
+      ]
     },
     {
       "component": "Risk",
@@ -2320,6 +2325,84 @@
       "arm": "admin",
       "source": "contracts/src/deploy/40_payments.rho",
       "visibility": "internal",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "SureMath",
+      "arm": "varianceRate",
+      "source": "contracts/src/deploy/04_math.rho",
+      "visibility": "public",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "SureMath",
+      "arm": "varianceGap",
+      "source": "contracts/src/deploy/04_math.rho",
+      "visibility": "public",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "SureMath",
+      "arm": "loadedPremium",
+      "source": "contracts/src/deploy/04_math.rho",
+      "visibility": "public",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "SureMath",
+      "arm": "varianceStats",
+      "source": "contracts/src/deploy/04_math.rho",
+      "visibility": "public",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "RgenAdapter",
+      "arm": "variance",
+      "source": "contracts/src/deploy/05_rgen.rho",
+      "visibility": "public",
+      "flow_rule": null,
+      "flow_status": null,
+      "lean_target": null,
+      "hazards": [],
+      "findings": [],
+      "improvements": [],
+      "tests": []
+    },
+    {
+      "component": "Risk",
+      "arm": "variance",
+      "source": "contracts/src/deploy/12_risk.rho",
+      "visibility": "public",
       "flow_rule": null,
       "flow_status": null,
       "lean_target": null,

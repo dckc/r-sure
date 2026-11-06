@@ -175,6 +175,9 @@ class Placement:
         self.expiry_blocks = expiry_blocks
         self.notice_blocks = notice_blocks
         self.asset_id = asset_id
+        self.kasset_ref = f"rho:id:fixture-kasset-{self.token}"
+        self.kasset_hash = f"kasset:{self.name}"
+        self.variance_bps = 1000
         self.term_overrides = term_overrides
 
         self.terms = terms(
@@ -310,8 +313,15 @@ class Placement:
         now = actors.block_height()
         req = {
             "class": self.class_,
-            "assetRef": {"kind": "site", "hash": f"asset:{self.name}"},
-            "evidence": [{"kind": "loss-run", "hash": f"loss:{self.name}"}],
+            "assetRef": {"kind": "site", "hash": f"asset:{self.name}",
+                         "uri": self.kasset_ref},
+            "evidence": [
+                {"kind": "loss-run", "hash": f"loss:{self.name}"},
+                {"kind": "rgen:kasset", "uri": self.kasset_ref,
+                 "hash": self.kasset_hash}],
+            "variance": {"source": "attested", "kassetUri": self.kasset_ref,
+                         "varianceBps": self.variance_bps,
+                         "evidenceHash": self.kasset_hash},
             "triTest": {
                 "exposureRef": f"exposure:{self.name}",
                 "probabilityBasis": "claims-history",
@@ -333,9 +343,15 @@ class Placement:
         return self.risk_uri
 
     def assess_risk(self, quoted_premium: int | None = None) -> tuple:
+        premium = quoted_premium or self.premium
         assessment = {
-            "quotedPremium": quoted_premium or self.premium,
+            "quotedPremium": premium,
             "recommendedLimit": self.per_claim,
+            "expectedLoss": max(1, premium * 9 // 10),
+            "varianceBps": 2000,
+            "loadBps": 2000,
+            "basisHash": f"underwriting:{self.name}",
+            "toleranceBps": 2000,
         }
         reply = actors.invoke(
             self.risk_uri, "assess", f"*dId, {_rl(assessment)}", key=self.insured)

@@ -201,3 +201,10 @@ tests:
   focus: Manual propose is called only when configured or RSURE_FORCE_PROPOSE=1; the
     install-recursion-fix run completed against a node advertising autopropose true/manualPropose
     false.
+- id: T-040
+  name: variance
+  file: harness/unit_variance.py
+  status: passing
+  focus: 'Variance is risk: SureMath varianceRate/varianceGap/loadedPremium/varianceStats,
+    the engineering and insurer estimates, the signed gap, the minimum premium, the
+    acknowledgement on accept, and the attestation-binding and premium-floor refusals.'

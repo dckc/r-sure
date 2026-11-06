@@ -15,13 +15,8 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
         check-docs spec-check parse-check normalize-check docs docs-serve docs-check \
         devnet devnet-up devnet-wait down status rcash-install rcash-keys \
         rcash-bootstrap rgen-install rgen-keys keys install setup \
-        unit-root unit-payments unit-syndicate unit-capital unit-broker unit-risk \
-        unit-slip unit-subscription unit-binding unit-line unit-policy unit-distribution \
-        unit-premium unit-fund unit-books unit-pause unit-pause-scope unit-admin \
-        unit-admin-keys unit-cell-liveness unit-factory-auth unit-replay unit-expiry \
-        unit-evidence unit-oracle unit-claim-lifecycle unit-claim-refusals unit-settlement \
-        unit-shortfall unit-conservation unit-behavior unit-generality unit-share-reuse \
-        integration-rcash integration-rgen integration-rshare unit-all \
+        unit-all \
+        integration-rcash integration-rgen integration-rshare \
         lean-build lean-check vectors check-flows check-flows-strict check-claims \
         critical-check formal-check check-evidence check-rca check-experiments \
         audit-check audit-trace audit-trace-check check-audit check-arm-inventory audit-dynamic \

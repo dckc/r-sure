@@ -30,3 +30,7 @@
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
 - Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+
+## Variance read (2026-11-06)
+
+`RgenAdapter("variance", kassetUri, ret)` is a read-only arm. It peeks `rgenState`, reads the K-Asset at the supplied URI via `KAsset("get")`, validates the conventions (quantity, the four quality dimensions, verdict, approved status and liability), then calls SureMath `varianceRate`. It does not hold `rgenState` across the await and takes no capability from r-gen. An unresolvable URI blocks the caller, as the existing provenance read does; that is recorded as a boundary in the local-reducer notes.

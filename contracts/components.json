@@ -71,7 +71,8 @@
       ],
       "depends_on": [
         "SureAdmin",
-        "AdminGuard"
+        "AdminGuard",
+        "SureMath"
       ]
     },
     "Payments": {
@@ -169,7 +170,9 @@
         "riskState"
       ],
       "depends_on": [
-        "Clock"
+        "Clock",
+        "RgenAdapter",
+        "SureMath"
       ],
       "cross_cell_writers": [
         "riskBookState"

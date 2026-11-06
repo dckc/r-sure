@@ -690,3 +690,65 @@ interfaces:
   hazards: []
   verdict: concern
   findings: []
+- id: C-43
+  caller: RgenAdapter
+  callee: KAsset (r-gen core)
+  arm: get
+  call_site: 05_rgen.rho kassetVariance
+  request: none (read-only state peek)
+  success_reply: (true, kasset state)
+  refusal_reply: n/a (unresolvable URI blocks, as with existing r-gen reads)
+  awaits: registry lookup and KAsset get
+  state_held: none; rgenState is peeked before the call
+  atomicity: read-only
+  capabilities: none
+  verdict: boundary
+  hazards: []
+  findings: []
+- id: C-44
+  caller: RgenAdapter
+  callee: SureMath
+  arm: varianceRate
+  call_site: 05_rgen.rho varianceCall
+  request: qualitySum, verdict, liabilityBps
+  success_reply: (true, varianceBps)
+  refusal_reply: (false, 'quality' | 'verdict' | 'liability')
+  awaits: component resolve and SureMath
+  state_held: none
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards: []
+  findings: []
+- id: C-45
+  caller: Risk
+  callee: RgenAdapter
+  arm: variance
+  call_site: 12_risk.rho assess
+  request: kassetUri
+  success_reply: (true, {source, varianceBps, ...})
+  refusal_reply: (false, 'approval' | 'status' | 'quality' | ...)
+  awaits: component resolve and r-gen KAsset
+  state_held: riskState is peeked, then consumed with a nonce check
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards:
+  - HZ-036
+  findings: []
+- id: C-46
+  caller: Risk
+  callee: SureMath
+  arm: varianceGap / loadedPremium
+  call_site: 12_risk.rho assess
+  request: engineeringBps, insurerBps, tolerance; expectedLoss, varianceBps, loadBps
+  success_reply: (true, gapBps, flag); (true, minimumPremium)
+  refusal_reply: (false, 'bps' | 'amount')
+  awaits: component resolve and two SureMath calls
+  state_held: riskState is peeked, then consumed with a nonce check
+  atomicity: read-only
+  capabilities: none
+  verdict: safe-by-inspection
+  hazards:
+  - HZ-036
+  findings: []

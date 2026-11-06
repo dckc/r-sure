@@ -939,3 +939,37 @@ hazards:
   - audit/evidence/2026-11-05-install-rca/manifest.json
   - tools/check_evidence.py
   arm: audit@"evidence"
+- id: HZ-036
+  node: N07
+  guide_word: MORE
+  parameter: engineering vs insurer variance
+  deviation: The insurer records a variance materially above the K-Asset engineering
+    estimate, and the insured pays the loaded premium without the difference being
+    visible or acknowledged.
+  causes:
+  - kind: direct
+    cause: There was no quantitative risk field and no second estimate to compare.
+    evidence: contracts/src/deploy/12_risk.rho
+  - kind: contributing
+    cause: The assessment stored only a quoted premium, so the load basis was opaque.
+    evidence: audit/registers/findings.yaml
+  consequences:
+  - good QA is not reflected in the price
+  - the insured cannot contest the measure before accepting
+  severity: medium
+  likelihood: high
+  risk: medium
+  controls:
+  - derive the engineering rate from K-Asset conventions or a bound attestation
+  - record the insurer rate and the signed gap; flag a wide gap
+  - acceptance records the acknowledgement; Risk.variance is a public read
+  findings: []
+  tests:
+  - T-040
+  - T-035
+  disposition: mitigate
+  owner: underwriting
+  evidence:
+  - contracts/src/deploy/12_risk.rho
+  - harness/unit_variance.py
+  arm: Risk@"assess"

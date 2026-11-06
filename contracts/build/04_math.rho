@@ -8,7 +8,8 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  sharesSum, planBuild
+  sharesSum, planBuild,
+  mathVerdictPenalty, mathValuesSum, mathValuesOk, mathSsSum
 in {
   contract sharesSum(@items, @i, @acc, ret) = {
     if (i >= items.length()) { ret!(acc) }
@@ -186,6 +187,132 @@ in {
         for (@sum <- sCh) {
           if (sum != 10000) { ret!((false, "shares")) }
           else { planBuild!(lines, 0, payable, 0, [], *ret) }
+        }
+      }
+    }
+  } |
+
+  // Variance rate: sigma^2 / mean^2, in basis points. A full indemnity
+  // L = C - V keeps the variance of V, so this is the shared risk measure.
+  contract mathVerdictPenalty(@verdict, ret) = {
+    match verdict {
+      "valid" => { ret!(0) }
+      "partial" => { ret!(1000) }
+      _ => { ret!(-1) }
+    }
+  } |
+
+  contract mathValuesSum(@values, @i, @acc, ret) = {
+    if (i >= values.length()) { ret!(acc) }
+    else {
+      match values.nth(i) {
+        v => { mathValuesSum!(values, i + 1, acc + v, *ret) }
+      }
+    }
+  } |
+
+  contract mathValuesOk(@values, @i, ret) = {
+    if (i >= values.length()) { ret!(true) }
+    else {
+      match values.nth(i) {
+        v => {
+          if (v < 1 || v > 10000) { ret!(false) }
+          else { mathValuesOk!(values, i + 1, *ret) }
+        }
+      }
+    }
+  } |
+
+  contract mathSsSum(@values, @i, @w, @s, @acc, ret) = {
+    if (i >= values.length()) { ret!(acc) }
+    else {
+      match values.nth(i) {
+        v => {
+          match w * v - s {
+            d => { mathSsSum!(values, i + 1, w, s, acc + d * d, *ret) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"varianceRate", @qualitySum, @verdict, @liabilityBps, ret) = {
+    if (qualitySum < 4 || qualitySum > 20) {
+      ret!((false, "quality"))
+    } else {
+      if (liabilityBps < 0 || liabilityBps > 10000) {
+        ret!((false, "liability"))
+      } else {
+        new pCh in {
+          mathVerdictPenalty!(verdict, *pCh) |
+          for (@p <- pCh) {
+            if (p < 0) { ret!((false, "verdict")) }
+            else {
+              match (20 - qualitySum) * 500 + p + (10000 - liabilityBps) / 10 {
+                rate => { ret!((true, rate)) }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract SureMath(@"varianceGap", @engineeringBps, @insurerBps, @toleranceBps, ret) = {
+    if (engineeringBps < 0 || engineeringBps > 10000
+        || insurerBps < 0 || insurerBps > 10000
+        || toleranceBps < 0 || toleranceBps > 10000) {
+      ret!((false, "bps"))
+    } else {
+      match insurerBps - engineeringBps {
+        gap => {
+          if (gap < 0) {
+            ret!((true, gap, (0 - gap) > toleranceBps))
+          } else {
+            ret!((true, gap, gap > toleranceBps))
+          }
+        }
+      }
+    }
+  } |
+
+  // Variance-principle load: E + E * variance * loading / BPS^2. Integer-exact and
+  // monotone; at 100% loading and a variance rate of 10000 bps the load is 100%.
+  contract SureMath(@"loadedPremium", @expectedLoss, @varianceBps, @loadBps, ret) = {
+    if (expectedLoss < 1 || expectedLoss > 1000000000000
+        || varianceBps < 0 || varianceBps > 10000
+        || loadBps < 0 || loadBps > 10000) {
+      ret!((false, "amount"))
+    } else {
+      match expectedLoss
+            + (expectedLoss * varianceBps * loadBps) / 100000000 {
+        loaded => { ret!((true, loaded)) }
+      }
+    }
+  } |
+
+  contract SureMath(@"varianceStats", @values, ret) = {
+    if (values.length() < 1 || values.length() > 16) {
+      ret!((false, "values"))
+    } else {
+      new okCh, sCh in {
+        mathValuesOk!(values, 0, *okCh) |
+        mathValuesSum!(values, 0, 0, *sCh) |
+        for (@ok <- okCh; @s <- sCh) {
+          if (ok == false || s < 1) {
+            ret!((false, "values"))
+          } else {
+            match values.length() {
+              w => {
+                new ssCh in {
+                  mathSsSum!(values, 0, w, s, 0, *ssCh) |
+                  for (@ss <- ssCh) {
+                    ret!((true, (ss * 10000) / (w * s * s), ss))
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

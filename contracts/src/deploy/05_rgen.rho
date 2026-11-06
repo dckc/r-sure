@@ -8,7 +8,8 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  adminGuard, rgenResolve, rgenUri, resolveComponent
+  adminGuard, rgenResolve, rgenUri, resolveComponent,
+  varianceDim, varianceQuality, varianceQuantity, varianceLiability, varianceCall
 in {
   // @@INLINE:lib/Resolve.rho@@
   // @@INLINE:lib/AdminGuard.rho@@
@@ -52,6 +53,111 @@ in {
               _ => { ret!(u) }
             }
           }
+        }
+      }
+    }
+  } |
+
+  // K-Asset conventions are validated here: r-gen stores quality/quantity/liability
+  // as conventions, not core-enforced shapes. Approval is required; a validated or
+  // conditional K-Asset has no liability record, so derivation refuses and the
+  // bound variance attestation is the fallback.
+  contract varianceDim(@v, ret) = {
+    match v {
+      1 => { ret!(1) }
+      2 => { ret!(2) }
+      3 => { ret!(3) }
+      4 => { ret!(4) }
+      5 => { ret!(5) }
+      _ => { ret!(0) }
+    }
+  } |
+
+  contract varianceQuality(@q, ret) = {
+    match (q.get("completeness"), q.get("correctness"),
+           q.get("traceability"), q.get("fitness")) {
+      (a, b, c, d) => {
+        new aCh, bCh, cCh, dCh in {
+          varianceDim!(a, *aCh) | varianceDim!(b, *bCh) |
+          varianceDim!(c, *cCh) | varianceDim!(d, *dCh) |
+          for (@x <- aCh; @y <- bCh; @z <- cCh; @w <- dCh) {
+            if (x == 0 || y == 0 || z == 0 || w == 0) {
+              ret!((false, "quality"))
+            } else { ret!((true, x + y + z + w)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract varianceQuantity(@q, ret) = {
+    match (q.get("unit"), q.get("value")) {
+      (unit, value) => {
+        if (unit == Nil || value == Nil) {
+          ret!((false, "quantity"))
+        } else {
+          if (unit.length() == 0) {
+            ret!((false, "quantity"))
+          } else {
+            if (value < 1) { ret!((false, "quantity")) }
+            else { ret!((true, value)) }
+          }
+        }
+      }
+    }
+  } |
+
+  contract varianceLiability(@approval, ret) = {
+    match approval {
+      Nil => { ret!((false, "approval")) }
+      a => {
+        match a.get("liability") {
+          Nil => { ret!((false, "approval")) }
+          liability => {
+            match (liability.get("responsible"), liability.get("shareBps")) {
+              (who, share) => {
+                if (who == Nil || share == Nil) {
+                  ret!((false, "liability"))
+                } else {
+                  if (share < 0 || share > 10000) { ret!((false, "liability")) }
+                  else { ret!((true, share)) }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract varianceCall(@qualitySum, @verdict, @share, @kassetUri, @state, ret) = {
+    new mCh in {
+      resolveComponent!("component:suremath", *mCh) |
+      for (@m <- mCh) {
+        match m {
+          (true, SureMath) => {
+            new vCh in {
+              @SureMath!("varianceRate", qualitySum, verdict, share, *vCh) |
+              for (@v <- vCh) {
+                match v {
+                  (true, varianceBps) => {
+                    ret!((true, {
+                      "source": "derived",
+                      "kasset": kassetUri,
+                      "varianceBps": varianceBps,
+                      "quantity": state.get("quantity"),
+                      "qualitySum": qualitySum,
+                      "verdict": verdict,
+                      "status": "approved",
+                      "liabilityBps": share
+                    }))
+                  }
+                  _ => { ret!(v) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "math unavailable")) }
         }
       }
     }
@@ -103,6 +209,72 @@ in {
     new cCh in {
       rgenUri!("component:claim-factory", *cCh) |
       for (@r <- cCh) { ret!(r) }
+    }
+  } |
+
+  contract RgenAdapter(@"variance", @kassetUri, ret) = {
+    if (kassetUri.length() == 0) {
+      ret!((false, "kasset"))
+    } else {
+      new assetCh, gCh in {
+        rl!(kassetUri, *assetCh) |
+        for (KAsset <- assetCh) {
+          KAsset!("get", *gCh) |
+          for (@g <- gCh) {
+            match g {
+              (true, s) => {
+                match s.get("status") {
+                  "approved" => {
+                    new qCh, nCh, lCh in {
+                      varianceQuality!(s.get("quality"), *qCh) |
+                      varianceQuantity!(s.get("quantity"), *nCh) |
+                      varianceLiability!(s.get("approval"), *lCh) |
+                      for (@q <- qCh; @n <- nCh; @l <- lCh) {
+                        match (q, n, l) {
+                          ((true, qualitySum), (true, _), (true, share)) => {
+                            match s.get("verdict") {
+                              "valid" => {
+                                varianceCall!(qualitySum, "valid", share,
+                                              kassetUri, s, *ret)
+                              }
+                              "partial" => {
+                                varianceCall!(qualitySum, "partial", share,
+                                              kassetUri, s, *ret)
+                              }
+                              _ => { ret!((false, "verdict")) }
+                            }
+                          }
+                          _ => {
+                            match q {
+                              (false, r) => { ret!((false, r)) }
+                              _ => {
+                                match n {
+                                  (false, r) => { ret!((false, r)) }
+                                  _ => {
+                                    match l {
+                                      (false, r) => { ret!((false, r)) }
+                                      _ => { ret!((false, "kasset")) }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  "rejected" => { ret!((false, "status")) }
+                  "validated" => { ret!((false, "approval")) }
+                  "conditional" => { ret!((false, "approval")) }
+                  _ => { ret!((false, "status")) }
+                }
+              }
+              _ => { ret!((false, "kasset")) }
+            }
+          }
+        }
+      }
     }
   } |
 

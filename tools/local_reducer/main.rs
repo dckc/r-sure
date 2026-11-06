@@ -419,6 +419,83 @@ async fn check_model_vectors(
         }
         checked += 1;
     }
+
+    for (name, vector) in vectors {
+        let Some(rest) = name.strip_prefix("variance.") else {
+            continue;
+        };
+        let input = vector["input"].as_str().unwrap_or("");
+        let output = vector["output"].as_str().unwrap_or("");
+        let (arm, args, expected) = if rest.starts_with("rate.")
+            && !rest.starts_with("rate.two-point")
+            && !rest.starts_with("rate.scale")
+        {
+            let parts = input.split(',').map(str::trim).collect::<Vec<_>>();
+            if parts.len() != 3 {
+                return Err(std::io::Error::other(format!("{name}: input {input}")).into());
+            }
+            let verdict = format!("\"{}\"", parts[1]);
+            (
+                "varianceRate",
+                format!(", {}, {}, {}", parts[0], verdict, parts[2]),
+                format!("(true, {output})"),
+            )
+        } else if rest.starts_with("ss.") || rest == "rate.two-point" || rest == "rate.scale" {
+            let values = input
+                .split(',')
+                .map(str::trim)
+                .collect::<Vec<_>>()
+                .join(", ");
+            let expected = if rest.starts_with("ss.") {
+                format!(", {output})")
+            } else {
+                format!("(true, {output},")
+            };
+            ("varianceStats", format!(", [{values}]"), expected)
+        } else if rest.starts_with("gap.") {
+            let values = ints(input);
+            if values.len() != 3 {
+                return Err(std::io::Error::other(format!("{name}: input {input}")).into());
+            }
+            let parts = output.split(',').map(str::trim).collect::<Vec<_>>();
+            (
+                "varianceGap",
+                format!(", {}, {}, {}", values[0], values[1], values[2]),
+                format!("(true, {}, {})", parts[0], parts[1]),
+            )
+        } else if rest.starts_with("load.") {
+            let values = ints(input);
+            if values.len() != 3 {
+                return Err(std::io::Error::other(format!("{name}: input {input}")).into());
+            }
+            (
+                "loadedPremium",
+                format!(", {}, {}, {}", values[0], values[1], values[2]),
+                format!("(true, {output})"),
+            )
+        } else {
+            return Err(std::io::Error::other(format!("{name}: unknown variance vector")).into());
+        };
+        let reply = reducer
+            .component_call(root, "component:suremath", arm, &args)
+            .await?;
+        let reply = reply.trim();
+        let matched = if rest.starts_with("ss.") {
+            reply.ends_with(&expected)
+        } else if rest == "rate.two-point" || rest == "rate.scale" {
+            reply.starts_with(&expected)
+        } else {
+            reply == expected
+        };
+        if !matched {
+            return Err(std::io::Error::other(format!(
+                "{name}: expected {}, got {reply}",
+                expected
+            ))
+            .into());
+        }
+        checked += 1;
+    }
     Ok(checked)
 }
 
@@ -892,6 +969,98 @@ async fn run() -> Result<(), Error> {
         .await?;
     expect_refusal("create after resume", &after_resume, "duplicate owner")?;
     println!("local-reducer: pause and resume with two admin signatures");
+
+    // A stub K-Asset exercises the r-gen read path without installing r-gen.
+    let kasset_stub = r#"new rs(`rho:registry:insertArbitrary`), uriCh,
+    deployId(`rho:rchain:deployId`), KAsset in {
+  contract KAsset(@"get", ret) = {
+    ret!((true, {
+      "id": "rho:id:local-kasset",
+      "quantity": {"unit": "inspections", "value": 12},
+      "quality": {"completeness": 3, "correctness": 3,
+                  "traceability": 3, "fitness": 3},
+      "verdict": "valid",
+      "status": "approved",
+      "approval": {"decision": "approve",
+                   "liability": {"responsible": "approver", "shareBps": 10000}}
+    }))
+  } |
+  rs!(bundle+{*KAsset}, *uriCh) |
+  for (@u <- uriCh) { deployId!([u]) }
+}"#;
+    let kasset_reply = reducer.deploy(kasset_stub).await?.join(" ");
+    let kasset_uri = find_uri(&kasset_reply)
+        .ok_or_else(|| std::io::Error::other(format!("kasset stub: {kasset_reply}")))?;
+    let derived = reducer
+        .component_call(
+            &root,
+            "component:rgen",
+            "variance",
+            &format!(r#", "{kasset_uri}""#),
+        )
+        .await?;
+    if !derived.contains("true") || !derived.contains("4000") {
+        return Err(std::io::Error::other(format!("kasset variance: {derived}")).into());
+    }
+    println!("local-reducer: kasset variance -> {derived}");
+
+    let risk_req = format!(
+        r#", *dId, {{"class": "property", "assetRef": {{"kind": "site", "hash": "asset:local", "uri": "{kasset_uri}"}}, "evidence": [{{"kind": "rgen:kasset", "uri": "{kasset_uri}", "hash": "kasset:local"}}], "triTest": {{"exposureRef": "exposure:local", "probabilityBasis": "claims-history", "consequenceBasis": "declared-value", "consequenceRef": "consequence:local"}}, "periodStart": 0, "periodEnd": 1000000, "declaredValue": 5000, "requestedLimit": 1000, "requestedDeductible": 0}}"#
+    );
+    let risk_reply = reducer
+        .component_call(&root, "component:risk-book", "submit", &risk_req)
+        .await?;
+    let risk_uri = find_uri(&risk_reply)
+        .ok_or_else(|| std::io::Error::other(format!("risk submit: {risk_reply}")))?;
+    println!("local-reducer: variance risk {risk_uri}");
+
+    let assessed = reducer
+        .uri_call(
+            &risk_uri,
+            "assess",
+            r#", *dId, {"expectedLoss": 800, "varianceBps": 5000, "quotedPremium": 1200, "loadBps": 2000, "basisHash": "underwriting:local", "toleranceBps": 1000}"#,
+        )
+        .await?;
+    if !assessed.contains("true") {
+        return Err(std::io::Error::other(format!("assess variance risk: {assessed}")).into());
+    }
+    let variance = reducer.uri_call(&risk_uri, "variance", "").await?;
+    if !variance.contains("4000") || !variance.contains("1000") {
+        return Err(std::io::Error::other(format!("risk variance: {variance}")).into());
+    }
+    println!("local-reducer: risk variance -> {variance}");
+
+    let accepted = reducer.uri_call(&risk_uri, "accept", ", *dId").await?;
+    if !accepted.contains("true") {
+        return Err(std::io::Error::other(format!("accept variance risk: {accepted}")).into());
+    }
+    let acknowledged = reducer.uri_call(&risk_uri, "variance", "").await?;
+    if !acknowledged.contains("acknowledged") || !acknowledged.contains("true") {
+        return Err(std::io::Error::other(format!("acknowledged: {acknowledged}")).into());
+    }
+    println!("local-reducer: variance acknowledged on accept");
+
+    let bad_assess = reducer
+        .component_call(&root, "component:risk-book", "submit", &risk_req)
+        .await?;
+    let bad_uri = find_uri(&bad_assess)
+        .ok_or_else(|| std::io::Error::other(format!("second risk: {bad_assess}")))?;
+    let too_high = reducer
+        .uri_call(
+            &bad_uri,
+            "assess",
+            r#", *dId, {"expectedLoss": 800, "varianceBps": 10001, "quotedPremium": 1200, "loadBps": 2000, "basisHash": "underwriting:local"}"#,
+        )
+        .await?;
+    expect_refusal("variance above range", &too_high, "assessment")?;
+    let low_premium = reducer
+        .uri_call(
+            &bad_uri,
+            "assess",
+            r#", *dId, {"expectedLoss": 800, "varianceBps": 5000, "quotedPremium": 1, "loadBps": 2000, "basisHash": "underwriting:local"}"#,
+        )
+        .await?;
+    expect_refusal("premium below floor", &low_premium, "premium floor")?;
     let keys = reducer.deploy(&keys).await?.join(" ");
     let registered = keys.matches("component:").count();
     if !keys.contains("true") || registered != 21 {

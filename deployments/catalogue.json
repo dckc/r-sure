@@ -2,119 +2,119 @@
   "schema": "rsure.catalogue/v1",
   "networkId": "testnet",
   "shard": "/root",
-  "root": "rho:id:yxpowf9h8wt9e4t8grptk5341dh5dbecapi9gdenzz7rz113hhdo",
-  "generatedAt": "2026-11-05T21:16:00.583961+00:00",
+  "root": "rho:id:uzpc9sn6f9mfk97in6ep944wjj5ku6k4cefrex8cocoiq69ut3po",
+  "generatedAt": "2026-11-06T12:17:41.879637+00:00",
   "entries": [
     {
       "kind": "syndicates",
-      "uri": "rho:id:ucgfyy9rijo18sxtnqidbodk3qmnt7pzxt4wrxzsngqawakcx1cy",
+      "uri": "rho:id:5bzmxi3mp1n6d3wdbm989y7715gbby6k91kw335k47d5kafxhkoo",
       "label": "Syndicate \u00b7 web-open",
       "class": "engineering"
     },
     {
       "kind": "brokers",
-      "uri": "rho:id:rwari59idr33iiz699tfkwrt3es4yf3mkykprc5jujoeuz7pr36o",
+      "uri": "rho:id:hzkh4yn3x3s173httkt7pnwdzj8mzk6kse4gasnfa73i8kh4kh8y",
       "label": "Broker \u00b7 web-open",
       "insured": "1111CVF4mK447yNSCrMvqr4SRLGMZRqazPtJo49iE5RNo7q5fzt2J"
     },
     {
       "kind": "risks",
-      "uri": "rho:id:bx5qbczxr1oqb8uerux4khe5znjfmndfjzuixxga7uf8rrsj957y",
+      "uri": "rho:id:fr4kz4gi9h9zdi3sjqiuxf49j4137smqxmqiqxzyo5ta1qnpefqo",
       "label": "Risk \u00b7 web-open",
       "class": "engineering",
       "insured": "1111CVF4mK447yNSCrMvqr4SRLGMZRqazPtJo49iE5RNo7q5fzt2J",
-      "broker": "rho:id:rwari59idr33iiz699tfkwrt3es4yf3mkykprc5jujoeuz7pr36o"
+      "broker": "rho:id:hzkh4yn3x3s173httkt7pnwdzj8mzk6kse4gasnfa73i8kh4kh8y"
     },
     {
       "kind": "slips",
-      "uri": "rho:id:x4dttt9ui46xq8zaz34ssidc4xct15qgmhf4srwe5xsd3yyb1fho",
+      "uri": "rho:id:9p9zhkhhdnc3zmumam7ifbjairogpishcpsbtmj9ctrisj5xzrmo",
       "label": "Slip \u00b7 web-open",
       "class": "engineering",
       "insured": "1111CVF4mK447yNSCrMvqr4SRLGMZRqazPtJo49iE5RNo7q5fzt2J",
-      "broker": "rho:id:rwari59idr33iiz699tfkwrt3es4yf3mkykprc5jujoeuz7pr36o"
+      "broker": "rho:id:hzkh4yn3x3s173httkt7pnwdzj8mzk6kse4gasnfa73i8kh4kh8y"
     },
     {
       "kind": "syndicates",
-      "uri": "rho:id:mgtph4q6iqezqymx86yywz573pt5qntzts8aksiaodbbz6d6tg3y",
+      "uri": "rho:id:mjnozpisz34pe1dzady7m16s9ruikcqdgwzoocwe5sigf1jbpayo",
       "label": "Syndicate \u00b7 web-bound",
       "class": "property"
     },
     {
       "kind": "brokers",
-      "uri": "rho:id:8iidtiwsx39ffe91oqeupqm5nyi9emizhiehzxwxoxccawdoxety",
+      "uri": "rho:id:hwzmgdz7khuozwpd8cdm8cbzjp317wxwa666nawj8pdt5dkwojyo",
       "label": "Broker \u00b7 web-bound",
       "insured": "11112mRBwp3PPqaL7EidamWriPSmWm6ptbocNMVdxzs2nmhAdcWHUP"
     },
     {
       "kind": "risks",
-      "uri": "rho:id:t5xwk5xumk7occ5x1c139dghs7jdwrrhm6znx7btm5dx81eqwm9o",
+      "uri": "rho:id:rrd78sa8qsjkgz7s19erdwr35ruhfypif1hwxbmjbnmd616wi8uo",
       "label": "Risk \u00b7 web-bound",
       "class": "property",
       "insured": "11112mRBwp3PPqaL7EidamWriPSmWm6ptbocNMVdxzs2nmhAdcWHUP",
-      "broker": "rho:id:8iidtiwsx39ffe91oqeupqm5nyi9emizhiehzxwxoxccawdoxety"
+      "broker": "rho:id:hwzmgdz7khuozwpd8cdm8cbzjp317wxwa666nawj8pdt5dkwojyo"
     },
     {
       "kind": "slips",
-      "uri": "rho:id:ur6axcnjrdpzf3w3bu7soky8emgmwmygby5qapj8ww737p3c5x7y",
+      "uri": "rho:id:6oui7rq7q3q5jd8kqfpys4hpyawf4dgu11e185xdo91tix6pziso",
       "label": "Slip \u00b7 web-bound",
       "class": "property",
       "insured": "11112mRBwp3PPqaL7EidamWriPSmWm6ptbocNMVdxzs2nmhAdcWHUP",
-      "broker": "rho:id:8iidtiwsx39ffe91oqeupqm5nyi9emizhiehzxwxoxccawdoxety"
+      "broker": "rho:id:hwzmgdz7khuozwpd8cdm8cbzjp317wxwa666nawj8pdt5dkwojyo"
     },
     {
       "kind": "policies",
-      "uri": "rho:id:zjdbzq75uiscwmhf9fbxnux9emzyqb4ezabi9uc6easfnxtsfz3y",
+      "uri": "rho:id:qrwguya6g1a83t54memsb9cmbxqtwyfmubd1ptsxohaddafy5syo",
       "label": "Policy \u00b7 web-bound",
       "class": "property",
       "insured": "11112mRBwp3PPqaL7EidamWriPSmWm6ptbocNMVdxzs2nmhAdcWHUP",
-      "broker": "rho:id:8iidtiwsx39ffe91oqeupqm5nyi9emizhiehzxwxoxccawdoxety"
+      "broker": "rho:id:hwzmgdz7khuozwpd8cdm8cbzjp317wxwa666nawj8pdt5dkwojyo"
     },
     {
       "kind": "claims",
-      "uri": "rho:id:mqpp4wjora59c5j8ahp6z58u1gipaonru8f3mmtwsa9mfgcu3p4o",
+      "uri": "rho:id:wuacwgje9zb1ooyjuxum6at7boidjbzrua4r6pspa1jembg7nxwy",
       "label": "Claim \u00b7 web-bound",
       "class": "property",
       "insured": "11112mRBwp3PPqaL7EidamWriPSmWm6ptbocNMVdxzs2nmhAdcWHUP"
     },
     {
       "kind": "syndicates",
-      "uri": "rho:id:63ustgbkqsmobhjgd3h6ha77ibpdfqrpoa7ysduu9pifb7dyekso",
+      "uri": "rho:id:xb6ruzboqc4ktigg3irp1y4781fg6gyqczemdwkg8go7cogajtgo",
       "label": "Syndicate \u00b7 web-claim",
       "class": "marine"
     },
     {
       "kind": "brokers",
-      "uri": "rho:id:cxerus3qhegp7cyzkknruecjed678x7am91q7ox9g9w99ot99rey",
+      "uri": "rho:id:eh8dxjkc36cer5c3zyzx5kbwe1ip6om57gupscx4h8p9ucoh94jy",
       "label": "Broker \u00b7 web-claim",
       "insured": "11112ptQ6ZE7WK2X1YZSFgFUmpYqmuZGbUHSsv7G9ZWKQEAxHT1e1C"
     },
     {
       "kind": "risks",
-      "uri": "rho:id:8s3rs1bog5omejm5df5u7k8xnocc6mgeqbiuk7qf3qqxdexi19io",
+      "uri": "rho:id:kt17g5169idadq9pc8def1r18au13cmjegp4rx8xp9j4w47quycy",
       "label": "Risk \u00b7 web-claim",
       "class": "marine",
       "insured": "11112ptQ6ZE7WK2X1YZSFgFUmpYqmuZGbUHSsv7G9ZWKQEAxHT1e1C",
-      "broker": "rho:id:cxerus3qhegp7cyzkknruecjed678x7am91q7ox9g9w99ot99rey"
+      "broker": "rho:id:eh8dxjkc36cer5c3zyzx5kbwe1ip6om57gupscx4h8p9ucoh94jy"
     },
     {
       "kind": "slips",
-      "uri": "rho:id:cxd7yqj6uzndceijzf13biox5tey9n7osn5n5a85f9m4hmjdimyo",
+      "uri": "rho:id:bun91ntp5rhhf5gpz8z9o75dj7rgozxndudsoo4jx6padokwn7hy",
       "label": "Slip \u00b7 web-claim",
       "class": "marine",
       "insured": "11112ptQ6ZE7WK2X1YZSFgFUmpYqmuZGbUHSsv7G9ZWKQEAxHT1e1C",
-      "broker": "rho:id:cxerus3qhegp7cyzkknruecjed678x7am91q7ox9g9w99ot99rey"
+      "broker": "rho:id:eh8dxjkc36cer5c3zyzx5kbwe1ip6om57gupscx4h8p9ucoh94jy"
     },
     {
       "kind": "policies",
-      "uri": "rho:id:7h8oym8kaqhrzywmd4oc9yywdieuhj7dxjeamxdg11u8n4adqncy",
+      "uri": "rho:id:898533xuquoaj67khwfp8zjxo7rhe4tysp3tfyyueezge5y5hoxo",
       "label": "Policy \u00b7 web-claim",
       "class": "marine",
       "insured": "11112ptQ6ZE7WK2X1YZSFgFUmpYqmuZGbUHSsv7G9ZWKQEAxHT1e1C",
-      "broker": "rho:id:cxerus3qhegp7cyzkknruecjed678x7am91q7ox9g9w99ot99rey"
+      "broker": "rho:id:eh8dxjkc36cer5c3zyzx5kbwe1ip6om57gupscx4h8p9ucoh94jy"
     },
     {
       "kind": "claims",
-      "uri": "rho:id:hc1gk8uroo511cfsb8q1x3y4gpmyugrx4popgin9f8586yhtztxy",
+      "uri": "rho:id:m1wdjbazj1pixjnfi48fme1gx8dedydg4i8w5fnw7mc3jym9ghao",
       "label": "Claim \u00b7 web-claim",
       "class": "marine",
       "insured": "11112ptQ6ZE7WK2X1YZSFgFUmpYqmuZGbUHSsv7G9ZWKQEAxHT1e1C"
