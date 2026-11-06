@@ -153,20 +153,20 @@
       "input": "1000,2500,2000",
       "output": "1050"
     },
-    "variance.rate.liability": {
-      "input": "20,valid,0",
-      "output": "1000"
-    },
     "variance.rate.lowqa": {
-      "input": "4,valid,0",
-      "output": "9000"
+      "input": "4,valid",
+      "output": "8000"
+    },
+    "variance.rate.mid": {
+      "input": "12,valid",
+      "output": "4000"
     },
     "variance.rate.partial": {
-      "input": "16,partial,10000",
+      "input": "16,partial",
       "output": "3000"
     },
     "variance.rate.perfect": {
-      "input": "20,valid,10000",
+      "input": "20,valid",
       "output": "0"
     },
     "variance.rate.scale": {
@@ -178,8 +178,8 @@
       "output": "1111"
     },
     "variance.rate.worst": {
-      "input": "4,partial,0",
-      "output": "10000"
+      "input": "4,partial",
+      "output": "9000"
     },
     "variance.ss.base": {
       "input": "1000,2000",

@@ -2,7 +2,7 @@
 
 > **Status:** Internal desk, tabletop, install-RCA and behavioural review, 2026-11-06.
 > **Not an independent audit.** The 17-term install is E2 green after the fixes recorded in
-> `rca.yaml#RCA-001`. The campaign records 38 runs, 411 assertions and 0 assertion failures;
+> `rca.yaml#RCA-001`. The campaign records 38 runs, 410 assertions and 0 assertion failures;
 > 37 of 40 registered suites pass and three process gates are `not_run`. Install evidence is
 > not behavioural coverage. No primitive is audited or production-safe.
 
@@ -124,7 +124,7 @@ gap.
   `python3 tools/check_experiments.py`.
 - They are not yet in `make audit-check`; the Makefile is owned by the lead. Proposed
   targets: `check-evidence`, `check-rca`, `check-experiments`, appended to `audit-check`.
-- `deployments/suite-results.json` records 38 runs, 411 assertions and no assertion
+- `deployments/suite-results.json` records 38 runs, 410 assertions and no assertion
   failure; the coverage report derives 37/40 suites and 126/151 public arms.
 
 ## Next steps

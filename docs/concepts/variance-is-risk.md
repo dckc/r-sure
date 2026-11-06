@@ -46,7 +46,8 @@ one to win; it makes the disagreement visible.
   - `quantity = {unit: non-empty, value ≥ 1}`;
   - `quality` with completeness, correctness, traceability and fitness, each 1..5;
   - `verdict`: `valid` or `partial` (`invalid` is not insurable);
-  - `status == "approved"` with a non-nil `approval.liability.shareBps` in 0..10000.
+  - `status == "approved"` with a non-nil `approval.liability` (the share is validated and
+    recorded, but not used in the engineering rate).
 - **Attestation.** The insured may submit a variance record bound to a `rgen:kasset`
   evidence entry `{kind, uri, hash}`. The attestation overrides the derivation and the source
   is recorded; it is an off-chain engineering claim, not a proof.
@@ -77,14 +78,18 @@ The derivation maps the K-Asset conventions to a bounded rate:
 ```text
 Q = completeness + correctness + traceability + fitness     (4..20)
 D = 20 - Q                                                  (0..16)
-verdictPenalty  = 0 for valid, 1000 for partial
-liabilityPenalty = (10000 - liabilityShareBps) / 10         (0..1000)
-engineeringBps = D×500 + verdictPenalty + liabilityPenalty   (0..10000)
+verdictPenalty = 0 for valid, 1000 for partial
+engineeringBps = D×500 + verdictPenalty                     (0..9000)
 ```
 
-Better QA, a valid verdict and more approver liability can only lower the measure. Perfect
-quality with a full liability share is 0; the worst rubric with a partial verdict and no
-liability share is 10000.
+Better QA and a valid verdict can only lower the measure. Perfect quality with a valid
+verdict is 0; the worst rubric with a partial verdict is 9000.
+
+`approval.liability.shareBps` is **not** part of this measure. It is a declared
+liability/indemnity share, so r-sure validates and records it (the approved status requires
+the approval record) but does not treat it as an engineering-variance signal. Retained risk
+is a separate co-insurance/indemnity input if a later design prices it; putting it in the
+engineering rate would conflate QA with the allocation of liability.
 
 ## The loaded premium
 
@@ -102,11 +107,10 @@ the Risk, where the insured accepts them.
 
 ## Worked example
 
-An approved K-Asset has quality 3/3/3/3 (sum 12), a valid verdict and an approver liability
-share of 10000:
+An approved K-Asset has quality 3/3/3/3 (sum 12) and a valid verdict:
 
 ```text
-engineeringBps = (20-12)×500 + 0 + (10000-10000)/10 = 4000
+engineeringBps = (20-12)×500 + 0 = 4000
 ```
 
 The insurer assesses `varianceBps = 5000`, `expectedLoss = 800` and `loadBps = 2000`:
@@ -132,7 +136,7 @@ Proved in Lean over the shallow model (`RSure.Model.Variance`):
 Assumed, and recorded in `spec/lean/claims.yaml`:
 
 - **variance.estimator** — the quality mapping is an implied rate, not a statistical moment
-  from observed K-Asset values;
+  from observed K-Asset values; `liability.shareBps` is deliberately excluded from it;
 - **kasset.conventions** — r-gen passes quantity/quality/liability as conventions; r-sure
   validates them, and the K-Asset hash is a reference, not a recomputed digest;
 - **attestation trust** — r-sure records the source and binding but does not verify the

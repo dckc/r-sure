@@ -163,39 +163,35 @@ theorem nat_div_le_div_right {a b c : Nat} (h : a ≤ b) : a / c ≤ b / c := by
 /-! Engineering estimate and the insurer's gap. -/
 
 /-- Engineering variance rate from the K-Asset conventions. `qualitySum` is the four
-    1..5 rubric dimensions; `partial` covers a partial verdict; `liabilityBps` is the
-    approver's liability share. -/
-def qualityVariance (qualitySum : Nat) (isPartial : Bool) (liabilityBps : Nat) : Nat :=
+    1..5 rubric dimensions; `isPartial` covers a partial verdict. The approver's
+    `liability.shareBps` is a declared indemnity share, not a variance signal, so it is
+    not part of this measure. -/
+def qualityVariance (qualitySum : Nat) (isPartial : Bool) : Nat :=
   let deficit := 20 - qualitySum
   let verdict := if isPartial then 1000 else 0
-  let liability := (10000 - liabilityBps) / 10
-  deficit * 500 + verdict + liability
+  deficit * 500 + verdict
 
-theorem qualityVariance_le (qualitySum liabilityBps : Nat) (isPartial : Bool)
-    (hq : qualitySum ≤ 20) (hq4 : 4 ≤ qualitySum) (hl : liabilityBps ≤ 10000) :
-    qualityVariance qualitySum isPartial liabilityBps ≤ 10000 := by
+theorem qualityVariance_le (qualitySum : Nat) (isPartial : Bool)
+    (hq : qualitySum ≤ 20) (hq4 : 4 ≤ qualitySum) :
+    qualityVariance qualitySum isPartial ≤ 9000 := by
   have hd : 20 - qualitySum ≤ 16 := by omega
-  have hl' : (10000 - liabilityBps) / 10 ≤ 1000 := by
-    have hle : 10000 - liabilityBps ≤ 10000 := by omega
-    have := nat_div_le_div_right (c := 10) hle
-    simpa using this
   dsimp only [qualityVariance]
   split <;> omega
 
-def qualityVarianceOption (qualitySum liabilityBps : Nat) (isPartial : Bool) : Option Nat :=
-  if qualitySum < 4 || qualitySum > 20 || liabilityBps > 10000 then none
-  else some (qualityVariance qualitySum isPartial liabilityBps)
+def qualityVarianceOption (qualitySum : Nat) (isPartial : Bool) : Option Nat :=
+  if qualitySum < 4 || qualitySum > 20 then none
+  else some (qualityVariance qualitySum isPartial)
 
 theorem variance_refuses_bad_input (isPartial : Bool) :
-    qualityVarianceOption 3 10000 isPartial = none := by
+    qualityVarianceOption 3 isPartial = none := by
   simp [qualityVarianceOption]
 
-theorem variance_reachable : qualityVarianceOption 20 10000 false = some 0 := by
+theorem variance_reachable : qualityVarianceOption 20 false = some 0 := by
   simp [qualityVarianceOption, qualityVariance]
 
 theorem qualityVariance_mono {q1 q2 : Nat} (h : q1 ≤ q2) (h2 : q2 ≤ 20)
-    (isPartial : Bool) (liabilityBps : Nat) :
-    qualityVariance q2 isPartial liabilityBps ≤ qualityVariance q1 isPartial liabilityBps := by
+    (isPartial : Bool) :
+    qualityVariance q2 isPartial ≤ qualityVariance q1 isPartial := by
   have hd : 20 - q2 ≤ 20 - q1 := by omega
   dsimp only [qualityVariance]
   split <;> omega

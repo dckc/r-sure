@@ -17,9 +17,13 @@ contracts and does not modify r-share.
 Local reference checkout: `/home/patrick/RGen`, commit `c4f8a91`.
 
 Patterns referenced: `OracleFactory.open` and the private `applyDecision` execution protocol
-(`contracts/src/deploy/30_oracle.rho`); the claim/validation/K-Asset evidence model; and the
-insurability tri-test in `legacy/lib/RiskMath.rho`. r-sure consumes the interface only; it has
-no compile-time r-gen dependency.
+(`contracts/src/deploy/30_oracle.rho`); the claim/validation/K-Asset evidence model; the
+insurability tri-test in `legacy/lib/RiskMath.rho`; and the public `KAsset("get")` state shape
+under `kasset.conventions/v1` (the r-gen working tree at the time of writing; the normative
+artifacts are `docs/src/reference/kasset-conventions.md`,
+`spec/schemas/kasset-conventions.json` and `spec/fixtures/kasset-conventions-v1.json`, pending
+an r-gen commit). r-sure consumes the interface only; it validates the conventions itself and
+has no compile-time r-gen dependency.
 
 ## r-cash — https://github.com/rhovision-org/r-cash
 

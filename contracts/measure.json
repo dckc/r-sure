@@ -27,12 +27,12 @@
       "contracts": 6
     },
     "04_math.rho": {
-      "bytes": 6658,
+      "bytes": 6527,
       "depth": 16,
       "contracts": 7
     },
     "05_rgen.rho": {
-      "bytes": 8699,
+      "bytes": 8692,
       "depth": 24,
       "contracts": 10
     },

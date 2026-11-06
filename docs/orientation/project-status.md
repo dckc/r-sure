@@ -11,7 +11,7 @@
 | Contracts | 17 deploy terms installed on devnet; 30 catalogue components and 19 state cells; static, parser, normalize and size gates pass. |
 | Formal model | 285 Lean theorems, 48 vectors, 58 flow rules and 11 `proved-model` core arms; 15 critical primitives covered. Claims register: 26 covered, 1 partial, 1 tool; 176 substantive theorems, 1 weak, 0 unaudited. |
 | Audit | 25 findings (22 fixed, 3 accepted boundaries), 36 hazards, 25 improvements; 30/30 concurrency reviews and 46/46 composition interfaces. |
-| Tests | 40 registered suites; 37 passing and 3 `not_run` process gates. The campaign records 38 runs, 411 assertions and 0 assertion failures. |
+| Tests | 40 registered suites; 37 passing and 3 `not_run` process gates. The campaign records 38 runs, 410 assertions and 0 assertion failures. |
 | Coverage | 126/151 public arms (83.4%), 139/168 all registered arms (82.7%), 8/11 core-flow arms; 17/22 fixed findings have a passing regression suite. |
 | Web client | React/Vite app with wallet, reads, placement, policy, claim, fund and 2-of-3 admin flows; typecheck, Vitest, ESLint, production build and Playwright pass. |
 | Documentation | mdBook under `docs/`; `make docs-check` passes. |
@@ -65,7 +65,8 @@ signatures. See [Use the web client](../guides/use-the-web-client.md).
   scripts, not by the behavioural campaign. They are registered as `not_run` rather than
   claimed as passing suites.
 - **Variance estimator (boundary).** The quality-rubric mapping is an implied rate, not a
-  statistical moment from observed K-Asset values. The K-Asset hash is a reference, not a
+  statistical moment from observed K-Asset values. `approval.liability.shareBps` is a
+  declared indemnity share and is excluded from the engineering rate. The K-Asset hash is a reference, not a
   recomputed digest; an attestation is an off-chain claim that r-sure records but does not
   verify. The measured variance identity is about the modelled value distribution.
 - **Evidence.** The tabletop HAZOP is an internal simulation, not an independent audit.

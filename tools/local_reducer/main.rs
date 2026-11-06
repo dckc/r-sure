@@ -431,13 +431,13 @@ async fn check_model_vectors(
             && !rest.starts_with("rate.scale")
         {
             let parts = input.split(',').map(str::trim).collect::<Vec<_>>();
-            if parts.len() != 3 {
+            if parts.len() != 2 {
                 return Err(std::io::Error::other(format!("{name}: input {input}")).into());
             }
             let verdict = format!("\"{}\"", parts[1]);
             (
                 "varianceRate",
-                format!(", {}, {}, {}", parts[0], verdict, parts[2]),
+                format!(", {}, {}", parts[0], verdict),
                 format!("(true, {output})"),
             )
         } else if rest.starts_with("ss.") || rest == "rate.two-point" || rest == "rate.scale" {

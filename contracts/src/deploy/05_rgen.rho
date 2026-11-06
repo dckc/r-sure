@@ -137,7 +137,7 @@ in {
         match m {
           (true, SureMath) => {
             new vCh in {
-              @SureMath!("varianceRate", qualitySum, verdict, share, *vCh) |
+              @SureMath!("varianceRate", qualitySum, verdict, *vCh) |
               for (@v <- vCh) {
                 match v {
                   (true, varianceBps) => {

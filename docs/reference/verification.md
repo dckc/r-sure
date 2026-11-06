@@ -51,7 +51,7 @@ make web-e2e          # Playwright, devnet-gated
 ```
 
 The behavioural campaign's current output is recorded in `deployments/suite-results.json`:
-38 runs, 411 assertions, 0 assertion failures. The coverage report derives 37/40 registered
+38 runs, 410 assertions, 0 assertion failures. The coverage report derives 37/40 registered
 suites passing (three `not_run` process gates), 126/151 public arms, 139/168 all registered
 arms and 8/11 core-flow arms asserted.
 

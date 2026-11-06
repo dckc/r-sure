@@ -59,21 +59,18 @@ def main() -> int:
 
         A.cover('SureMath@"varianceRate"', "success")
         A.expect("perfect quality has no measured variance",
-                 actors.invoke(math, "varianceRate", '20, "valid", 10000'),
+                 actors.invoke(math, "varianceRate", '20, "valid"'),
                  (True, 0))
-        A.expect("mid quality", actors.invoke(math, "varianceRate", '12, "valid", 10000'),
+        A.expect("mid quality", actors.invoke(math, "varianceRate", '12, "valid"'),
                  (True, 4000))
-        A.expect("partial verdict", actors.invoke(math, "varianceRate", '20, "partial", 0'),
-                 (True, 2000))
+        A.expect("partial verdict", actors.invoke(math, "varianceRate", '20, "partial"'),
+                 (True, 1000))
         A.cover('SureMath@"varianceRate"', "refusal")
         A.expect_refusal("quality out of range",
-                         actors.invoke(math, "varianceRate", '3, "valid", 10000'), "quality")
+                         actors.invoke(math, "varianceRate", '3, "valid"'), "quality")
         A.expect_refusal("unknown verdict",
-                         actors.invoke(math, "varianceRate", '12, "invalid", 10000'),
+                         actors.invoke(math, "varianceRate", '12, "invalid"'),
                          "verdict")
-        A.expect_refusal("liability out of range",
-                         actors.invoke(math, "varianceRate", '12, "valid", 10001'),
-                         "liability")
 
         A.cover('SureMath@"varianceGap"', "success")
         A.expect("wide gap is flagged",

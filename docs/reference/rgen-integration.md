@@ -27,13 +27,23 @@ K-Asset through the public `KAsset("get")` arm and returns
 liabilityBps})`. The rate is `Var(value)/mean(value)^2` in bps; the derivation is in
 [Variance is risk](../concepts/variance-is-risk.md).
 
-The adapter validates the r-gen conventions itself, because the core passes them through
-without shape checks:
+The conventions are versioned as **`kasset.conventions/v1`** and pinned to r-gen
+`c4f8a91`. The normative artifacts in the r-gen working tree are
+`docs/src/reference/kasset-conventions.md`, `spec/schemas/kasset-conventions.json` and
+`spec/fixtures/kasset-conventions-v1.json`; a conformance fixture yields 4000 bps for quality
+12, a valid verdict and an approved asset. They are a convention, not core enforcement, and
+the r-gen commit is pending.
+
+The adapter validates the conventions itself, because the core passes them through without
+shape checks:
 
 - `quantity = {unit: non-empty string, value: integer ≥ 1}`;
 - the four quality dimensions, each 1..5;
 - `verdict` `valid` or `partial`; `invalid` is refused;
-- `status == "approved"` with a non-nil `approval.liability.shareBps` in 0..10000.
+- `status == "approved"` with a non-nil `approval.liability`; its `shareBps` is validated and
+  recorded, but it is a declared indemnity share, not an engineering-variance signal. The
+  engineering rate is `(20 - qualitySum)×500 + (0 for valid, 1000 for partial)`, bounded to
+  9000.
 
 `validated` and `conditional` have no liability record, so they refuse derivation with
 `"approval"`; `disputed`, `upheld`, `revoked` and `partially_revoked` refuse with

@@ -3405,7 +3405,7 @@ theorems:
   module: RSure.Model.Variance
   kind: theorem
   status: proved-model
-  statement: '(qualitySum liabilityBps : Nat) (isPartial : Bool) : qualitySum ≤ 20 → 4 ≤ qualitySum → liabilityBps ≤ 10000 → qualityVariance qualitySum isPartial liabilityBps ≤ 10000'
+  statement: '(qualitySum : Nat) (isPartial : Bool) : qualitySum ≤ 20 → 4 ≤ qualitySum → qualityVariance qualitySum isPartial ≤ 9000'
   axioms:
   - propext
   - Quot.sound
@@ -3418,7 +3418,7 @@ theorems:
   module: RSure.Model.Variance
   kind: theorem
   status: proved-model
-  statement: '{q1 q2 : Nat} : q1 ≤ q2 → q2 ≤ 20 → qualityVariance q2 isPartial liabilityBps ≤ qualityVariance q1 isPartial liabilityBps'
+  statement: '{q1 q2 : Nat} : q1 ≤ q2 → q2 ≤ 20 → qualityVariance q2 isPartial ≤ qualityVariance q1 isPartial'
   axioms:
   - propext
   - Quot.sound
@@ -3494,7 +3494,7 @@ theorems:
   module: RSure.Model.Variance
   kind: theorem
   status: proved-model
-  statement: '(isPartial : Bool) : qualityVarianceOption 3 10000 isPartial = none'
+  statement: '(isPartial : Bool) : qualityVarianceOption 3 isPartial = none'
   axioms:
   - propext
   scope: shallow Lean component model; not a Rholang refinement
@@ -3506,7 +3506,7 @@ theorems:
   module: RSure.Model.Variance
   kind: theorem
   status: proved-model
-  statement: ': qualityVarianceOption 20 10000 false = some 0'
+  statement: ': qualityVarianceOption 20 false = some 0'
   axioms:
   - propext
   scope: shallow Lean component model; not a Rholang refinement

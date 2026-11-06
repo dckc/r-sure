@@ -24,8 +24,9 @@ Insurance terms first, then r-sure terms.
 - **Variance rate**: `Var(value)/mean(value)^2`, expressed in basis points; the dimensionless
   measure r-sure uses for both a K-Asset and the insurance policy. See
   [Variance is risk](../concepts/variance-is-risk.md).
-- **Engineering variance**: the rate implied by the K-Asset's quality rubric, verdict and
-  approver liability, or supplied by a bound attestation.
+- **Engineering variance**: the rate implied by the K-Asset's quality rubric and verdict, or
+  supplied by a bound attestation. The approver's liability share is recorded but is not an
+  engineering-variance signal.
 - **Insurer variance**: the underwriter's rate in the assessment. The signed difference from
   the engineering estimate is the **gap**; a gap beyond the tolerance is **flagged** and
   acknowledged by the insured at acceptance.

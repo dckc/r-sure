@@ -236,21 +236,20 @@ in {
     }
   } |
 
-  contract SureMath(@"varianceRate", @qualitySum, @verdict, @liabilityBps, ret) = {
+  // The engineering rate is a QA measure. approval.liability.shareBps is a declared
+  // indemnity share, not a variance signal, so it is validated and recorded by the
+  // adapter but not priced here. Retained risk is a separate co-insurance field.
+  contract SureMath(@"varianceRate", @qualitySum, @verdict, ret) = {
     if (qualitySum < 4 || qualitySum > 20) {
       ret!((false, "quality"))
     } else {
-      if (liabilityBps < 0 || liabilityBps > 10000) {
-        ret!((false, "liability"))
-      } else {
-        new pCh in {
-          mathVerdictPenalty!(verdict, *pCh) |
-          for (@p <- pCh) {
-            if (p < 0) { ret!((false, "verdict")) }
-            else {
-              match (20 - qualitySum) * 500 + p + (10000 - liabilityBps) / 10 {
-                rate => { ret!((true, rate)) }
-              }
+      new pCh in {
+        mathVerdictPenalty!(verdict, *pCh) |
+        for (@p <- pCh) {
+          if (p < 0) { ret!((false, "verdict")) }
+          else {
+            match (20 - qualitySum) * 500 + p {
+              rate => { ret!((true, rate)) }
             }
           }
         }
