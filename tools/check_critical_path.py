@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the critical-path manifest against claims, Lean, flows, arms and suites.
 
-The manifest `spec/critical-path.yaml` is the campaign gate for the 14 critical
+The manifest `spec/critical-path.yaml` is the campaign gate for the 15 critical
 primitives. A primitive may be `status: covered` only when:
 
   * its claims.yaml entry is `covered` with a substantive, axiom-audited `*_sound`
@@ -35,7 +35,7 @@ HAZARDS_REGISTER = ROOT / "audit" / "registers" / "hazards.yaml"
 LEAN = ROOT / "spec" / "lean"
 AUDIT = LEAN / "RSure" / "Audit.lean"
 
-REQUIRED_IDS = [f"CP-{i:02d}" for i in range(1, 15)]
+REQUIRED_IDS = [f"CP-{i:02d}" for i in range(1, 16)]
 FLOW_STATUSES = {"proved-model", "proved-model-bounded"}
 BAD_STATUSES = {"deferred", "partial", "tool", "owed", "open", "modeled", "assumption"}
 ARM_RE = re.compile(r"^(?P<component>[A-Za-z0-9_]+)@\"(?P<arm>[^\"]+)\"$")
@@ -107,12 +107,12 @@ def check(manifest: dict, claims: dict) -> list[str]:
     ids = [row.get("id") for row in rows]
     if sorted(ids) != sorted(REQUIRED_IDS):
         errors.append(
-            "critical-path: primitive ids must be exactly CP-01..CP-14 "
+            "critical-path: primitive ids must be exactly CP-01..CP-15 "
             f"(got {ids})")
     claim_prims = claims.get("primitives") or {}
     if sorted(claim_prims) != sorted(REQUIRED_IDS):
         errors.append(
-            "claims.yaml primitives must be exactly CP-01..CP-14 "
+            "claims.yaml primitives must be exactly CP-01..CP-15 "
             f"(got {sorted(claim_prims)})")
 
     names, bodies, audited = lean_index()

@@ -3212,3 +3212,304 @@ theorems:
   evidence: spec/lean/RSure/Model/System.lean
   reviewer: internal
   audit_line: true
+- id: TH-262
+  name: int_mul_self_nonneg
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(a : Int) : 0 ≤ a * a'
+  axioms: []
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-263
+  name: wlen_nonneg
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) : 0 ≤ wlen xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-264
+  name: wlen_map_add
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : wlen (xs.map (v => v + c)) = wlen xs'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-265
+  name: total_map_add
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : total (xs.map (v => v + c)) = total xs + wlen xs * c'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-266
+  name: ssAux_shift
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(w s c : Int) (xs : List Int) : ssAux w (s + w*c) (xs.map (v => v + c)) = ssAux w s xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-267
+  name: ssNum_shift
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : ssNum (xs.map (v => v + c)) = ssNum xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-268
+  name: wlen_map_reflect
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : wlen (xs.map (v => c - v)) = wlen xs'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-269
+  name: total_map_reflect
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : total (xs.map (v => c - v)) = wlen xs * c - total xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-270
+  name: ssAux_reflect
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(w s c : Int) (xs : List Int) : ssAux w (w*c - s) (xs.map (v => c - v)) = ssAux w s xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-271
+  name: ssNum_reflect
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : ssNum (xs.map (v => c - v)) = ssNum xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-272
+  name: risk_is_variance
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) (c : Int) : ssNum (xs.map (v => c - v)) = ssNum xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-273
+  name: ssAux_nonneg
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(w s : Int) (xs : List Int) : 0 ≤ ssAux w s xs'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-274
+  name: ssNum_nonneg
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) : 0 ≤ ssNum xs'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-275
+  name: rateBps_nonneg
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(xs : List Int) : 0 ≤ rateBps xs'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-276
+  name: nat_div_le_div_right
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(a b c : Nat) : a ≤ b → a / c ≤ b / c'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-277
+  name: qualityVariance_le
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(qualitySum liabilityBps : Nat) (isPartial : Bool) : qualitySum ≤ 20 → 4 ≤ qualitySum → liabilityBps ≤ 10000 → qualityVariance qualitySum isPartial liabilityBps ≤ 10000'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-278
+  name: qualityVariance_mono
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '{q1 q2 : Nat} : q1 ≤ q2 → q2 ≤ 20 → qualityVariance q2 isPartial liabilityBps ≤ qualityVariance q1 isPartial liabilityBps'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-279
+  name: loadedPremium_ge_expected
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(expectedLoss varianceBps loadBps : Nat) : expectedLoss ≤ loadedPremium expectedLoss varianceBps loadBps'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-280
+  name: loadedPremium_mono_variance
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '{v1 v2 : Nat} : v1 ≤ v2 → loadedPremium expectedLoss v1 loadBps ≤ loadedPremium expectedLoss v2 loadBps'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-281
+  name: loadedPremium_zero
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(expectedLoss loadBps : Nat) : loadedPremium expectedLoss 0 loadBps = expectedLoss'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-282
+  name: gapFlag_sound
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(engineering insurer tolerance : Nat) : gapFlag engineering insurer tolerance = true ↔ tolerance < (gapBps engineering insurer).natAbs'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-283
+  name: variance_sound
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(engineering insurer tolerance expectedLoss loadBps : Nat) : expectedLoss ≤ loadedPremium expectedLoss insurer loadBps ∧ (gapFlag engineering insurer tolerance = true ↔ tolerance < (gapBps engineering insurer).natAbs)'
+  axioms:
+  - propext
+  - Quot.sound
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-284
+  name: variance_refuses_bad_input
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: '(isPartial : Bool) : qualityVarianceOption 3 10000 isPartial = none'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true
+- id: TH-285
+  name: variance_reachable
+  module: RSure.Model.Variance
+  kind: theorem
+  status: proved-model
+  statement: ': qualityVarianceOption 20 10000 false = some 0'
+  axioms:
+  - propext
+  scope: shallow Lean component model; not a Rholang refinement
+  evidence: spec/lean/RSure/Model/Variance.lean
+  reviewer: internal
+  audit_line: true

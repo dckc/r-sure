@@ -1,13 +1,13 @@
 # Formal model
 
 > **Status:** Component model proved in Lean 4.12. `proved-model` means proved about the
-> shallow model in `spec/lean`, not a refinement of the Rholang contracts. Devnet behaviour
-> is still `not_run`; the contracts remain unaudited.
+> shallow model in `spec/lean`, not a refinement of the Rholang contracts. The devnet suite
+> campaign and the local reducer are green; the contracts remain unaudited.
 
 ## What is proved
 
-The Lean project at `spec/lean` contains 108 kernel-checked theorems over the insurance
-economics. They answer four questions:
+The Lean project at `spec/lean` contains 285 kernel-checked theorems over the insurance
+economics. They answer five questions:
 
 1. **Can the promise be backed?** Capacity, quote reservation, open-line and loss payment
    preserve `committed + written <= capital` (`INV-1`, `INV-7`).
@@ -19,6 +19,10 @@ economics. They answer four questions:
    the per-claim limit (`INV-5`).
 4. **Is every payout once?** A line pays a claim at most once, a policy settles it at most
    once, the fund covers it at most once, and a claim settles once (`INV-8`).
+5. **Is variance the same as risk?** A full indemnity preserves the value's variance
+   (`INV-13`); the variance rate is scale-free and bounded under the K-Asset rubric; the
+   engineering and insurer estimates and their signed gap are recorded; and the loaded
+   premium never undercuts expected loss.
 
 The register in `spec/lean/claims.yaml` is the authoritative claim list. `docs/reference/proof-map.md`
 is the rendered view.
@@ -34,7 +38,9 @@ capabilities and purses to `Bool` guards, and block heights to `Nat`. It does no
 - cryptographic unforgeability or 2-of-3 signature semantics;
 - node rollback, deploy atomicity or scheduler fairness;
 - phlo, gas, liveness or liveness under congestion;
-- evidence quality, probability, reserve adequacy or regulatory solvency.
+- evidence quality, probability, reserve adequacy or regulatory solvency;
+- the variance estimator: the quality-rubric mapping is an implied rate, not a statistical
+  moment from observed values.
 
 The assumptions are recorded in `claims.yaml` and repeated here:
 
@@ -48,6 +54,8 @@ The assumptions are recorded in `claims.yaml` and repeated here:
 | `scheduler.fairness` | out of scope | safety only; no liveness claim |
 | `pause.contract` | assumed | F-003 is closed in the contracts; INV-12 is enforced by the pause-scope source gate |
 | `evidence.quality` | out of scope | evidence presence is checked, not loss quality |
+| `variance.estimator` | assumed | the quality map is an implied variance-rate estimator, not a measured moment |
+| `kasset.conventions` | assumed | r-gen passes quantity/quality/liability as conventions; r-sure validates them |
 
 ## Module tree
 
@@ -69,6 +77,7 @@ spec/lean/
   RSure/Model/Fund.lean          capped one-shot cover
   RSure/Model/Policy.lean        premium distribution and settlement
   RSure/Model/Claim.lean         agreement, adjudication, settle once
+  RSure/Model/Variance.lean      variance identity, derived rate, gap, loaded premium
   RSure/Model/Oracle.lean        decide/execute/close
   RSure/Model/Books.lean         unique registration and lookup
   RSure/Model/System.lean        settlement composition and two-cell atomicity
@@ -95,6 +104,7 @@ spec/lean/
 | INV-10 | Terminal states | covered | `claim_agree_terminal`, `claim_applyDecision_terminal` |
 | INV-11 | Atomicity | partial | `system_step_atomic`; native ERTP is assumed |
 | INV-12 | Pause does not block settlement | tool | `tools/check_pause_scope.py` |
+| INV-13 | Variance is risk | covered (estimator boundary) | `risk_is_variance`, `qualityVariance_le`, `loadedPremium_ge_expected`, `gapFlag_sound` |
 
 F-020 and F-021 are fixed: the payable is the documented three-way minimum, the
 aggregate guard propagates through Policy settlement, and terminal claim states are

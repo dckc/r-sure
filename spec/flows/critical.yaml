@@ -286,3 +286,52 @@ rules:
     lean_status: proved-model
     invariants: [INV-8, INV-10]
     note: case-bound decision, claim lifecycle preserved
+  - id: C-041
+    arm: 'SureMath@"varianceRate"'
+    source: contracts/src/deploy/04_math.rho
+    lean: RSure.Model.Variance.qualityVariance_le
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: quality/verdict/liability map to a bounded variance rate
+  - id: C-042
+    arm: 'SureMath@"varianceGap"'
+    source: contracts/src/deploy/04_math.rho
+    lean: RSure.Model.Variance.gapFlag_sound
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: the flag is exactly the tolerance comparison on the signed gap
+  - id: C-043
+    arm: 'SureMath@"loadedPremium"'
+    source: contracts/src/deploy/04_math.rho
+    lean: RSure.Model.Variance.loadedPremium_ge_expected
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: the variance-principle load never undercuts expected loss
+  - id: C-044
+    arm: 'RgenAdapter@"variance"'
+    source: contracts/src/deploy/05_rgen.rho
+    lean: RSure.Model.Variance.variance_sound
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: K-Asset conventions validated; approved status required for derivation
+  - id: C-045
+    arm: 'Risk@"assess"'
+    source: contracts/src/deploy/12_risk.rho
+    lean: RSure.Model.Variance.variance_sound
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: both estimates, the signed gap and the loaded floor are recorded
+  - id: C-046
+    arm: 'Risk@"variance"'
+    source: contracts/src/deploy/12_risk.rho
+    lean: RSure.Model.Variance.gapFlag_sound
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: the gap and flag are a public read
+  - id: C-047
+    arm: 'Risk@"accept"'
+    source: contracts/src/deploy/12_risk.rho
+    lean: RSure.Model.Variance.variance_sound
+    lean_status: proved-model
+    invariants: [INV-13]
+    note: acceptance records the acknowledgement of the measured gap

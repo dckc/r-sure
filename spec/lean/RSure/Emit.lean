@@ -1,5 +1,6 @@
 import RSure.Basic
 import RSure.Model.Math
+import RSure.Model.Variance
 import RSure.Model.Types
 import RSure.Model.Syndicate
 import RSure.Model.Grant
@@ -161,6 +162,21 @@ def main : IO Unit := do
   IO.println s!"claim.terminal.refused|settled|{showClaim (Model.Claim.agree (Model.Claim.settledStandardClaim) { caller := 1, amount := 999, basisHash := 0 })}"
   let b := Model.Books.register { entries := [] } 1 10
   IO.println s!"book.register.twice|id=1|{match b with | none => "none" | some b' => showBook (Model.Books.register b' 1 20)}"
+  IO.println s!"variance.rate.perfect|20,valid,10000|{Model.Variance.qualityVariance 20 false 10000}"
+  IO.println s!"variance.rate.partial|16,partial,10000|{Model.Variance.qualityVariance 16 true 10000}"
+  IO.println s!"variance.rate.lowqa|4,valid,0|{Model.Variance.qualityVariance 4 false 0}"
+  IO.println s!"variance.rate.worst|4,partial,0|{Model.Variance.qualityVariance 4 true 0}"
+  IO.println s!"variance.rate.liability|20,valid,0|{Model.Variance.qualityVariance 20 false 0}"
+  IO.println s!"variance.ss.base|1000,2000|{Model.Variance.ssNum [1000,2000]}"
+  IO.println s!"variance.ss.shifted|1500,2500|{Model.Variance.ssNum [1500,2500]}"
+  IO.println s!"variance.ss.reflected|2000,1000|{Model.Variance.ssNum [2000,1000]}"
+  IO.println s!"variance.rate.two-point|1000,2000|{Model.Variance.rateBps [1000,2000]}"
+  IO.println s!"variance.rate.scale|2000,4000|{Model.Variance.rateBps [2000,4000]}"
+  IO.println s!"variance.gap.flagged|1000,3000,1000|{Model.Variance.gapBps 1000 3000},{Model.Variance.gapFlag 1000 3000 1000}"
+  IO.println s!"variance.gap.within|1000,1500,1000|{Model.Variance.gapBps 1000 1500},{Model.Variance.gapFlag 1000 1500 1000}"
+  IO.println s!"variance.gap.negative|3000,1000,1000|{Model.Variance.gapBps 3000 1000},{Model.Variance.gapFlag 3000 1000 1000}"
+  IO.println s!"variance.load.mid|1000,2500,2000|{Model.Variance.loadedPremium 1000 2500 2000}"
+  IO.println s!"variance.load.max|1000,10000,10000|{Model.Variance.loadedPremium 1000 10000 10000}"
 
 end RSure.Emit
 

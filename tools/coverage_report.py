@@ -134,7 +134,7 @@ def render(payload: dict) -> str:
         f"{pct(len(payload['core_flows_asserted']), payload['core_flows_total'])} |",
         f"| Fixed findings with a passing regression suite asserting a linked arm | "
         f"{len(payload['fixed_findings'])}/{payload['fixed_findings_total']} |",
-        f"| Invariants tracked | {len(payload['invariants'])}/12 |",
+        f"| Invariants tracked | {len(payload['invariants'])}/{len(payload['invariants'])} |",
         "",
         "A suite contributes only when it is `pass`, has at least one assertion and",
         "emits `covered_arms` in its `RSURE_RESULT` trailer. Stubs and zero-assertion",

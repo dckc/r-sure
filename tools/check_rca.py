@@ -95,7 +95,14 @@ def main() -> int:
         problems.append(f"schema {doc.get('schema')!r} is not {SCHEMA}")
 
     findings = ids_of(load("findings.yaml").get("findings", []))
-    hazards = ids_of(load("hazards.yaml").get("hazards", []))
+    hazard_rows = load("hazards.yaml").get("hazards", [])
+    hazards = ids_of(hazard_rows)
+    # The RCA-link rule is for install/test-campaign hazards (N16-N19), not for
+    # domain hazards such as risk measurement.
+    install_hazards = {
+        row.get("id") for row in hazard_rows
+        if row.get("node") in {"N16", "N17", "N18", "N19"}
+    }
     improvements = ids_of(load("improvements.yaml").get("improvements", []))
     experiments = ids_of(load("experiments.yaml").get("experiments", []))
     nodes = ids_of(yaml.safe_load((ROOT / "audit" / "hazop" / "nodes.yaml").read_text())
@@ -238,6 +245,8 @@ def main() -> int:
         if not record:
             problems.append(f"{finding}: new finding is not linked to an RCA record")
     for hazard in hazards:
+        if hazard not in install_hazards:
+            continue
         match = NEW_HAZARD.match(str(hazard))
         if not match or int(match.group(1)) < 28:
             continue

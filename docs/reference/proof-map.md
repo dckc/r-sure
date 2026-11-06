@@ -19,6 +19,7 @@
 | INV-10 | terminal guards | `claim_settle_once`, `claim_terminal_sticky`, `policy_terminal`, `claim_agree_terminal`, `claim_applyDecision_terminal` | F-005, F-010 | covered |
 | INV-11 | `System.transfer`, `Linear.Cell.commit` | `system_step_atomic`, `system_step_refuses`, `commit_all_or_none`, `commit_keeps_held` | none | partial (ERTP assumed) |
 | INV-12 | pause boundary | `tools/check_pause_scope.py` | none | tool |
+| INV-13 | `Variance.risk_is_variance` | `risk_is_variance`, `ssNum_reflect`, `ssNum_shift`, `qualityVariance_le`, `loadedPremium_ge_expected`, `gapFlag_sound` | C-041..C-047 | covered (estimator boundary) |
 
 ## Cornerstone flows
 
@@ -84,7 +85,7 @@
 
 The campaign gate is `spec/critical-path.yaml`; `tools/check_critical_path.py` joins it to
 `claims.yaml`, the Lean declarations and axiom audit, the flow rules, the arm register and
-the suite register. All 14 primitives are `covered` as model-only proofs.
+the suite register. All 15 primitives are `covered` as model-only proofs.
 
 | ID | Primitive | Arms | Model | Soundness theorem | Classes |
 |---|---|---|---|---|---|
@@ -102,6 +103,11 @@ the suite register. All 14 primitives are `covered` as model-only proofs.
 | CP-12 | ClaimStateMachine | `Claim` agree/assess/dispute/settle | `Model/Claim.lean` | `claim_agree_sound` | binding, terminal, exactly-once |
 | CP-13 | FundCover | `SureFund` cover/contribute/admin | `Model/Fund.lean` | `fund_cover_sound` | conservation, exactly-once, authority |
 | CP-14 | OracleDecision | `RgenAdapter` verifyClaim/verifyCredential, `Claim@"dispute"`, `applyCap@"applyDecision"` | `Model/Oracle.lean` | `oracle_decision_sound` | binding, exactly-once, terminal |
+| CP-15 | VarianceConversion | `SureMath` varianceRate/varianceGap/loadedPremium, `RgenAdapter@"variance"`, `Risk` assess/variance/accept | `Model/Variance.lean` | `variance_sound` | binding, bound |
+
+The variance flows are C-041..C-047 in `spec/flows/critical.yaml`; every target is a
+substantive theorem in `Model/Variance.lean`, and the arm register and suites join through
+`check_critical_path.py`.
 
 The composed settlement path `Claim -> Policy -> lines -> Fund` is modelled in
 `Model/System.lean` by `EngineState`/`settleEngine`. It calls the component

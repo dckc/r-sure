@@ -339,3 +339,35 @@ primitives:
     assumptions: [rgen.oracle_binding, crypto.authority]
     suite: [unit_oracle, unit_claim_refusals, unit_evidence, integration_rgen]
     hazards: [HZ-023]
+  - id: CP-15
+    name: VarianceConversion
+    status: covered
+    arms:
+      - 'SureMath@"varianceRate"'
+      - 'SureMath@"varianceGap"'
+      - 'SureMath@"loadedPremium"'
+      - 'RgenAdapter@"variance"'
+      - 'Risk@"assess"'
+      - 'Risk@"variance"'
+      - 'Risk@"accept"'
+    source:
+      - contracts/src/deploy/04_math.rho
+      - contracts/src/deploy/05_rgen.rho
+      - contracts/src/deploy/12_risk.rho
+    model: spec/lean/RSure/Model/Variance.lean
+    soundness: RSure.Model.Variance.variance_sound
+    theorems:
+      - RSure.Model.Variance.variance_sound
+      - RSure.Model.Variance.qualityVariance_le
+      - RSure.Model.Variance.qualityVariance_mono
+      - RSure.Model.Variance.gapFlag_sound
+      - RSure.Model.Variance.loadedPremium_ge_expected
+      - RSure.Model.Variance.loadedPremium_mono_variance
+      - RSure.Model.Variance.risk_is_variance
+      - RSure.Model.Variance.variance_refuses_bad_input
+      - RSure.Model.Variance.variance_reachable
+    required_classes: [binding, bound]
+    invariants: [INV-13]
+    assumptions: [variance.estimator, kasset.conventions]
+    suite: [unit_variance, integration_rgen]
+    hazards: [HZ-036]

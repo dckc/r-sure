@@ -132,6 +132,66 @@
     "synd.release.restore": {
       "input": "1000,0,400",
       "output": "ok:1000,0,0,1000"
+    },
+    "variance.gap.flagged": {
+      "input": "1000,3000,1000",
+      "output": "2000,true"
+    },
+    "variance.gap.negative": {
+      "input": "3000,1000,1000",
+      "output": "-2000,true"
+    },
+    "variance.gap.within": {
+      "input": "1000,1500,1000",
+      "output": "500,false"
+    },
+    "variance.load.max": {
+      "input": "1000,10000,10000",
+      "output": "2000"
+    },
+    "variance.load.mid": {
+      "input": "1000,2500,2000",
+      "output": "1050"
+    },
+    "variance.rate.liability": {
+      "input": "20,valid,0",
+      "output": "1000"
+    },
+    "variance.rate.lowqa": {
+      "input": "4,valid,0",
+      "output": "9000"
+    },
+    "variance.rate.partial": {
+      "input": "16,partial,10000",
+      "output": "3000"
+    },
+    "variance.rate.perfect": {
+      "input": "20,valid,10000",
+      "output": "0"
+    },
+    "variance.rate.scale": {
+      "input": "2000,4000",
+      "output": "1111"
+    },
+    "variance.rate.two-point": {
+      "input": "1000,2000",
+      "output": "1111"
+    },
+    "variance.rate.worst": {
+      "input": "4,partial,0",
+      "output": "10000"
+    },
+    "variance.ss.base": {
+      "input": "1000,2000",
+      "output": "2000000"
+    },
+    "variance.ss.reflected": {
+      "input": "2000,1000",
+      "output": "2000000"
+    },
+    "variance.ss.shifted": {
+      "input": "1500,2500",
+      "output": "2000000"
     }
   }
 }

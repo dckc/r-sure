@@ -1,5 +1,6 @@
 import RSure.Basic
 import RSure.Model.Math
+import RSure.Model.Variance
 import RSure.Model.Terms
 import RSure.Model.Root
 import RSure.Model.Admin
@@ -281,3 +282,27 @@ import RSure.Linear.Protocol
 #print axioms RSure.Model.System.system_composition_once
 #print axioms RSure.Model.System.system_composition_refuses_terminal
 #print axioms RSure.Model.System.system_composition_reachable
+#print axioms RSure.Model.Variance.int_mul_self_nonneg
+#print axioms RSure.Model.Variance.wlen_nonneg
+#print axioms RSure.Model.Variance.wlen_map_add
+#print axioms RSure.Model.Variance.total_map_add
+#print axioms RSure.Model.Variance.ssAux_shift
+#print axioms RSure.Model.Variance.ssNum_shift
+#print axioms RSure.Model.Variance.wlen_map_reflect
+#print axioms RSure.Model.Variance.total_map_reflect
+#print axioms RSure.Model.Variance.ssAux_reflect
+#print axioms RSure.Model.Variance.ssNum_reflect
+#print axioms RSure.Model.Variance.risk_is_variance
+#print axioms RSure.Model.Variance.ssAux_nonneg
+#print axioms RSure.Model.Variance.ssNum_nonneg
+#print axioms RSure.Model.Variance.rateBps_nonneg
+#print axioms RSure.Model.Variance.nat_div_le_div_right
+#print axioms RSure.Model.Variance.qualityVariance_le
+#print axioms RSure.Model.Variance.qualityVariance_mono
+#print axioms RSure.Model.Variance.loadedPremium_ge_expected
+#print axioms RSure.Model.Variance.loadedPremium_mono_variance
+#print axioms RSure.Model.Variance.loadedPremium_zero
+#print axioms RSure.Model.Variance.gapFlag_sound
+#print axioms RSure.Model.Variance.variance_sound
+#print axioms RSure.Model.Variance.variance_refuses_bad_input
+#print axioms RSure.Model.Variance.variance_reachable

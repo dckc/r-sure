@@ -20,6 +20,7 @@ The simulator and the audit use the same numbering as `spec/invariants.md`.
 | INV-10 | Terminal | Settled/denied claims and expired policies cannot be re-opened or re-paid. | covered |
 | INV-11 | Atomicity | A failed deploy leaves no partial value move. | partial: native ERTP assumed |
 | INV-12 | Pause | New risk is blocked; settlement, close, expiry and refunds are not. | tool-checked (F-003 fixed) |
+| INV-13 | Variance is risk | A K-Asset's value variance is the insurance risk. The engineering and insurer estimates and their signed gap are recorded; acceptance acknowledges the gap. | covered (model; estimator boundary) |
 
 ## Modelling notes
 

@@ -17,6 +17,7 @@ The Lean names are in `spec/lean/claims.yaml` and `spec/lean/RSure/Invariants.le
 | INV-10 | Terminal | A settled/denied claim or expired policy cannot be re-opened or re-paid. |
 | INV-11 | Atomicity | No partial value move survives a failed deploy. |
 | INV-12 | Pause | Settlement, close, expiry and refunds are not blocked by global pause. |
+| INV-13 | Variance is risk | A K-Asset's value variance is the insurance risk: the rate is `Var/mean^2` in bps, the engineering and insurer estimates and their signed gap are recorded, and acceptance acknowledges the gap. |
 
 ## Model scope
 

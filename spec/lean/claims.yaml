@@ -49,6 +49,18 @@ assumptions:
       F-003 is closed in the contracts: new-risk arms consult SureAdmin isPaused
       and fail closed. The Lean model does not prove the Rholang wiring; INV-12
       is enforced by tools/check_pause_scope.py.
+  variance.estimator:
+    status: assumed
+    note: >-
+      The quality/verdict/liability mapping is an implied variance-rate estimator, not a
+      statistical moment from observed K-Asset values. The variance identities are about
+      the modelled value distribution; the estimator is a boundary (INV-13).
+  kasset.conventions:
+    status: assumed
+    note: >-
+      r-gen passes quantity, quality, verdict, status and approval.liability as
+      conventions, not core-enforced shapes. r-sure validates them; the K-Asset hash is a
+      reference, not a recomputed state digest.
   evidence.quality:
     status: out_of_scope
     note: >-
@@ -182,6 +194,24 @@ invariants:
       - {name: RSure.Model.System.system_step_refuses, strength: substantive, kind: rejection}
       - {name: RSure.commit_all_or_none, strength: substantive, kind: preservation}
       - {name: RSure.commit_keeps_held, strength: substantive, kind: preservation}
+
+  INV-13:
+    statement: >-
+      The variance of the K-Asset value is the risk of the insurance product. The rate is
+      scale-free; the engineering and insurer estimates and their signed gap are recorded;
+      a flagged gap is acknowledged by the insured on acceptance.
+    predicate: RSure.Model.Variance.risk_is_variance
+    status: covered
+    note: >-
+      Conditional on the K-Asset conventions and the estimator boundary. The identity is
+      exact for the modelled value/loss distribution; the derived rate is an estimate.
+    theorems:
+      - {name: RSure.Model.Variance.risk_is_variance, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Variance.ssNum_reflect, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Variance.ssNum_shift, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Variance.qualityVariance_le, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.loadedPremium_ge_expected, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.gapFlag_sound, strength: substantive, kind: binding}
 
   INV-12:
     statement: global pause blocks new risk without blocking settlement, close, expiry or refunds.
@@ -640,3 +670,40 @@ primitives:
       - {name: RSure.Model.Oracle.oracle_applyCap_sound, strength: substantive, kind: preservation}
       - {name: RSure.Model.Oracle.oracle_decision_sound, strength: substantive, kind: binding}
       - {name: RSure.Model.Oracle.adapter_reachable, strength: substantive, kind: reachability}
+  CP-15:
+    name: VarianceConversion
+    statement: >-
+      The engineering variance rate is derived from K-Asset conventions and bounded; the
+      insurer estimate, signed gap and flag are recorded; the loaded premium never
+      undercuts expected loss; and acceptance records the acknowledgement.
+    status: covered
+    model: spec/lean/RSure/Model/Variance.lean
+    soundness: RSure.Model.Variance.variance_sound
+    arms:
+      - 'SureMath@"varianceRate"'
+      - 'SureMath@"varianceGap"'
+      - 'SureMath@"loadedPremium"'
+      - 'RgenAdapter@"variance"'
+      - 'Risk@"assess"'
+      - 'Risk@"variance"'
+      - 'Risk@"accept"'
+    classes: [binding, bound]
+    invariants: [INV-13]
+    assumptions: [variance.estimator, kasset.conventions]
+    tie:
+      status: model-only
+      note: shallow Lean variance model; not a refinement of 04_math.rho or 12_risk.rho
+    refinement_gap: >-
+      The estimator is an implied CV^2 from the quality rubric, not a measured moment;
+      the K-Asset hash is a reference, not a recomputed digest; and an attestation is an
+      off-chain engineering claim that r-sure records but does not verify.
+    theorems:
+      - {name: RSure.Model.Variance.variance_sound, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Variance.qualityVariance_le, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.qualityVariance_mono, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.gapFlag_sound, strength: substantive, kind: binding}
+      - {name: RSure.Model.Variance.loadedPremium_ge_expected, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.loadedPremium_mono_variance, strength: substantive, kind: bound}
+      - {name: RSure.Model.Variance.risk_is_variance, strength: substantive, kind: preservation}
+      - {name: RSure.Model.Variance.variance_refuses_bad_input, strength: substantive, kind: rejection}
+      - {name: RSure.Model.Variance.variance_reachable, strength: substantive, kind: reachability}

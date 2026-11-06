@@ -52,6 +52,10 @@ invariants:
   INV-12:
     statement: pause blocks new risk without blocking settlement, close, expiry or refunds
     lean_status: assumption
+  INV-13:
+    statement: the K-Asset value variance is the insurance risk; the rate is scale-free and the engine
+    lean: RSure.Model.Variance.risk_is_variance
+    lean_status: proved-model
 
 rules:
   - id: F-001
