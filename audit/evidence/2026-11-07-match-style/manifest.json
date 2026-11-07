@@ -67,10 +67,10 @@
     "before_inventory": "recorded (397 sites, 64 violations on b4e671d; before-report.txt)",
     "call_arity": "pass (41 files, 0 mismatches; make check-call-arity)",
     "local_reducer": "pass (17 terms, 25 vectors, journey, refusals, variance; after the helper arity fix)",
-    "behavioural_suites": "partial (ten suites passed before the shared devnet was reset; later suites not_run)"
+    "behavioural_suites": "partial (ten suites passed on the refactored tree before the shared devnet was reset; the fund helper arity defect the run exposed is fixed and the local reducer passes)"
   },
   "reasons": {
-    "behavioural_suites": "The 40403 devnet was recreated by another session mid-campaign; the remaining suites reported not_run. The local reducer passed on the same tree."
+    "behavioural_suites": "The 40403 devnet was recreated by another session mid-campaign (13:32, 15:09 and 15:23), so later suites reported not_run. The run exposed a helper-call arity defect in the fund refactor; it is fixed, gated by tools/check_call_arity.py, and the local reducer passes on the fixed tree."
   },
   "limitations": [
     "Internal audit, not an independent review; no production-safety claim.",

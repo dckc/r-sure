@@ -1,6 +1,6 @@
 # r-sure audit and HAZOP
 
-> **Status:** Internal desk, tabletop and install-RCA review, 2026-11-05. This is not an
+> **Status:** Internal desk, tabletop, install-RCA and match-style review, 2026-11-07. This is not an
 > independent audit and does not certify the contracts, r-cash, r-gen or any deployment.
 > The 17-term install is E2 green. The behavioural campaign is incomplete: the root suite
 > passes, the other registered suites are `not_run` or implemented. Install evidence is
@@ -52,6 +52,8 @@ python3 tools/check_take_repost.py
 python3 tools/check_bundle_closedness.py
 python3 tools/check_reply_shapes.py
 python3 tools/check_pause_scope.py
+python3 tools/check_match_style.py --check
+python3 tools/check_call_arity.py
 python3 tools/check_evidence.py
 python3 tools/check_rca.py
 python3 tools/check_experiments.py

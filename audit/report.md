@@ -128,9 +128,12 @@ gap.
 - `make local-reducer` passes all 17 terms, 25 vectors, the journey, the refusal vectors and
   the variance checks on the refactored tree.
 - `deployments/suite-results.json` records the last full campaign (38 runs, 410 assertions,
-  no assertion failure). That campaign predates the match refactor: ten suites passed on the
-  refactored tree before the shared devnet was reset, and the full campaign must be rerun
-  before the new terms are called behavioural-verified.
+  no assertion failure). That campaign predates the match refactor. A partial campaign on
+  the refactored tree passed root, payments, syndicate, capital, broker, risk, variance,
+  slip, subscription and binding before the shared devnet was reset; it also exposed a
+  helper-call arity defect in the fund refactor, now fixed and covered by
+  `make check-call-arity`. The full campaign must be rerun before the new terms are called
+  behavioural-verified; `make local-reducer` passes on the fixed tree.
 
 ## Next steps
 
