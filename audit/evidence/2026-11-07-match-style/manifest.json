@@ -1,0 +1,82 @@
+{
+  "schema": "rsure.evidence/v2",
+  "id": "2026-11-07-match-style",
+  "date": "2026-11-07",
+  "kind": "Match-style static audit and state-loss fix",
+  "commit": "e438d53dbf4df49c4b69ad3438ab14669ce370de",
+  "scope": {
+    "audit": "internal",
+    "production": false,
+    "dynamic": "static gate only",
+    "note": "E1 is the static scanner on source. The local reducer passed after the arity fix; the devnet campaign was interrupted by shared-devnet resets and is not a claim of this evidence set."
+  },
+  "artifacts": [
+    {
+      "path": "before-report.txt",
+      "role": "baseline",
+      "sha256": "561db6ef580303b8284c1a3545c3f44e55f288287c2ebad1f5cdd760fdb655ed",
+      "bytes": 6009,
+      "description": "Scanner report on the pre-refactor tree at b4e671d with the final checker: 397 sites, 64 violations."
+    },
+    {
+      "path": "after-report.txt",
+      "role": "final",
+      "sha256": "849596b8a06512dfce60e42c525e3b96ddeea22581ab0600362a2d8af1423a9f",
+      "bytes": 1054,
+      "description": "Scanner report on the refactored tree: 403 sites, 0 violations, depth histogram max 3."
+    },
+    {
+      "path": "gate.txt",
+      "role": "final",
+      "sha256": "7850f9a8a612bea9b7aa07034e4e5c828f5062d41189838bea1794f5f09de131",
+      "bytes": 1217,
+      "description": "make check-match-style: self-test and hard gate output."
+    },
+    {
+      "path": "self-test.txt",
+      "role": "final",
+      "sha256": "6875af545e6cc02f23997feb4e45bb25f1f1811046f5c86929b1590b8d72c614",
+      "bytes": 55,
+      "description": "Self-test output: 14 fixture groups."
+    },
+    {
+      "path": "rca.md",
+      "role": "narrative",
+      "sha256": "2f21e7707e06da1ebe1e61d3cc243e14285c31d5774d5acb2b09000025585da7",
+      "bytes": 5008,
+      "description": "Readable RCA-002 account."
+    },
+    {
+      "path": "commit.txt",
+      "role": "provenance",
+      "sha256": "24359313481f653e7ae1b88285b11875cb5627861bd4f46e3fd8347fb2804147",
+      "bytes": 41,
+      "description": "Commit under audit (git rev-parse HEAD at capture)."
+    }
+  ],
+  "commands": [
+    "python3 tools/check_match_style.py --self-test",
+    "python3 tools/check_match_style.py --report",
+    "make check-match-style",
+    "make check-call-arity",
+    "make local-reducer"
+  ],
+  "results": {
+    "match_gate": "pass (403 sites, 0 violations, 0 suppressions; gate.txt)",
+    "match_self_test": "pass (14 fixture groups; self-test.txt)",
+    "before_inventory": "recorded (397 sites, 64 violations on b4e671d; before-report.txt)",
+    "call_arity": "pass (41 files, 0 mismatches; make check-call-arity)",
+    "local_reducer": "pass (17 terms, 25 vectors, journey, refusals, variance; after the helper arity fix)",
+    "behavioural_suites": "partial (ten suites passed before the shared devnet was reset; later suites not_run)"
+  },
+  "reasons": {
+    "behavioural_suites": "The 40403 devnet was recreated by another session mid-campaign; the remaining suites reported not_run. The local reducer passed on the same tree."
+  },
+  "limitations": [
+    "Internal audit, not an independent review; no production-safety claim.",
+    "The scanner is a brace/token heuristic; make parse-check remains the syntax gate.",
+    "M-004 accepts a total arm that forwards the cell and reply to a helper defined in the same file; the helper is checked separately.",
+    "The behavioural campaign is incomplete because the shared devnet was reset; the local reducer is the dynamic evidence for this set.",
+    "The before inventory uses the final checker on commit b4e671d, not the first scanner revision, so the M-004 count is higher than the first run reported."
+  ]
+}

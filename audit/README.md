@@ -24,8 +24,8 @@ the book chapters summarise them.
 | [hazop/worksheet-install-2026-11-05.md](hazop/worksheet-install-2026-11-05.md) | install guide-word worksheet for N16–N19 |
 | [registers/findings.yaml](registers/findings.yaml) | 28 findings |
 | [registers/hazards.yaml](registers/hazards.yaml) | 37 hazards |
-| [registers/improvements.yaml](registers/improvements.yaml) | 29 fixes/deferred items |
-| [registers/tests.yaml](registers/tests.yaml) | 41 tests: 37 passing, 3 `not_run`, 1 implemented |
+| [registers/improvements.yaml](registers/improvements.yaml) | 30 fixes/deferred items |
+| [registers/tests.yaml](registers/tests.yaml) | 42 tests: 37 passing, 3 `not_run`, 2 implemented |
 | [registers/rca.yaml](registers/rca.yaml) | RCA-001 install and RCA-002 match state-loss root causes |
 | [registers/experiments.yaml](registers/experiments.yaml) | 10 RCA experiments with artifacts |
 | [rca/template.md](rca/template.md) | RCA template |

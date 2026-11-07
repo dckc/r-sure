@@ -32,8 +32,8 @@ and processed. Three caveats bound that claim:
 | P0 findings | 5 (5 fixed; F-002/F-022/F-023/F-024 E2 install) |
 | P1 findings | 14 (14 fixed, 0 open) |
 | P2/P3 findings | 9 (6 fixed, 3 accepted) |
-| Improvements | 29 |
-| Tests registered | 41 (37 passing, 3 `not_run`, 1 implemented) |
+| Improvements | 30 |
+| Tests registered | 42 (37 passing, 3 `not_run`, 2 implemented) |
 | Lean theorems registered | 285 (register and source agree; no unregistered theorem) |
 | Claims | 26 covered, 1 partial, 1 tool; 15 critical primitives covered |
 
@@ -114,21 +114,23 @@ gap.
 - `audit/composition/` — 42 interface rows, reply-shape inventory and assumed invariants.
 - `audit/hazop/` — 19-node catalogue, worksheet, install worksheet and the 2026-11-05
   tabletop.
-- `audit/registers/` — hazards, findings, improvements, 40 tests, RCA and experiments.
+- `audit/registers/` — hazards, findings, improvements, 42 tests, RCA and experiments.
 - `audit/rca/template.md` — RCA template.
 - `audit/evidence/2026-11-05-concurrency-tabletop/` — pre-fix scanner output and gate notes.
 - `audit/traceability/` — generated arm/hazard/finding/test matrix and coverage report.
 
 ## Gate status
 
-- Static gates in `make audit-check` pass except `check-audit`, which fails only on the
-  Lean theorem-register drift described above.
-- New checkers pass: `python3 tools/check_evidence.py`, `python3 tools/check_rca.py`,
-  `python3 tools/check_experiments.py`.
-- They are not yet in `make audit-check`; the Makefile is owned by the lead. Proposed
-  targets: `check-evidence`, `check-rca`, `check-experiments`, appended to `audit-check`.
-- `deployments/suite-results.json` records 38 runs, 410 assertions and no assertion
-  failure; the coverage report derives 37/40 suites and 126/151 public arms.
+- `make audit-check` runs the registers, arm inventory, traceability, concurrency and
+  composition reviews, guard and pause checks, suite results, coverage, evidence, RCA and
+  experiment validators; all pass.
+- `make spec-check` runs the arity and match-style gates; both pass with zero findings.
+- `make local-reducer` passes all 17 terms, 25 vectors, the journey, the refusal vectors and
+  the variance checks on the refactored tree.
+- `deployments/suite-results.json` records the last full campaign (38 runs, 410 assertions,
+  no assertion failure). That campaign predates the match refactor: ten suites passed on the
+  refactored tree before the shared devnet was reset, and the full campaign must be rerun
+  before the new terms are called behavioural-verified.
 
 ## Next steps
 

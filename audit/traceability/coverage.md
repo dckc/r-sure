@@ -4,11 +4,11 @@
 
 | Metric | Covered |
 |---|---|
-| Passed suites | 37/40 |
+| Passed suites | 37/42 |
 | Public arms asserted by passing suites | 126/151 (83.4%) |
 | All registered arms asserted | 139/168 (82.7%) |
 | Core flow arms asserted | 8/11 (72.7%) |
-| Fixed findings with a passing regression suite asserting a linked arm | 17/22 |
+| Fixed findings with a passing regression suite asserting a linked arm | 20/25 |
 | Invariants tracked | 13/13 |
 
 A suite contributes only when it is `pass`, has at least one assertion and

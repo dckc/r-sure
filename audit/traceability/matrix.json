@@ -4,10 +4,10 @@
     "arms": 168,
     "arms_with_flow_rule": 11,
     "arms_with_hazard": 25,
-    "hazards": 36,
-    "findings": 25,
-    "improvements": 25,
-    "tests": 40
+    "hazards": 37,
+    "findings": 28,
+    "improvements": 30,
+    "tests": 42
   },
   "arms": [
     {
@@ -1044,16 +1044,24 @@
       "flow_status": null,
       "lean_target": null,
       "hazards": [
-        "HZ-013"
+        "HZ-013",
+        "HZ-037"
       ],
       "findings": [
-        "F-008"
+        "F-008",
+        "F-027"
       ],
       "improvements": [
-        "R-008"
+        "R-008",
+        "R-027"
       ],
       "tests": [
-        "T-003"
+        "T-003",
+        "T-005",
+        "T-007",
+        "T-011",
+        "T-012",
+        "T-041"
       ]
     },
     {
