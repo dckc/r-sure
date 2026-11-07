@@ -1,6 +1,6 @@
 # SlipFactory — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,11 +11,11 @@
 - Writers: none
 - Readers: open
 - Replay guard: `none`
-- Bundle publication: publishes Slip with unclosed bundle
+- Bundle publication: publishes Slip after the rebind fix; check_bundle_closedness reports no candidates
 
 ## Review
 
-Stateless factory. It performs broker, risk, terms and payments lookups, creates a purse, then calls `slipMake`. `Slip` is published with `bundle+{*Slip}`, which captures `slipState`, the purse and tokens (P0 bundle). The factory does not validate the risk/insured fields itself; that is delegated to the caller and `Slip`.
+Stateless factory. It resolves the broker, terms and payments components, validates and hashes the terms, creates the purse, and calls `slipMake`; the stages are `slipOpenBroker`, `slipOpenTerms`, `slipOpenPayments`, `slipOpenPurse` and `slipOpenHeight`, each at depth 2 or less. A failing lookup or helper reply returns the refusal to the caller instead of leaving a receive waiting. `Slip` is published after the rebind fix; `check_bundle_closedness` reports no candidates. The factory does not validate the risk/insured fields itself; that is delegated to the caller and `Slip`.
 
 ## Await / value-move notes
 
@@ -29,4 +29,4 @@ Stateless factory. It performs broker, risk, terms and payments lookups, creates
 - Source: `contracts/src/deploy/13_slip.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

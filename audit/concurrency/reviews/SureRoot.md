@@ -1,6 +1,6 @@
 # SureRoot — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **concern**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -15,7 +15,7 @@
 
 ## Review
 
-`register` consumes `rootState`, awaits `dops.pubKeyBytes`, then reposts the consumed snapshot. The deploy is atomic and no re-entrant call reaches `SureRoot`, but the cell is held across an external await (P2/P4 concern). `admin` holds the cell across `AdminGuard.verify`; the nonce check is on the snapshot.
+`register` consumes `rootState`, awaits `dops.pubKeyBytes`, then reposts the consumed snapshot. The deploy is atomic and no re-entrant call reaches `SureRoot`, but the cell is held across an external await (P2/P4 concern). `admin` holds the cell across `AdminGuard.verify`; the nonce check is on the snapshot. The match gate is green; this term was not part of the 2026-11-07 handler flattening.
 
 ## Await / value-move notes
 
@@ -29,4 +29,4 @@
 - Source: `contracts/src/deploy/00_root.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

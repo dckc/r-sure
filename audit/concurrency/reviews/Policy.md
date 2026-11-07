@@ -1,6 +1,6 @@
 # Policy — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,13 +11,11 @@
 - Writers: distribute, openClaim, settleClaim, expire
 - Readers: info, terms, lines, line, claims, claim, payable
 - Replay guard: `policyToken/claimToken`
-- Bundle publication: bundle+{*Policy} unclosed: captures policyState/purse/tokens
+- Bundle publication: bundle+{*Policy}; the contract body rebinds state, purse and tokens, and check_bundle_closedness reports no candidates
 
 ## Review
 
-`distribute`, `openClaim` and `settleClaim` take `policyState` and later take it again after external awaits without a repost (P0, HZ-C4). `expire` does not release the policy lines, so capacity remains written (P1, HZ-L1). `openClaim` does not check the loss period or notice window (P1). `bundle+{*Policy}` is unclosed.
-
-F-020 is fixed: `SureMath.payable` now returns the documented three-way minimum, and `settleClaim` reposts state and propagates a math refusal before any value move. `policy_settle_aggregate` is unconditional and INV-9 is covered. `Policy.distribute` is not pause-gated; new policy creation is blocked through the gated syndicate/slip path, so distributing an existing policy remains a value-out path.
+`distribute` and `settleClaim` consume `policyState` once and repost on every terminal arm. Their component lookups and value flows are staged in `policyDistribute*` and `policySettle*` helpers that receive the snapshot as data and the cell name only to repost; dispatch depth is 3. `openClaim` peeks the snapshot because ClaimFactory reads the policy back; the claim id is committed by the single consume once the factory replies. `expire` holds the cell across Clock, reposts, and releases the policy lines (F-006). F-020 holds: SureMath.payable is the documented minimum and `settleClaim` propagates a math refusal before any value move; the covered and uncovered branches share `policySettleApply`. `Policy.distribute` is not pause-gated; new policy creation is blocked through the gated syndicate/slip path, so distributing an existing policy remains a value-out path.
 
 ## Await / value-move notes
 
@@ -31,4 +29,4 @@ F-020 is fixed: `SureMath.payable` now returns the documented three-way minimum,
 - Source: `contracts/src/deploy/17_policy.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

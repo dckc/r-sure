@@ -1,6 +1,6 @@
 # Distribution — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,11 +11,11 @@
 - Writers: run
 - Readers: info, plan, paid
 - Replay guard: `one-shot status/token`
-- Bundle publication: bundle+{*Distribution} unclosed: captures distState/purse/token
+- Bundle publication: bundle+{*Distribution}; the contract body rebinds state, purse and token, and check_bundle_closedness reports no candidates
 
 ## Review
 
-`run` takes `distState`, runs `allocPlan`/`payPlan` (including value moves), then takes the same cell again without a repost (P0 take-await-take, HZ-C2). `payAccount`/`payFund`/`payLine` withdraw and deposit; unexpected branches use `1/0` after the value move. `bundle+{*Distribution}` is unclosed.
+`run` consumes `distState`, runs `allocPlan` and `payPlan` (including value moves), and reposts on success and on every refusal; unexpected branches after a value move call `1/0`. `payAccount` is staged in `payAccountMove`, and the match refactor flattened `run` to depth 3. `distState` is held across the value moves, which is the documented P2 pattern for this arm.
 
 ## Await / value-move notes
 
@@ -29,4 +29,4 @@
 - Source: `contracts/src/deploy/15_distribution.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

@@ -1,6 +1,6 @@
 # CoverTerms — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **safe-by-inspection**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **safe-by-inspection**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -15,7 +15,7 @@
 
 ## Review
 
-Stateless or pure component. It has no owned mutable cell; the review checks reply shape, purity, and that it cannot be used to bypass a state owner.
+Stateless or pure component. It has no owned mutable cell; the review checks reply shape, purity, and that it cannot be used to bypass a state owner. The 2026-11-07 refactor replaced the duplicated evidence/claims policy arms with membership tests and a single `termsPolicyOk` helper; dispatch depth is 3.
 
 ## Await / value-move notes
 
@@ -29,4 +29,4 @@ Stateless or pure component. It has no owned mutable cell; the review checks rep
 - Source: `contracts/src/deploy/03_terms.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

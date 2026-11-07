@@ -1,6 +1,6 @@
 # Payments — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **concern**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -15,7 +15,7 @@
 
 ## Review
 
-`payResolveUri` peeks `paymentsState` and awaits the r-cash Root. The admin arm consumes the cell across `SureAdmin/AdminGuard`. `issuer`/`depositFacet` are per-arm resolves, not cached. A missing r-cash Root is a hang point for every value path.
+`payResolveUri` peeks `paymentsState` and awaits the r-cash Root. The admin arm consumes the cell across `SureAdmin`/`AdminGuard` and delegates to `paymentsApplyAction`, which reposts on success and refusal. `health` is one tuple match on the issuer/facet/account replies. `issuer`/`depositFacet` are per-arm resolves, not cached. A missing r-cash Root remains a hang point for every value path; the match gate is green at depth 3.
 
 ## Await / value-move notes
 
@@ -29,4 +29,4 @@
 - Source: `contracts/src/deploy/40_payments.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

@@ -1,6 +1,6 @@
 # RgenAdapter — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **concern**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -15,7 +15,7 @@
 
 ## Review
 
-`rgenResolve` peeks `rgenState` for the Root URI and then awaits the r-gen Root. A concurrent admin change could make a read use a stale URI; reads are advisory. `admin` consumes the cell across `AdminGuard`. `verifyProvenance` resolves a URI and calls `Provenance.verify`; a missing or refusing r-gen leaves the caller to handle the refusal.
+`rgenResolve` peeks `rgenState` for the Root URI and awaits the r-gen Root; reads are advisory and a concurrent admin change can make one use a stale URI. `admin` consumes the cell across `AdminGuard` and delegates to `rgenApplyAction`, which reposts on success and refusal. `variance` is read-only: it peeks `rgenState`, reads the K-Asset, validates conventions and calls SureMath; the 2026-11-07 refactor split status, verdict and first-failure stages into helpers at depth 3 or less. `verifyProvenance` leaves a missing or refusing r-gen to the caller.
 
 ## Await / value-move notes
 
@@ -29,7 +29,7 @@
 - Source: `contracts/src/deploy/05_rgen.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.
 
 ## Variance read (2026-11-06)
 

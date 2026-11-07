@@ -1,6 +1,6 @@
 # Syndicate — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,11 +11,11 @@
 - Writers: setManager, contribute, withdrawCapital, quote, revokeQuote, expireQuote, openLine, suspend, resume
 - Readers: info, capacity, quotes, quote, lines, line, members, member
 - Replay guard: `nonce/quotes`
-- Bundle publication: bundle+{*Syndicate} unclosed: captures syndicateState
+- Bundle publication: bundle+{*Syndicate}; the contract body rebinds state and capabilities, and check_bundle_closedness reports no candidates
 
 ## Review
 
-`quote` is the correct pattern: take, repost before `rs!`, then a second take and repost. `openLine` takes `syndicateState`, awaits LineGrant/LineFactory, then takes the same cell again without a repost (P0 take-await-take, HZ-C1). `contribute` deposits before the state update; a failed update can hang (P3 concern). `withdrawCapital` updates state before the value move and uses `1/0` on failure. `expireQuote` takes the cell then awaits Clock.
+Every writer takes `syndicateState` once and reposts it on every terminal path, including refusals. `openLine` holds the snapshot across LineGrant, LineFactory and the capability creations and reposts in each arm; the staged helpers keep dispatch at depth 3. `withdrawCapital` and `lineSettleCap.pay` delegate to helpers that receive the snapshot as data and the cell name only to repost; every refusal now reposts, closing HZ-037. `contribute` deposits before the consume and updates with a Nil/value match. `expireQuote` holds the cell across Clock and reposts. The pause gate covers `SyndicateBook.create`, the 8-arg `quote` and `openLine`; `revokeQuote`, `expireQuote`, `suspend/resume` and capital flows remain exempt.
 
 The pause gate covers `SyndicateBook.create`, the 8-arg `quote` and `openLine`; `revokeQuote`, `expireQuote`, `suspend/resume` and capital flows remain exempt.
 
@@ -31,4 +31,4 @@ The pause gate covers `SyndicateBook.create`, the 8-arg `quote` and `openLine`; 
 - Source: `contracts/src/deploy/10_syndicate.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

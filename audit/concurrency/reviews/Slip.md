@@ -1,6 +1,6 @@
 # Slip — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,13 +11,13 @@
 - Writers: accept, subscribe, fundPremium, bind, expire
 - Readers: info, subscriptions, subscription, premium, policy
 - Replay guard: `nonce/tokens`
-- Bundle publication: bundle+{*Slip} unclosed: captures slipState/purse/tokens
+- Bundle publication: bundle+{*Slip}; the contract body rebinds state, purse and tokens, and check_bundle_closedness reports no candidates
 
 ## Review
 
-`bind` takes `slipState`, opens lines, creates the policy and distributes the premium, then takes `slipState` again without a repost (P0 take-await-take, HZ-C3). `subscribe` holds the cell across `Syndicate.quote` (P2). `fundPremium` authenticates an owner but does not check that it is the insured (P1). `expire` does not refund a funded premium (P1). `bundle+{*Slip}` is unclosed.
+`bind` consumes `slipState`, validates status, acceptance, funding and subscription, then runs the staged `slipBindTerms`, `slipBindLines`, `slipBindCreate` and `slipBindDistribute` helpers and reposts on success and on every refusal. `subscribe` holds the cell across `Syndicate.quote` (P2). `fundPremium` requires the insured (F-007), and `expire` refunds a funded premium (F-011) and reposts. The 2026-11-07 refactor flattened bind to depth 3 and merged the four identical `slipExpireQuotes` arms.
 
-Slip-level pause gates were omitted because `13_slip.rho` exceeds the node parser depth with any added wrapper. Binding is blocked through the gated `Syndicate.quote`/`openLine` capacity path; this is recorded in F-003 and R-003.
+Slip-level pause gates were omitted because the term is near the parser-depth budget. Binding is blocked through the gated `Syndicate.quote`/`openLine` capacity path; this is recorded in F-003 and R-003.
 
 ## Await / value-move notes
 
@@ -31,4 +31,4 @@ Slip-level pause gates were omitted because `13_slip.rho` exceeds the node parse
 - Source: `contracts/src/deploy/13_slip.rho`
 - Static scanners: `tools/check_take_repost.py`, `tools/check_bundle_closedness.py`,
   `tools/check_reply_shapes.py`, `tools/check_pause_scope.py`
-- Dynamic evidence: not run (devnet install blocked at the P0 bundle defect).
+- Dynamic evidence: the last full campaign (2026-11-06) passed the relevant suites; the 2026-11-07 refactor is covered by `make spec-check`, the local reducer and CI run 42386549218. The full campaign must be rerun.

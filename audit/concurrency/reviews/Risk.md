@@ -1,6 +1,6 @@
 # Risk — concurrency and composition review
 
-> **Status:** Internal review, 2026-11-05. Verdict: **finding**. This is a desk review, not
+> **Status:** Internal review, updated 2026-11-07. Verdict: **concern**. This is a desk review, not
 > an independent audit or a dynamic test.
 
 ## Ownership
@@ -11,11 +11,11 @@
 - Writers: addEvidence, assess, accept, decline, expire
 - Readers: info, evidence, variance
 - Replay guard: `nonce`
-- Bundle publication: bundle+{*Risk} unclosed: captures riskState
+- Bundle publication: bundle+{*Risk}; the contract body rebinds the cell, and check_bundle_closedness reports no candidates
 
 ## Review
 
-`expire` consumes `riskState`, awaits Clock, then reposts. `assess` peeks `riskState`, validates the assessment, awaits r-gen and SureMath, then consumes with a nonce check and refuses `stale` if the cell moved; it computes the engineering/insurer gap and the loaded-premium floor. `accept` records the variance acknowledgement. `bundle+{*Risk}` captures `riskState` (the intended private capability). `RiskBook.submit`, `accept` and `decline` are pause-gated; `addEvidence`, `assess` and `expire` stay exempt.
+`expire` consumes `riskState`, awaits Clock, then reposts. `assess` peeks `riskState`, validates the assessment, awaits r-gen and SureMath, then consumes with a nonce check and refuses `stale` if the cell moved; it computes the engineering/insurer gap and the loaded-premium floor. `accept` records the variance acknowledgement. `bundle+{*Risk}` publishes the contract name; the body rebinds the cell and `check_bundle_closedness` reports no candidates. `RiskBook.submit`, `accept` and `decline` are pause-gated; `addEvidence`, `assess` and `expire` stay exempt.
 
 ## Await / value-move notes
 
