@@ -3,7 +3,7 @@
   "id": "2026-11-07-match-style",
   "date": "2026-11-07",
   "kind": "Match-style static audit and state-loss fix",
-  "commit": "e438d53dbf4df49c4b69ad3438ab14669ce370de",
+  "commit": "ed84172475096776c23e9c5923c84f3bde02603c",
   "scope": {
     "audit": "internal",
     "production": false,
@@ -49,9 +49,16 @@
     {
       "path": "commit.txt",
       "role": "provenance",
-      "sha256": "24359313481f653e7ae1b88285b11875cb5627861bd4f46e3fd8347fb2804147",
+      "sha256": "54fc2b81ea8d2b3ae70cd9e29fb41ad7e18c720d6709693b3e2bf10ae70b7362",
       "bytes": 41,
       "description": "Commit under audit (git rev-parse HEAD at capture)."
+    },
+    {
+      "path": "campaign-summary.txt",
+      "role": "final",
+      "sha256": "12d6366918f820d7f70ed6f564756fa88c228b1383afa4eaa83e41d2e194472d",
+      "bytes": 2105,
+      "description": "2026-11-07 suite and web-e2e campaign summary."
     }
   ],
   "commands": [

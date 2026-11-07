@@ -1,0 +1,45 @@
+2026-11-07 r-sure campaign on the match-refactored tree
+commit: ed84172475096776c23e9c5923c84f3bde02603c
+
+rows: 38  pass: 38  fail: 0  not_run: 0
+assertions: 410
+  root             pass     passed= 11 failed=0
+  payments         pass     passed= 11 failed=0
+  syndicate        pass     passed= 24 failed=0
+  capital          pass     passed=  9 failed=0
+  broker           pass     passed= 15 failed=0
+  risk             pass     passed= 16 failed=0
+  variance         pass     passed= 30 failed=0
+  slip             pass     passed= 18 failed=0
+  subscription     pass     passed=  9 failed=0
+  binding          pass     passed=  9 failed=0
+  line             pass     passed= 10 failed=0
+  policy           pass     passed= 13 failed=0
+  distribution     pass     passed=  3 failed=0
+  premium          pass     passed=  7 failed=0
+  fund             pass     passed=  9 failed=0
+  books            pass     passed= 11 failed=0
+  pause            pass     passed=  8 failed=0
+  pause_scope      pass     passed=  9 failed=0
+  admin            pass     passed= 10 failed=0
+  admin_keys       pass     passed=  6 failed=0
+  cell_liveness    pass     passed= 11 failed=0
+  factory_auth     pass     passed=  7 failed=0
+  replay           pass     passed=  6 failed=0
+  expiry           pass     passed=  7 failed=0
+  evidence         pass     passed=  9 failed=0
+  oracle           pass     passed=  8 failed=0
+  claim_lifecycle  pass     passed= 24 failed=0
+  claim_refusals   pass     passed= 13 failed=0
+  settlement       pass     passed= 11 failed=0
+  shortfall        pass     passed= 11 failed=0
+  conservation     pass     passed=  7 failed=0
+  behavior         pass     passed= 12 failed=0
+  generality       pass     passed= 24 failed=0
+  share_reuse      pass     passed=  5 failed=0
+  integration_rcash pass     passed=  5 failed=0
+  integration_rgen pass     passed=  8 failed=0
+  integration_rshare pass     passed=  4 failed=0
+  fixtures         pass     passed=  0 failed=0
+
+web-e2e: 3/3 Playwright journeys pass (admin pause/resume, smoke/books, write risk -> bind policy -> settle claim)
