@@ -9,7 +9,9 @@ new
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
   adminGuard, rgenResolve, rgenUri, resolveComponent,
-  varianceDim, varianceQuality, varianceQuantity, varianceLiability, varianceCall
+  varianceDim, varianceQuality, varianceQuantity, varianceLiability, varianceCall,
+  varianceStatusOk, varianceApproved, varianceFirstFailure, varianceVerdict,
+  rgenApplyAction
 in {
   // @@INLINE:lib/Resolve.rho@@
   // @@INLINE:lib/AdminGuard.rho@@
@@ -212,6 +214,62 @@ in {
     }
   } |
 
+  contract varianceStatusOk(@status, ret) = {
+    match status {
+      "approved" => { ret!((true, Nil)) }
+      _ => {
+        if (status == "validated" || status == "conditional") {
+          ret!((false, "approval"))
+        } else { ret!((false, "status")) }
+      }
+    }
+  } |
+
+  contract varianceFirstFailure(@q, @n, @l, ret) = {
+    match q {
+      (false, reason) => { ret!((false, reason)) }
+      _ => {
+        match n {
+          (false, reason) => { ret!((false, reason)) }
+          _ => {
+            match l {
+              (false, reason) => { ret!((false, reason)) }
+              _ => { ret!((false, "kasset")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract varianceVerdict(@s, @qualitySum, @share, @kassetUri, ret) = {
+    match s.get("verdict") {
+      "valid" => {
+        varianceCall!(qualitySum, "valid", share, kassetUri, s, *ret)
+      }
+      "partial" => {
+        varianceCall!(qualitySum, "partial", share, kassetUri, s, *ret)
+      }
+      _ => { ret!((false, "verdict")) }
+    }
+  } |
+
+  contract varianceApproved(@s, @kassetUri, ret) = {
+    new qCh, nCh, lCh in {
+      varianceQuality!(s.get("quality"), *qCh) |
+      varianceQuantity!(s.get("quantity"), *nCh) |
+      varianceLiability!(s.get("approval"), *lCh) |
+      for (@q <- qCh; @n <- nCh; @l <- lCh) {
+        match (q, n, l) {
+          ((true, qualitySum), (true, _), (true, share)) => {
+            varianceVerdict!(s, qualitySum, share, kassetUri, *ret)
+          }
+          _ => { varianceFirstFailure!(q, n, l, *ret) }
+        }
+      }
+    }
+  } |
+
   contract RgenAdapter(@"variance", @kassetUri, ret) = {
     if (kassetUri.length() == 0) {
       ret!((false, "kasset"))
@@ -223,51 +281,15 @@ in {
           for (@g <- gCh) {
             match g {
               (true, s) => {
-                match s.get("status") {
-                  "approved" => {
-                    new qCh, nCh, lCh in {
-                      varianceQuality!(s.get("quality"), *qCh) |
-                      varianceQuantity!(s.get("quantity"), *nCh) |
-                      varianceLiability!(s.get("approval"), *lCh) |
-                      for (@q <- qCh; @n <- nCh; @l <- lCh) {
-                        match (q, n, l) {
-                          ((true, qualitySum), (true, _), (true, share)) => {
-                            match s.get("verdict") {
-                              "valid" => {
-                                varianceCall!(qualitySum, "valid", share,
-                                              kassetUri, s, *ret)
-                              }
-                              "partial" => {
-                                varianceCall!(qualitySum, "partial", share,
-                                              kassetUri, s, *ret)
-                              }
-                              _ => { ret!((false, "verdict")) }
-                            }
-                          }
-                          _ => {
-                            match q {
-                              (false, r) => { ret!((false, r)) }
-                              _ => {
-                                match n {
-                                  (false, r) => { ret!((false, r)) }
-                                  _ => {
-                                    match l {
-                                      (false, r) => { ret!((false, r)) }
-                                      _ => { ret!((false, "kasset")) }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
+                new stCh in {
+                  varianceStatusOk!(s.get("status"), *stCh) |
+                  for (@st <- stCh) {
+                    match st {
+                      (true, Nil) => { varianceApproved!(s, kassetUri, *ret) }
+                      (false, reason) => { ret!((false, reason)) }
+                      _ => { ret!((false, "status")) }
                     }
                   }
-                  "rejected" => { ret!((false, "status")) }
-                  "validated" => { ret!((false, "approval")) }
-                  "conditional" => { ret!((false, "approval")) }
-                  _ => { ret!((false, "status")) }
                 }
               }
               _ => { ret!((false, "kasset")) }
@@ -315,6 +337,44 @@ in {
     }
   } |
 
+  contract rgenApplyAction(@s, @nonce, @action, @args, stateCell, ret) = {
+    match action {
+      "setRgenRoot" => {
+        match args.nth(0) {
+          root => {
+            stateCell!(s.set("rgenRootUri", root).set("nonce", nonce)) |
+            ret!((true, Nil))
+          }
+        }
+      }
+      "setEnabled" => {
+        match args.nth(0) {
+          enabled => {
+            if ((enabled == true || enabled == false) == false) {
+              stateCell!(s) | ret!((false, "enabled"))
+            } else {
+              stateCell!(s.set("enabled", enabled).set("nonce", nonce)) |
+              ret!((true, Nil))
+            }
+          }
+        }
+      }
+      "setStrict" => {
+        match args.nth(0) {
+          strict => {
+            if ((strict == true || strict == false) == false) {
+              stateCell!(s) | ret!((false, "strict"))
+            } else {
+              stateCell!(s.set("strictCredentials", strict).set("nonce", nonce)) |
+              ret!((true, Nil))
+            }
+          }
+        }
+      }
+      _ => { stateCell!(s) | ret!((false, "unknown action")) }
+    }
+  } |
+
   contract RgenAdapter(@"admin", @nonce, @action, @args, @sigs, ret) = {
     for (@s <- rgenState) {
       if (nonce <= s.get("nonce")) {
@@ -339,44 +399,7 @@ in {
                                 if (ok == false) {
                                   rgenState!(s) | ret!((false, "below threshold"))
                                 } else {
-                                  match action {
-                                    "setRgenRoot" => {
-                                      match args.nth(0) {
-                                        root => {
-                                          rgenState!(s.set("rgenRootUri", root)
-                                                      .set("nonce", nonce)) |
-                                          ret!((true, Nil))
-                                        }
-                                      }
-                                    }
-                                    "setEnabled" => {
-                                      match args.nth(0) {
-                                        enabled => {
-                                          if ((enabled == true || enabled == false) == false) {
-                                            rgenState!(s) | ret!((false, "enabled"))
-                                          } else {
-                                            rgenState!(s.set("enabled", enabled)
-                                                        .set("nonce", nonce)) |
-                                            ret!((true, Nil))
-                                          }
-                                        }
-                                      }
-                                    }
-                                    "setStrict" => {
-                                      match args.nth(0) {
-                                        strict => {
-                                          if ((strict == true || strict == false) == false) {
-                                            rgenState!(s) | ret!((false, "strict"))
-                                          } else {
-                                            rgenState!(s.set("strictCredentials", strict)
-                                                        .set("nonce", nonce)) |
-                                            ret!((true, Nil))
-                                          }
-                                        }
-                                      }
-                                    }
-                                    _ => { rgenState!(s) | ret!((false, "unknown action")) }
-                                  }
+                                  rgenApplyAction!(s, nonce, action, args, *rgenState, *ret)
                                 }
                               }
                               _ => { rgenState!(s) | ret!((false, "below threshold")) }

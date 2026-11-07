@@ -9,7 +9,9 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  adminGuard, fundResolve, fundPurse, fundAdmin, fundMake, porch, isPaused
+  adminGuard, fundResolve, fundPurse, fundAdmin, fundMake, porch, isPaused,
+  fundContributeIssuer, fundContributeAmount, fundContributionNew,
+  fundCoverFacet, fundCoverMove
 in {
   // @@INLINE:lib/AdminGuard.rho@@
 
@@ -117,6 +119,99 @@ in {
     }
   } |
 
+  contract fundContributeIssuer(@assetId, ret) = {
+    new pCh, iCh in {
+      fundResolve!("component:payments", *pCh) |
+      for (@p <- pCh) {
+        match p {
+          (true, Payments) => {
+            @Payments!("issuer", assetId, *iCh) |
+            for (@i <- iCh) {
+              match i {
+                (true, _, issuer) => { ret!((true, issuer)) }
+                _ => { ret!(i) }
+              }
+            }
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract fundContributeAmount(@issuer, @payment, @purse, ret) = {
+    new aCh in {
+      @issuer!("getAmountOf", payment, *aCh) |
+      for (@a <- aCh) {
+        match a {
+          (true, amount) => {
+            new dCh in {
+              @purse!("deposit", payment, *dCh) |
+              for (@d <- dCh) {
+                match d {
+                  (true, _) => { ret!((true, amount)) }
+                  _ => { 1/0 }
+                }
+              }
+            }
+          }
+          _ => { ret!(a) }
+        }
+      }
+    }
+  } |
+
+  contract fundContributionNew(@old, @amount, ret) = {
+    match old {
+      Nil => { ret!(amount) }
+      x => { ret!(x + amount) }
+    }
+  } |
+
+  contract fundCoverFacet(@toOwner, @assetId, ret) = {
+    new fCh in {
+      fundResolve!("component:payments", *fCh) |
+      for (@p <- fCh) {
+        match p {
+          (true, Payments) => {
+            new facetCh in {
+              @Payments!("depositFacet", toOwner, assetId, *facetCh) |
+              for (@fr <- facetCh) {
+                match fr {
+                  (true, facet) => { ret!((true, facet)) }
+                  _ => { ret!(fr) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract fundCoverMove(@purse, @facet, @brand, @amount, ret) = {
+    new wCh in {
+      @purse!("withdraw", (brand, amount), *wCh) |
+      for (@w <- wCh) {
+        match w {
+          (true, payment) => {
+            new dCh in {
+              @facet!("deposit", payment, *dCh) |
+              for (@d <- dCh) {
+                match d {
+                  (true, _) => { ret!((true, amount)) }
+                  _ => { 1/0 }
+                }
+              }
+            }
+          }
+          _ => { 1/0 }
+        }
+      }
+    }
+  } |
+
   contract fundMake(@purse, @brand, @issuer) = {
   contract SureFund(@"info", ret) = {
     for (@s <<- fundState) { ret!((true, s)) }
@@ -145,73 +240,46 @@ in {
       for (@paused <- pauseCh) {
         if (paused) { ret!((false, "paused")) }
         else {
-    new iCh in {
-      for (@s0 <<- fundState) {
-        new pCh in {
-          fundResolve!("component:payments", *pCh) |
-          for (@p <- pCh) {
-            match p {
-              (true, Payments) => {
-                @Payments!("issuer", s0.get("assetId"), *iCh) |
-                for (@i <- iCh) {
-                  match i {
-                    (true, brand, issuer) => {
-                      new aCh in {
-                        @issuer!("getAmountOf", payment, *aCh) |
-                        for (@a <- aCh) {
-                          match a {
-                            (true, amount) => {
-                              new dCh in {
-                                @purse!("deposit", payment, *dCh) |
-                                for (@d <- dCh) {
-                                  match d {
-                                    (true, _) => {
-                                      for (@s <- fundState) {
-                                        match s.get("contributions").get(policyId) {
-                                          Nil => {
-                                            fundState!(s.set("balance",
-                                                s.get("balance") + amount)
-                                              .set("contributions",
-                                                s.get("contributions").set(policyId, amount))
-                                              .set("nonce", s.get("nonce") + 1)) |
-                                            ret!((true, amount))
-                                          }
-                                          old => {
-                                            fundState!(s.set("balance",
-                                                s.get("balance") + amount)
-                                              .set("contributions",
-                                                s.get("contributions").set(policyId, old + amount))
-                                              .set("nonce", s.get("nonce") + 1)) |
-                                            ret!((true, amount))
-                                          }
-                                        }
-                                      }
-                                    }
-                                    _ => { 1/0 }
-                                  }
+          new iCh in {
+            for (@s0 <<- fundState) {
+              fundContributeIssuer!(s0.get("assetId"), *iCh) |
+              for (@i <- iCh) {
+                match i {
+                  (true, issuer) => {
+                    new aCh in {
+                      fundContributeAmount!(issuer, payment, *aCh) |
+                      for (@a <- aCh) {
+                        match a {
+                          (true, amount) => {
+                            for (@s <- fundState) {
+                              new nCh in {
+                                fundContributionNew!(
+                                  s.get("contributions").get(policyId), amount, *nCh) |
+                                for (@updated <- nCh) {
+                                  fundState!(s.set("balance",
+                                      s.get("balance") + amount)
+                                    .set("contributions",
+                                      s.get("contributions").set(policyId, updated))
+                                    .set("nonce", s.get("nonce") + 1)) |
+                                  ret!((true, amount))
                                 }
                               }
                             }
-                            _ => { ret!(a) }
                           }
+                          _ => { ret!(a) }
                         }
                       }
                     }
-                    _ => { ret!(i) }
                   }
+                  _ => { ret!(i) }
                 }
               }
-              _ => { ret!((false, "payments unavailable")) }
             }
           }
         }
       }
     }
-
-        }
-      }
-    }
-    } |
+  } |
 
   contract SureFund(@"cover", @nonce, @claimId, @claimUri, @toOwner, @amount,
                     @policyId, @sigs, ret) = {
@@ -225,67 +293,33 @@ in {
             else {
               for (@s <- fundState) {
                 match s.get("covers").get(claimId) {
-                  _ => {
-                    if (s.get("covers").get(claimId) != Nil) {
-                      fundState!(s) | ret!((false, "already covered"))
+                  Nil => {
+                    if (amount < 1 || amount > s.get("balance")
+                        || amount > s.get("maxCoverPerClaim")) {
+                      fundState!(s) | ret!((false, "amount"))
                     } else {
-                      if (amount < 1 || amount > s.get("balance")
-                          || amount > s.get("maxCoverPerClaim")) {
-                        fundState!(s) | ret!((false, "amount"))
-                      } else {
-                        new fCh in {
-                          fundResolve!("component:payments", *fCh) |
-                          for (@p <- fCh) {
-                            match p {
-                              (true, Payments) => {
-                                new facetCh in {
-                                  @Payments!("depositFacet", toOwner,
-                                             s.get("assetId"), *facetCh) |
-                                  for (@fr <- facetCh) {
-                                    match fr {
-                                      (true, facet) => {
-                                        fundState!(s.set("balance",
-                                            s.get("balance") - amount)
-                                          .set("covers", s.get("covers").set(claimId, {
-                                            "claimId": claimId, "claimUri": claimUri,
-                                            "to": toOwner, "amount": amount,
-                                            "policyId": policyId,
-                                            "at": s.get("nonce")}))
-                                          .set("govNonce", nonce)) |
-                                        new wCh in {
-                                          @purse!("withdraw", (brand, amount), *wCh) |
-                                          for (@w <- wCh) {
-                                            match w {
-                                              (true, payment) => {
-                                                new dCh in {
-                                                  @facet!("deposit", payment, *dCh) |
-                                                  for (@d <- dCh) {
-                                                    match d {
-                                                      (true, _) => {
-                                                        ret!((true, amount))
-                                                      }
-                                                      _ => { 1/0 }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                              _ => { 1/0 }
-                                            }
-                                          }
-                                        }
-                                      }
-                                      _ => { ret!(fr) }
-                                    }
-                                  }
-                                }
-                              }
-                              _ => { ret!((false, "payments unavailable")) }
+                      new fCh in {
+                        fundCoverFacet!(toOwner, s.get("assetId"), *fCh) |
+                        for (@f <- fCh) {
+                          match f {
+                            (true, facet) => {
+                              fundState!(s.set("balance",
+                                  s.get("balance") - amount)
+                                .set("covers", s.get("covers").set(claimId, {
+                                  "claimId": claimId, "claimUri": claimUri,
+                                  "to": toOwner, "amount": amount,
+                                  "policyId": policyId,
+                                  "at": s.get("nonce")}))
+                                .set("govNonce", nonce)) |
+                              fundCoverMove!(purse, facet, brand, amount, *ret)
                             }
+                            _ => { fundState!(s) | ret!(f) }
                           }
                         }
                       }
                     }
                   }
+                  _ => { fundState!(s) | ret!((false, "already covered")) }
                 }
               }
             }

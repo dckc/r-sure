@@ -7,7 +7,8 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  termsNumOk, termsCheckList, termsResolve, coverTail,
+  termsNumOk, termsCheckList, termsResolve,
+  termsEvidenceOk, termsClaimsOk, termsPolicyOk,
   resolveComponent
 in {
 contract resolveComponent(@key, ret) = {
@@ -141,12 +142,7 @@ contract resolveComponent(@key, ret) = {
                                       <= terms.get("periodStartHeight")) {
                                     ret!((false, "period"))
                                   } else {
-                                    match terms.get("evidencePolicy") {
-                                      "none" => { coverTail!(terms, *ret) }
-                                      "optional" => { coverTail!(terms, *ret) }
-                                      "required" => { coverTail!(terms, *ret) }
-                                      _ => { ret!((false, "evidence")) }
-                                    }
+                                    termsPolicyOk!(terms, *ret)
                                   }
                                 }
                               }
@@ -166,11 +162,42 @@ contract resolveComponent(@key, ret) = {
     }
   } |
 
-  contract coverTail(@terms, ret) = {
-    match terms.get("claimsLeadPolicy") {
-      "lead" => { ret!((true, Nil)) }
-      "lead+second" => { ret!((true, Nil)) }
-      _ => { ret!((false, "claims lead")) }
+  contract termsEvidenceOk(@policy, ret) = {
+    match policy {
+      Nil => { ret!((false, "evidence")) }
+      p => {
+        if (p == "none" || p == "optional" || p == "required") {
+          ret!((true, Nil))
+        } else { ret!((false, "evidence")) }
+      }
+    }
+  } |
+
+  contract termsClaimsOk(@policy, ret) = {
+    match policy {
+      Nil => { ret!((false, "claims lead")) }
+      p => {
+        if (p == "lead" || p == "lead+second") { ret!((true, Nil)) }
+        else { ret!((false, "claims lead")) }
+      }
+    }
+  } |
+
+  contract termsPolicyOk(@terms, ret) = {
+    new eCh, cCh in {
+      termsEvidenceOk!(terms.get("evidencePolicy"), *eCh) |
+      termsClaimsOk!(terms.get("claimsLeadPolicy"), *cCh) |
+      for (@e <- eCh; @c <- cCh) {
+        match e {
+          (false, reason) => { ret!((false, reason)) }
+          _ => {
+            match c {
+              (false, reason) => { ret!((false, reason)) }
+              _ => { ret!((true, Nil)) }
+            }
+          }
+        }
+      }
     }
   } |
 

@@ -8,7 +8,7 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  adminGuard, payResolveUri, payShareResolve, payAssetAllowed,
+  adminGuard, payResolveUri, payShareResolve, payAssetAllowed, paymentsApplyAction,
   resolveComponent
 in {
 contract resolveComponent(@key, ret) = {
@@ -81,21 +81,13 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
       payResolveUri!("component:asset-resolver", *arCh) |
       payResolveUri!("component:clock", *clkCh) |
       for (@a <- afCh; @b <- arCh; @c <- clkCh) {
-        match a {
-          (true, _, av) => {
-            match b {
-              (true, _, bv) => {
-                match c {
-                  (true, _, cv) => {
-                    ret!((true, {"accountFactory": av, "assetResolver": bv, "clock": cv}))
-                  }
-                  _ => { ret!(c) }
-                }
-              }
-              _ => { ret!(b) }
-            }
+        match (a, b, c) {
+          ((true, _, av), (true, _, bv), (true, _, cv)) => {
+            ret!((true, {"accountFactory": av, "assetResolver": bv, "clock": cv}))
           }
-          _ => { ret!(a) }
+          ((false, _, _), _, _) => { ret!(a) }
+          (_, (false, _, _), _) => { ret!(b) }
+          _ => { ret!(c) }
         }
       }
     }
@@ -199,6 +191,40 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
     for (@s <<- paymentsState) { ret!((true, s.get("platformOwnerId"))) }
   } |
 
+  contract paymentsApplyAction(@s, @nonce, @action, @args, stateCell, ret) = {
+    match action {
+      "setPlatformOwner" => {
+        match args.nth(0) {
+          ownerId => {
+            stateCell!(s.set("platformOwnerId", ownerId).set("nonce", nonce)) |
+            ret!((true, Nil))
+          }
+        }
+      }
+      "setAssets" => {
+        match args.nth(0) {
+          assets => {
+            if (assets.length() == 0) {
+              stateCell!(s) | ret!((false, "asset"))
+            } else {
+              stateCell!(s.set("assets", assets).set("nonce", nonce)) |
+              ret!((true, Nil))
+            }
+          }
+        }
+      }
+      "setRcashRoot" => {
+        match args.nth(0) {
+          newRoot => {
+            stateCell!(s.set("rcashRootUri", newRoot).set("nonce", nonce)) |
+            ret!((true, Nil))
+          }
+        }
+      }
+      _ => { stateCell!(s) | ret!((false, "unknown action")) }
+    }
+  } |
+
   contract Payments(@"admin", @nonce, @action, @args, @sigs, ret) = {
     for (@s <- paymentsState) {
       if (nonce <= s.get("nonce")) {
@@ -223,43 +249,7 @@ contract adminGuard(@domain, @nonce, @action, @args, @sigs,
                                   if (ok == false) {
                                     paymentsState!(s) | ret!((false, "below threshold"))
                                   } else {
-                                    match action {
-                                      "setPlatformOwner" => {
-                                        match args.nth(0) {
-                                          ownerId => {
-                                            paymentsState!(s.set("platformOwnerId", ownerId)
-                                                            .set("nonce", nonce)) |
-                                            ret!((true, Nil))
-                                          }
-                                        }
-                                      }
-                                      "setAssets" => {
-                                        match args.nth(0) {
-                                          assets => {
-                                            if (assets.length() == 0) {
-                                              paymentsState!(s) |
-                                              ret!((false, "asset"))
-                                            } else {
-                                              paymentsState!(s.set("assets", assets)
-                                                              .set("nonce", nonce)) |
-                                              ret!((true, Nil))
-                                            }
-                                          }
-                                        }
-                                      }
-                                      "setRcashRoot" => {
-                                        match args.nth(0) {
-                                          newRoot => {
-                                            paymentsState!(s.set("rcashRootUri", newRoot)
-                                                            .set("nonce", nonce)) |
-                                            ret!((true, Nil))
-                                          }
-                                        }
-                                      }
-                                      _ => {
-                                        paymentsState!(s) | ret!((false, "unknown action"))
-                                      }
-                                    }
+                                    paymentsApplyAction!(s, nonce, action, args, *paymentsState, *ret)
                                   }
                                 }
                                 _ => {

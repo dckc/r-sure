@@ -9,7 +9,8 @@ new
   deployerId(`rho:rchain:deployerId`),
   deployId(`rho:rchain:deployId`),
   rootCh, c, ack,
-  distResolve, allocPlan, allocLast, planAmount, payPlan, payAccount, payFund, payLine,
+  distResolve, allocPlan, allocLast, planAmount, payPlan, payAccount, payAccountMove,
+  payFund, payLine,
   planOk
 in {
   contract distResolve(@key, ret) = {
@@ -206,6 +207,28 @@ in {
     }
   } |
 
+  contract payAccountMove(@purse, @facet, @brand, @amount, ret) = {
+    new wCh in {
+      @purse!("withdraw", (brand, amount), *wCh) |
+      for (@w <- wCh) {
+        match w {
+          (true, payment) => {
+            new dCh in {
+              @facet!("deposit", payment, *dCh) |
+              for (@d <- dCh) {
+                match d {
+                  (true, _) => { ret!((true, Nil)) }
+                  _ => { 1/0 }
+                }
+              }
+            }
+          }
+          _ => { 1/0 }
+        }
+      }
+    }
+  } |
+
   contract payAccount(@p, @purse, @brand, @assetId, ret) = {
     new fCh in {
       distResolve!("component:payments", *fCh) |
@@ -217,25 +240,7 @@ in {
               for (@fr <- facetCh) {
                 match fr {
                   (true, facet) => {
-                    new wCh in {
-                      @purse!("withdraw", (brand, p.get("amount")), *wCh) |
-                      for (@w <- wCh) {
-                        match w {
-                          (true, payment) => {
-                            new dCh in {
-                              @facet!("deposit", payment, *dCh) |
-                              for (@d <- dCh) {
-                                match d {
-                                  (true, _) => { ret!((true, Nil)) }
-                                  _ => { 1/0 }
-                                }
-                              }
-                            }
-                          }
-                          _ => { 1/0 }
-                        }
-                      }
-                    }
+                    payAccountMove!(purse, facet, brand, p.get("amount"), *ret)
                   }
                   _ => { ret!(fr) }
                 }
