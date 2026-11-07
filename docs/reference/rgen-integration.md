@@ -28,11 +28,10 @@ liabilityBps})`. The rate is `Var(value)/mean(value)^2` in bps; the derivation i
 [Variance is risk](../concepts/variance-is-risk.md).
 
 The conventions are versioned as **`kasset.conventions/v1`** and pinned to r-gen
-`c4f8a91`. The normative artifacts in the r-gen working tree are
-`docs/src/reference/kasset-conventions.md`, `spec/schemas/kasset-conventions.json` and
-`spec/fixtures/kasset-conventions-v1.json`; a conformance fixture yields 4000 bps for quality
-12, a valid verdict and an approved asset. They are a convention, not core enforcement, and
-the r-gen commit is pending.
+`639d0f2`. The normative artifacts are `docs/src/reference/kasset-conventions.md`,
+`spec/schemas/kasset-conventions.json`, `spec/fixtures/kasset-conventions-v1.json` and
+`spec/vectors/kasset-conventions.tsv`; the conformance fixture yields 4000 bps for quality 12,
+a valid verdict and an approved asset. They are a convention, not core enforcement.
 
 The adapter validates the conventions itself, because the core passes them through without
 shape checks:

@@ -1,5 +1,5 @@
 {
-  "pinned_commit": "c4f8a91cc5fa8f35a2f5be4230c4866282077499",
+  "pinned_commit": "639d0f2b2ddcb4cc2f90186b4b7ad82b296fc008",
   "min_version": 1,
   "manifest": "../RGen/deployments/devnet.json",
   "required_components": [
@@ -7,5 +7,6 @@
     "component:credential-factory",
     "component:claim-factory",
     "component:provenance-factory"
-  ]
+  ],
+  "conventions": "kasset.conventions/v1"
 }
