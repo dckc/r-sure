@@ -1,5 +1,8 @@
 # Rholang match style
 
+> **Status:** Reference for the static match-style gate, 2026-11-07. The gate is a
+> heuristic shape check; `make parse-check` and the behavioural suites remain separate.
+
 `match` is the strongest control-flow primitive in Rholang and the r-sure contracts use it
 for every dispatch decision. The gate in `tools/check_match_style.py` keeps the use
 effective: shallow, total where the state is held, and free of duplicated or dead arms.
