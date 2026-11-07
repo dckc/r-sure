@@ -31,7 +31,10 @@ Authority order: `contracts/src` and the static gates > `docs/` > this file.
 ## Commands
 
 ```
-make spec-check      # build, measure, architecture, captures, select, placeholders, money, suites
+make spec-check      # build, measure, architecture, captures, select, placeholders, money, suites, arity, match style
+make check-match-style        # hard match gate: depth <= 3, mutating catch-all, no dead arms
+make check-match-style-report # counts, depth histogram, per-file inventory
+make check-call-arity         # local contract calls match the declared parameter count
 make parse-check     # render and parse with the target node's parser
 make docs            # build docs/book with mdBook
 make docs-check      # docs links and mdBook build
@@ -49,6 +52,9 @@ make web-test web-build
 
 ## Rules for changes
 
+- Every mutating match ends in a total arm that reposts the held cell and replies (or
+  aborts with `1/0`); a total arm may forward the cell and reply channel only to a helper
+  that is itself checked. Non-let dispatch depth is at most 3.
 - Every mutating arm checks `opId`/`nonce` first and returns the prior result without a
   second effect.
 - Every new arm needs a refusal test and an idempotency test.

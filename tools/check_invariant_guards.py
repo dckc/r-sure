@@ -51,8 +51,12 @@ def main() -> int:
     require(DEPLOY / "04_math.rho", "SureMath", "payable",
             ["perClaimLimit < aggregateRemaining", "pay > aggregateRemaining",
              '"aggregate"'], problems)
+    # settleClaim delegates the payable round-trip to policySettleMath; the failure arm
+    # must repost the held policy state and forward the refusal.
     require(DEPLOY / "17_policy.rho", "Policy", "settleClaim",
-            ["policyState!(s) | ret2!(pay)"], problems)
+            ["policySettleMath!("], problems)
+    require(DEPLOY / "17_policy.rho", "policySettleMath", None,
+            ["stateCell!(s) | ret2!(pay)"], problems)
     for arm in ("addEvidence", "classify", "assess", "agree", "dispute"):
         require(DEPLOY / "18_claim.rho", "Claim", arm,
                 ['"settled"', '"denied"', '"closed"'], problems)

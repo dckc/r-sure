@@ -22,9 +22,9 @@
       "contracts": 5
     },
     "03_terms.rho": {
-      "bytes": 5005,
-      "depth": 22,
-      "contracts": 6
+      "bytes": 5470,
+      "depth": 20,
+      "contracts": 8
     },
     "04_math.rho": {
       "bytes": 6527,
@@ -32,17 +32,17 @@
       "contracts": 7
     },
     "05_rgen.rho": {
-      "bytes": 8692,
-      "depth": 24,
-      "contracts": 10
+      "bytes": 9471,
+      "depth": 19,
+      "contracts": 15
     },
     "10_syndicate.rho": {
-      "bytes": 22582,
-      "depth": 40,
-      "contracts": 23
+      "bytes": 25038,
+      "depth": 30,
+      "contracts": 33
     },
     "11_broker.rho": {
-      "bytes": 5810,
+      "bytes": 5832,
       "depth": 19,
       "contracts": 7
     },
@@ -52,9 +52,9 @@
       "contracts": 17
     },
     "13_slip.rho": {
-      "bytes": 16640,
-      "depth": 39,
-      "contracts": 19
+      "bytes": 18818,
+      "depth": 31,
+      "contracts": 33
     },
     "14_line.rho": {
       "bytes": 3417,
@@ -62,19 +62,19 @@
       "contracts": 3
     },
     "15_distribution.rho": {
-      "bytes": 7355,
+      "bytes": 7508,
       "depth": 24,
-      "contracts": 11
+      "contracts": 12
     },
     "16_fund.rho": {
-      "bytes": 7411,
-      "depth": 31,
-      "contracts": 7
+      "bytes": 8202,
+      "depth": 21,
+      "contracts": 12
     },
     "17_policy.rho": {
-      "bytes": 12375,
-      "depth": 42,
-      "contracts": 12
+      "bytes": 13791,
+      "depth": 25,
+      "contracts": 20
     },
     "18_claim.rho": {
       "bytes": 12152,
@@ -87,9 +87,9 @@
       "contracts": 4
     },
     "40_payments.rho": {
-      "bytes": 5485,
-      "depth": 24,
-      "contracts": 6
+      "bytes": 5645,
+      "depth": 19,
+      "contracts": 7
     }
   }
 }

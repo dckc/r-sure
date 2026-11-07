@@ -973,3 +973,40 @@ hazards:
   - contracts/src/deploy/12_risk.rho
   - harness/unit_variance.py
   arm: Risk@"assess"
+- id: HZ-037
+  node: N05
+  guide_word: LOST
+  parameter: state cells on refusal paths
+  deviation: A match consumes brokerBookState, syndicateBookState, policyState, syndicateState
+    or distState before dispatch, and a refusal arm replies without reposting the cell.
+  causes:
+  - a catch-all arm added for a defensive refusal copies the success arm's reply but not
+    the repost
+  - the state cell is held across component lookups, so every refusal is on the mutating path
+  consequences:
+  - the instance cell is empty after a duplicate registration or a failed component lookup
+  - every later call that takes or peeks the cell blocks indefinitely
+  severity: high
+  likelihood: medium
+  risk: high
+  controls:
+  - the match gate rejects a mutating catch-all without a repost and reply
+  - refusals repost the original snapshot before replying
+  findings:
+  - F-027
+  tests:
+  - T-003
+  - T-005
+  - T-007
+  - T-011
+  - T-012
+  - T-041
+  disposition: mitigate
+  owner: contracts
+  evidence:
+  - contracts/src/deploy/10_syndicate.rho
+  - contracts/src/deploy/11_broker.rho
+  - contracts/src/deploy/15_distribution.rho
+  - contracts/src/deploy/17_policy.rho
+  - audit/rholang-match-audit.md
+  arm: BrokerBook@"register"

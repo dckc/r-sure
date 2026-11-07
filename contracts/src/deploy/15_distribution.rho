@@ -382,7 +382,7 @@ in {
                                 }
                               }
                             }
-                            _ => { ret2!(alloc) }
+                            _ => { distState!(s) | ret2!(alloc) }
                           }
                         }
                       }

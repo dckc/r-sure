@@ -9,7 +9,7 @@
 make build-check      # no drift in contracts/build
 make measure-check    # every term <= 56 KiB
 make normalize-check  # every rendered term normalizes through the rholo parser
-make spec-check       # arch, captures, select, placeholders, money, suites
+make spec-check       # arch, captures, select, placeholders, money, suites, arity, match style
 make parse-check      # target node parser on built and rendered terms
 ```
 
@@ -22,6 +22,25 @@ CLI and WASM crates compile; `cargo test --workspace` passes 13 tests (5 core, 3
 the three Playwright journeys (wallet and books, placement through claim and fund, admin
 pause and resume) pass against the installed devnet.
 
+## Match-style gate (2026-11-07)
+
+```sh
+make check-call-arity
+make check-match-style
+```
+
+```text
+check-match-style: self-test: 14 fixture groups passed
+check-match-style: 24 files, 403 match sites (108 let, 295 dispatch), 0 violation(s), 0 suppression(s)
+  depth histogram: {'0': 74, '1': 213, '2': 96, '3': 20}
+```
+
+The scanner is heuristic, not a parser; the self-test covers every rule and the parse gate
+still runs the target parser. `make check-call-arity` closes the other silent-stall class
+introduced by helper extraction: a call whose argument count differs from the declared
+parameter list does not reduce. The audit record is `audit/rholang-match-audit.md`; the rules
+are in [Rholang match style](rholang-style.md).
+
 ## Audit gates (2026-11-05)
 
 `make audit-check` enforces a concurrency review per component, a composition row per
@@ -29,8 +48,8 @@ interface, the F-020/F-021 guard checks and the narrow pause scope, with no unre
 register IDs. `make audit-scan` runs the heuristic scanners for unclosed bundles,
 take-await-take, reply shapes and pause scope.
 
-Current audit state: 30/30 component reviews, 46 interfaces, 36 hazards, 25 findings (22
-fixed, 3 accepted boundaries), 25 improvements, 40 registered suites and 285 registered
+Current audit state: 30/30 component reviews, 46 interfaces, 37 hazards, 28 findings (25
+fixed, 3 accepted boundaries), 29 improvements, 41 registered suites and 285 registered
 theorems. `check_bundle_closedness.py` reports zero candidates. The devnet install completes
 all 17 terms and the node proposes blocks; the install root-cause analysis is recorded under
 `audit/evidence/2026-11-05-install-rca`. F-003 (narrow, fail-closed pause), F-020 (payable

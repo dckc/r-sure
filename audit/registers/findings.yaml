@@ -791,3 +791,138 @@ findings:
   proposed_fix: R-025
   reviewer: internal
   verified_at: '2026-11-05'
+- id: F-026
+  title: Non-let match dispatch nests up to seven levels
+  severity: P2
+  class: code-hygiene
+  status: fixed
+  confidence: high
+  components:
+  - Syndicate
+  - SlipFactory
+  - Slip
+  - Policy
+  - Distribution
+  - SureFund
+  - CoverTerms
+  - RgenAdapter
+  - Payments
+  arms:
+  - Syndicate@"withdrawCapital"
+  - Syndicate@"openLine"
+  - Slip@"bind"
+  - Policy@"distribute"
+  - Policy@"settleClaim"
+  - Distribution@"run"
+  - SureFund@"contribute"
+  - SureFund@"cover"
+  - CoverTerms@"validate"
+  - RgenAdapter@"variance"
+  - Payments@"health"
+  hazards: []
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: tool
+    ref: tools/check_match_style.py
+  - kind: source
+    ref: contracts/src/deploy
+  - kind: source
+    ref: audit/rholang-match-audit.md
+  description: 'Before the refactor the depth histogram was {0:73,1:163,2:81,3:30,4:24,5:12,6:9,7:5}:
+    41 dispatch sites exceeded depth 3, with SlipFactory.open at depth 7 and Policy.settleClaim
+    at depth 7. Deep arm ladders spread one handler across 100+ lines and made repost ownership
+    hard to review.'
+  preconditions: A caller reaches the affected arm.
+  impact: Maintainability and review risk; deep ladders were where the missing-repost defects
+    of F-027 hid.
+  proposed_fix: R-026
+  reviewer: internal
+  verified_at: '2026-11-07'
+- id: F-027
+  title: Mutating matches lose the state cell on refusal paths
+  severity: P1
+  class: concurrency
+  status: fixed
+  confidence: high
+  components:
+  - Broker
+  - SyndicateBook
+  - Policy
+  - Distribution
+  - Syndicate
+  - Slip
+  arms:
+  - BrokerBook@"register"
+  - SyndicateBook@"create"
+  - Policy@"distribute"
+  - Policy@"settleClaim"
+  - Distribution@"run"
+  - Syndicate@"withdrawCapital"
+  - LineSettle@"pay"
+  hazards:
+  - HZ-037
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: source
+    ref: contracts/src/deploy/11_broker.rho
+  - kind: source
+    ref: contracts/src/deploy/10_syndicate.rho
+  - kind: source
+    ref: contracts/src/deploy/15_distribution.rho
+  - kind: source
+    ref: contracts/src/deploy/17_policy.rho
+  - kind: tool
+    ref: tools/check_match_style.py
+  - kind: source
+    ref: audit/rholang-match-audit.md
+  description: Several matches consume a state cell before dispatch and then reply on a
+    refusal arm without reposting it. The duplicate-owner arms in the broker and syndicate
+    registration paths are reachable by calling registration twice; the component-unavailable
+    and malformed-reply arms in Policy.distribute, Policy.settleClaim, Distribution.run,
+    Syndicate.withdrawCapital and LineSettle.pay are reachable when a component lookup fails.
+    The consumed cell is never replaced, so every later call on the instance stalls.
+  preconditions: A caller reaches a refusal arm after the state cell was consumed.
+  impact: The broker book, syndicate book, policy, distribution or syndicate becomes
+    unresponsive; later reads that consume or peek the same cell block indefinitely.
+  proposed_fix: R-027
+  reviewer: internal
+  verified_at: '2026-11-07'
+- id: F-028
+  title: Identical, duplicate and dead match arms
+  severity: P3
+  class: code-hygiene
+  status: fixed
+  confidence: high
+  components:
+  - Slip
+  - Syndicate
+  - Policy
+  - SureMath
+  arms:
+  - Slip@"expire"
+  - Syndicate@"withdrawCapital"
+  - Policy@"settleClaim"
+  - SureMath@"payable"
+  hazards: []
+  invariants:
+  - INV-11
+  evidence_level: E1
+  evidence:
+  - kind: tool
+    ref: tools/check_match_style.py
+  - kind: source
+    ref: audit/rholang-match-audit.md
+  description: slipExpireQuotes had four identical recursion arms, Syndicate.withdrawCapital
+    and Policy.settleClaim carried a wildcard arm followed by a presence test on the same
+    scrutinee, and Policy.settleClaim duplicated the whole settlement block across the
+    covered and uncovered branches.
+  preconditions: None; the arms execute on every call.
+  impact: First-match order and repost ownership are hard to read, and a branch-local change
+    can silently diverge.
+  proposed_fix: R-028
+  reviewer: internal
+  verified_at: '2026-11-07'

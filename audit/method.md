@@ -22,7 +22,12 @@
 9. **Formal review**: Lean model, vectors, flow manifest and axiom audit.
 10. **Traceability**: every arm maps to hazards, findings, improvements, tests and Lean
     declarations where applicable.
-11. **RCA**: for an install or liveness incident, record a fault tree with evidence at
+11. **Match-style review**: `tools/check_match_style.py` measures every non-let match and
+    tag-dispatch `if`: depth (gate 3), mutating catch-all and repost, identical/duplicate
+    or dead arms, same-enum ladders, and parse drift. A mutating match that loses the
+    cell is a concurrency finding, not a style one. The rules and the do-not-force-match
+    boundary are in `docs/reference/rholang-style.md`.
+12. **RCA**: for an install or liveness incident, record a fault tree with evidence at
     every leaf, five whys, hypotheses, experiments with artifacts, root cause, escape
     analysis, corrective actions, verification and residual risk in
     `audit/registers/rca.yaml` and `audit/evidence/<date>-<slug>/rca.md`.

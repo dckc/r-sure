@@ -41,6 +41,9 @@ class Arm:
     pattern: str
     body: str
     line: int
+    body_start: int = 0
+    body_end: int = 0
+    braced: bool = False
 
 
 @dataclass
@@ -58,7 +61,19 @@ class Construct:
     state_cells: list[str] = field(default_factory=list)
     contract_start: int = 0
     offset: int = 0
+    body_offset: int = 0
+    body_end: int = 0
+    else_offset: int = 0
+    else_end: int = 0
     violations: list[tuple[str, str]] = field(default_factory=list)
+
+
+@dataclass
+class ContractMeta:
+    name: str
+    params: list[str]
+    body_start: int
+    body_end: int
 
 
 @dataclass
@@ -193,7 +208,8 @@ def has_top_level_arrow(text: str) -> bool:
     return False
 
 
-def split_arms(inner: str, raw: str, base_line: int) -> list[Arm]:
+def split_arms(inner: str, raw: str, base_line: int,
+               base_offset: int = 0) -> list[Arm]:
     arms: list[Arm] = []
     index = 0
     size = len(inner)
@@ -225,23 +241,31 @@ def split_arms(inner: str, raw: str, base_line: int) -> list[Arm]:
             break
         pattern = raw[start:arrow].strip().strip("|,").strip()
         index = skip_space(inner, index)
+        body_start = base_offset + index
         if index < size and inner[index] == "{":
             end = matching(inner, index)
             if end < 0:
                 break
             body = raw[index:end + 1]
+            body_end = base_offset + end + 1
+            braced = True
             index = end + 1
         else:
             newline = inner.find("\n", index)
             if newline < 0:
                 body = raw[index:]
+                body_end = base_offset + size
                 index = size
             else:
                 body = raw[index:newline]
+                body_end = base_offset + newline
                 index = newline + 1
+            braced = False
         if pattern:
             arms.append(Arm(pattern=pattern, body=body.strip(),
-                            line=base_line + inner.count("\n", 0, start)))
+                            line=base_line + inner.count("\n", 0, start),
+                            body_start=body_start, body_end=body_end,
+                            braced=braced))
         else:
             continue
     return arms
@@ -332,14 +356,22 @@ def state_cells() -> set[str]:
 
 def cell_regex(cells: set[str]) -> re.Pattern[str]:
     known = "|".join(sorted((re.escape(cell) for cell in cells), key=len, reverse=True))
-    fallback = r"(?:[A-Za-z_][A-Za-z0-9_']*)?[Ss]tate"
+    fallback = r"(?:[A-Za-z_][A-Za-z0-9_']*)?[Ss]tate(?:Cell)?"
     if known:
         return re.compile(rf"(?:{known}|{fallback})\s*!\s*\(")
     return re.compile(rf"\b{fallback}\s*!\s*\(")
 
 
-def consumed_cells(text: str, start: int, end: int, cells: set[str]) -> list[str]:
-    """Cells consumed in the window whose latest consume has no repost before `end`."""
+def consumed_cells(text: str, start: int, end: int, cells: set[str],
+                   branches: list[tuple[int, int]]) -> list[str]:
+    """Cells consumed on the path to `end` that have not been reposted since.
+
+    A consume or repost inside a branch that does not contain `end` (a sibling arm or the
+    other side of a guard) is on a different path and does not count.
+    """
+    def on_path(position: int) -> bool:
+        return not any(s <= position < e and not (s <= end < e) for s, e in branches)
+
     consumed: dict[str, int] = {}
     for match in re.finditer(r"\bfor\s*\(", text[start:end]):
         open_at = start + match.end() - 1
@@ -352,12 +384,16 @@ def consumed_cells(text: str, start: int, end: int, cells: set[str]) -> list[str
                 continue
             source = part.split("<-", 1)[1].strip()
             name = source.lstrip("@*").split(".", 1)[0].strip()
-            if name in cells or re.search(r"[Ss]tate$", name):
-                consumed[name] = max(consumed.get(name, -1), start + match.start())
+            if not (name in cells or re.search(r"[Ss]tate(?:Cell)?$", name)):
+                continue
+            position = start + match.start()
+            if on_path(position):
+                consumed[name] = max(consumed.get(name, -1), position)
     held: list[str] = []
     for name, at in consumed.items():
         repost = re.compile(re.escape(name) + r"\s*!\s*\(")
-        later = [m.start() for m in repost.finditer(text[at:end])]
+        later = [at + m.start() for m in repost.finditer(text[at:end])
+                 if on_path(at + m.start())]
         if not later:
             held.append(name)
     return sorted(held)
@@ -371,11 +407,26 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
     contract_body = -1
     contract_start = 0
 
+    contracts_meta: list[ContractMeta] = []
     for token in CONTRACT_RE.finditer(masked):
         body = find_header_body(masked, token.start(), "contract")
         if body < 0:
             errors.append((line_of(masked, token.start()), "contract body not found"))
             continue
+        body_end = matching(masked, body)
+        open_at = token.end() - 1
+        close_at = matching(masked, open_at, "(", ")")
+        params: list[str] = []
+        if close_at > open_at:
+            for part in masked[open_at + 1:close_at].split(","):
+                name = part.strip().lstrip("@*").split("=", 1)[0].strip()
+                if name:
+                    params.append(part.strip() if part.strip().startswith("@")
+                                  else name)
+        if body_end > body:
+            contracts_meta.append(ContractMeta(
+                name=token.group(0)[len("contract"):-1].strip(),
+                params=params, body_start=body, body_end=body_end))
         brace_labels[body] = ("contract", None)
 
     for token in MATCH_RE.finditer(masked):
@@ -388,7 +439,7 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
             errors.append((line_of(masked, token.start()), "match body unclosed"))
             continue
         arms = split_arms(masked[body + 1:end], text[body + 1:end],
-                          line_of(masked, body))
+                          line_of(masked, body), body + 1)
         scrutinee = masked[token.end():body].strip()
         let = len(arms) == 1 and (
             is_lone_binder(arms[0].pattern) or total_tuple_bind(arms[0].pattern)
@@ -402,6 +453,8 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
             is_let=let,
             counted=not let,
             offset=token.start(),
+            body_offset=body,
+            body_end=end,
         )
         if not arms:
             construct.violations.append(("M-008", "match has no arms"))
@@ -418,6 +471,18 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
             errors.append((line_of(masked, token.start()), "if body not found"))
             continue
         tag = is_tag_dispatch(condition)
+        then_end = matching(masked, body)
+        else_offset = else_end = 0
+        if then_end >= 0:
+            tail = masked[then_end + 1:]
+            else_match = re.match(r"\s*else\b", tail)
+            if else_match:
+                after = then_end + 1 + else_match.end()
+                brace = masked.find("{", after)
+                if brace >= 0 and not masked[after:brace].strip():
+                    close = matching(masked, brace)
+                    if close >= 0:
+                        else_offset, else_end = brace, close + 1
         construct = Construct(
             file=rel,
             line=line_of(masked, token.start()),
@@ -426,6 +491,10 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
             tag_dispatch=tag,
             counted=tag,
             offset=token.start(),
+            body_offset=body,
+            body_end=then_end + 1 if then_end >= 0 else body,
+            else_offset=else_offset,
+            else_end=else_end,
         )
         brace_labels[body] = ("if" if tag else "guard", construct)
         constructs.append(construct)
@@ -466,14 +535,38 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
                     contract_starts.pop()
 
     state_re = cell_regex(cells)
+    branches: list[tuple[int, int]] = []
+    for item in constructs:
+        if item.kind == "match":
+            branches.extend((arm.body_start, arm.body_end) for arm in item.arms)
+        elif item.kind == "if":
+            if item.body_end > item.body_offset:
+                branches.append((item.body_offset, item.body_end))
+            if item.else_end > item.else_offset:
+                branches.append((item.else_offset, item.else_end))
     for construct in constructs:
         if construct.kind != "match":
             continue
-        construct.state_cells = consumed_cells(
-            masked, construct.contract_start, construct.offset, cells)
+        held = set(consumed_cells(
+            masked, construct.contract_start, construct.offset, cells, branches))
+        owner = None
+        for meta in contracts_meta:
+            if meta.body_start < construct.offset < meta.body_end:
+                if owner is None or meta.body_start > owner.body_start:
+                    owner = meta
+        reply_param = ""
+        if owner is not None:
+            for param in owner.params:
+                if param.startswith("@"):
+                    continue
+                if re.search(r"[Ss]tate(?:Cell)?$", param):
+                    held.add(param)
+                if re.fullmatch(r"ret\d*", param):
+                    reply_param = param
+        construct.state_cells = sorted(held)
         # A match is mutating only while it still holds a consumed state cell. A state
         # send nested later in an arm does not make this match the repost owner.
-        construct.mutating = bool(construct.state_cells)
+        construct.mutating = bool(held)
 
         if construct.is_let:
             continue
@@ -485,7 +578,11 @@ def scan_text(text: str, rel: str, cells: set[str]) -> Scan:
             body = construct.arms[total].body
             has_repost = bool(state_re.search(body))
             has_reply = bool(REPLY_RE.search(body))
-            if not ABORT_RE.search(body) and not (has_repost and has_reply):
+            forwards = bool(reply_param and re.search(
+                r"\*?" + re.escape(reply_param) + r"\b", body)) and any(
+                re.search(r"\*?" + re.escape(cell) + r"\b", body) for cell in held)
+            if not ABORT_RE.search(body) and not (has_repost and has_reply) \
+                    and not forwards:
                 construct.violations.append(
                     ("M-004", "total arm must repost the state cell and reply"))
         patterns = [arm.pattern for arm in construct.arms]

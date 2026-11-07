@@ -1,0 +1,1 @@
+check-match-style: self-test: 14 fixture groups passed

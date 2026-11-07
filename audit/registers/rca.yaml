@@ -301,3 +301,175 @@ records:
   - ../RNodeRust/models/Cargo.toml
   - ../RNodeRust/models/src/wire.rs
   - audit/evidence/2026-11-05-install-rca/node/deep_par_codec.rs
+- id: RCA-002
+  title: Mutating match refusal paths consume the state cell without reposting
+  date: '2026-11-07'
+  owner: contracts-audit
+  severity: P1
+  status: closed
+  template: audit/rca/template.md
+  nodes:
+  - N05
+  - N06
+  - N10
+  - N11
+  - N13
+  findings:
+  - F-027
+  hazards:
+  - HZ-037
+  experiments: []
+  incident: The match-style audit found 19 mutating matches that replied on a refusal arm
+    without reposting the state cell consumed before dispatch. Duplicate broker or syndicate
+    registration reaches the arm in normal use; component-unavailable and malformed-reply
+    arms reach it in Policy, Distribution, Syndicate and LineSettle. The cell is empty
+    afterwards and the next take or peek blocks.
+  fault_tree:
+    top_event: The instance cell is empty after a refusal
+    gate: OR
+    evidence:
+    - audit/evidence/2026-11-07-match-style/before-report.txt
+    children:
+    - event: Duplicate registration loses the book cell
+      gate: AND
+      evidence:
+      - contracts/src/deploy/11_broker.rho
+      children:
+      - event: The registration match consumes brokerBookState or syndicateBookState
+          before dispatch
+        gate: LEAF
+        evidence:
+        - contracts/src/deploy/10_syndicate.rho
+        - contracts/src/deploy/11_broker.rho
+      - event: The duplicate-owner arm replies without reposting
+        gate: LEAF
+        evidence:
+        - audit/evidence/2026-11-07-match-style/before-report.txt
+    - event: A failed component lookup loses the object cell
+      gate: AND
+      evidence:
+      - contracts/src/deploy/17_policy.rho
+      children:
+      - event: A lookup or helper reply returns a non-success tuple
+        gate: LEAF
+        evidence:
+        - contracts/src/deploy/15_distribution.rho
+        - contracts/src/deploy/17_policy.rho
+      - event: The defensive arm replies without reposting the held cell
+        gate: LEAF
+        evidence:
+        - audit/evidence/2026-11-07-match-style/before-report.txt
+  five_whys:
+  - question: Why did the instance stop responding?
+    answer: The state cell was consumed and never reposted, so the next take had no datum.
+  - question: Why was it never reposted?
+    answer: The refusal arm copied the success reply but not the repost.
+  - question: Why did the copy omit the repost?
+    answer: The arm sat at depth 4-7 inside a ladder; the consume was far above and the
+      repost was not visible at the refusal site.
+  - question: Why was the ladder accepted?
+    answer: There was no rule about mutating-match totality or dispatch depth.
+  - question: Why was it not caught earlier?
+    answer: The suites exercise success paths, and no static gate linked a mutating match
+      to a repost; the concurrency review is manual.
+  hypotheses:
+  - id: H-001
+    statement: Duplicate registration in BrokerBook.create and SyndicateBook.create loses
+      the book cell and is reachable in normal use.
+    status: supported
+    note: The consume precedes the duplicate check and the refusal replies without a repost.
+  - id: H-002
+    statement: Component-unavailable and malformed-reply arms in Policy, Distribution,
+      Syndicate and LineSettle lose the object cell.
+    status: supported
+    note: The same shape appears in 19 sites in before-report.txt.
+  - id: H-003
+    statement: The style refactor alone proves the absence of state loss.
+    status: rejected
+    note: The gate is a shape check; the suites and the local reducer remain the
+      behavioural evidence.
+  root_cause: Refusal arms for mutating matches were written without the repost that the
+    success path had, and the deep ladders separated the consume from the refusal so the
+    ownership was not visible at the arm. The process gap was the absence of a rule and a
+    gate that every mutating match ends in a total arm that reposts and replies.
+  escape_analysis:
+  - The concurrency review is manual and reasoned about success paths.
+  - The behavioural suites do not exercise duplicate registration or a failing component
+    lookup.
+  - The static gates checked bundles, captures, money, placeholders and arm inventory, but
+    not match totality.
+  - Deep ladders made the consume and the refusal textually distant.
+  corrective_actions:
+  - id: CA-01
+    action: Repost the held snapshot on every refusal arm and add a total arm where one
+      was missing.
+    owner: contracts
+    status: done
+    findings:
+    - F-027
+    improvements:
+    - R-027
+  - id: CA-02
+    action: Add the match-style scanner and wire it into spec-check.
+    owner: audit
+    status: done
+    findings:
+    - F-026
+    improvements:
+    - R-029
+  - id: CA-03
+    action: Flatten the handlers so one consume and one repost owner are visible per path.
+    owner: contracts
+    status: done
+    findings:
+    - F-026
+    improvements:
+    - R-026
+  - id: CA-04
+    action: Cover duplicate registration and component-failure arms in the behavioural
+      suites.
+    owner: contracts-audit
+    status: open
+    findings:
+    - F-027
+    improvements:
+    - R-027
+  verification:
+    match_gate:
+      result: pass
+      detail: 403 sites, 0 violations, 0 suppressions, depth histogram max 3.
+      evidence:
+      - audit/evidence/2026-11-07-match-style/gate.txt
+    match_self_test:
+      result: pass
+      detail: 14 fixture groups.
+      evidence:
+      - audit/evidence/2026-11-07-match-style/self-test.txt
+    parse_and_normalize:
+      result: pass
+      detail: built and rendered terms parse and normalize.
+      evidence:
+      - audit/evidence/2026-11-07-match-style/gate.txt
+    duplicate_registration_regression:
+      result: implemented-not-executed
+      detail: the arms are fixed; CA-04 tracks the behavioural regression.
+      evidence:
+      - audit/evidence/2026-11-07-match-style/rca.md
+  residual_risk:
+  - The scanner is heuristic; M-004 accepts a checked-helper forwarding, not a proof that
+    the call completes.
+  - Duplicate registration and component-failure arms are not yet covered by a behavioural
+    suite (CA-04).
+  - The audit is internal, not independent.
+  evidence:
+  - audit/evidence/2026-11-07-match-style/manifest.json
+  - audit/evidence/2026-11-07-match-style/rca.md
+  - audit/evidence/2026-11-07-match-style/before-report.txt
+  - audit/evidence/2026-11-07-match-style/after-report.txt
+  - audit/evidence/2026-11-07-match-style/gate.txt
+  - audit/evidence/2026-11-07-match-style/self-test.txt
+  - contracts/src/deploy/10_syndicate.rho
+  - contracts/src/deploy/11_broker.rho
+  - contracts/src/deploy/15_distribution.rho
+  - contracts/src/deploy/17_policy.rho
+  - tools/check_match_style.py

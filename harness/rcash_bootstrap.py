@@ -90,7 +90,17 @@ def main(argv: list[str] | None = None) -> int:
     present = inst.resolved(tip, STEP_KEYS["identity"])
     if "missing" in present:
         print("rcash-bootstrap: installing the account factory")
-        resolver = inst.state["steps"]["14_asset_resolver"]["uris"]
+        # The installer writes the asset-resolver entry only when its own state is
+        # intact; a concurrent reset can leave the file behind the chain. Read the live
+        # entry from the Root when the state lacks it.
+        resolver = (inst.state.get("steps", {})
+                    .get("14_asset_resolver", {}).get("uris"))
+        if not resolver:
+            resolver = inst.resolved(tip, STEP_KEYS["asset_resolver"])
+        if "missing" in resolver:
+            print("rcash-bootstrap: asset resolver is absent from the Root",
+                  file=sys.stderr)
+            return 1
         try:
             inst.step("09_identity", "testnet:identity",
                       {"__ROOT_URI__": inst.root_uri,

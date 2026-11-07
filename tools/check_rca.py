@@ -94,7 +94,8 @@ def main() -> int:
     if doc.get("schema") != SCHEMA:
         problems.append(f"schema {doc.get('schema')!r} is not {SCHEMA}")
 
-    findings = ids_of(load("findings.yaml").get("findings", []))
+    finding_rows = load("findings.yaml").get("findings", [])
+    findings = ids_of(finding_rows)
     hazard_rows = load("hazards.yaml").get("hazards", [])
     hazards = ids_of(hazard_rows)
     # The RCA-link rule is for install/test-campaign hazards (N16-N19), not for
@@ -237,9 +238,13 @@ def main() -> int:
             if not resolve(str(ref)).exists():
                 problems.append(f"{label}: evidence does not exist: {ref}")
 
-    for finding in findings:
+    for row in finding_rows:
+        finding = row.get("id")
         match = NEW_FINDING.match(str(finding))
         if not match or int(match.group(1)) < 22:
+            continue
+        # Code-hygiene findings (P2/P3) do not need an incident record; P0/P1 do.
+        if row.get("severity") not in {"P0", "P1"}:
             continue
         record = next((r for r in records if finding in (r.get("findings") or [])), None)
         if not record:

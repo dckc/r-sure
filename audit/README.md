@@ -22,17 +22,19 @@ the book chapters summarise them.
 | [hazop/nodes.yaml](hazop/nodes.yaml) | 19 nodes, guide words and parameters |
 | [hazop/tabletop-2026-11-05.md](hazop/tabletop-2026-11-05.md) | internal tabletop record |
 | [hazop/worksheet-install-2026-11-05.md](hazop/worksheet-install-2026-11-05.md) | install guide-word worksheet for N16–N19 |
-| [registers/findings.yaml](registers/findings.yaml) | 25 findings |
-| [registers/hazards.yaml](registers/hazards.yaml) | 36 hazards |
-| [registers/improvements.yaml](registers/improvements.yaml) | 25 fixes/deferred items |
-| [registers/tests.yaml](registers/tests.yaml) | 40 tests: 37 passing, 3 `not_run` |
-| [registers/rca.yaml](registers/rca.yaml) | RCA-001 install root cause and corrective actions |
+| [registers/findings.yaml](registers/findings.yaml) | 28 findings |
+| [registers/hazards.yaml](registers/hazards.yaml) | 37 hazards |
+| [registers/improvements.yaml](registers/improvements.yaml) | 29 fixes/deferred items |
+| [registers/tests.yaml](registers/tests.yaml) | 41 tests: 37 passing, 3 `not_run`, 1 implemented |
+| [registers/rca.yaml](registers/rca.yaml) | RCA-001 install and RCA-002 match state-loss root causes |
 | [registers/experiments.yaml](registers/experiments.yaml) | 10 RCA experiments with artifacts |
 | [rca/template.md](rca/template.md) | RCA template |
 | [registers/theorems.yaml](registers/theorems.yaml) | 285 registered Lean component-model theorems |
 | [traceability/matrix.md](traceability/matrix.md) | generated arm/hazard/finding/test matrix |
 | [evidence/2026-11-05-install-rca/rca.md](evidence/2026-11-05-install-rca/rca.md) | readable install RCA |
 | [evidence/2026-11-05-install-rca/manifest.json](evidence/2026-11-05-install-rca/manifest.json) | `rsure.evidence/v2` install evidence manifest |
+| [rholang-match-audit.md](rholang-match-audit.md) | match-style audit and refactor record |
+| [evidence/2026-11-07-match-style/rca.md](evidence/2026-11-07-match-style/rca.md) | readable match state-loss RCA |
 
 ## What to read for the verdict
 
@@ -56,8 +58,7 @@ python3 tools/check_experiments.py
 make unit-all
 ```
 
-The three new checkers validate evidence schema v2, the RCA record and the experiment
-register. They are not yet in `make audit-check`; the Makefile is owned by the lead.
+The evidence, RCA and experiment checkers run in `make audit-check`.
 
 `deployments/suite-results.json` records the root suite passing; the other registered
 suites remain `not_run` or implemented. The install E2 is recorded in

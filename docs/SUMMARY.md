@@ -37,6 +37,7 @@
 # Reference
 
 - [Contract map](reference/contract-map.md)
+- [Rholang match style](reference/rholang-style.md)
 - [Arm reference](reference/arms.md)
 - [Data schemas](reference/data-schemas.md)
 - [Install order and keys](reference/install-order-and-keys.md)

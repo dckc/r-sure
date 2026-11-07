@@ -11,7 +11,8 @@ export RHOLO_DIR := $(abspath $(RHOLO_DIR))
 
 .PHONY: venv build build-check measure measure-check metrics metrics-compare \
         check-arch check-captures check-select check-placeholders check-money \
-        check-suites check-toplevel-bindings check-bundle-wildcards install-check \
+        check-suites check-toplevel-bindings check-bundle-wildcards \
+        check-match-style check-match-style-report check-call-arity install-check \
         check-docs spec-check parse-check normalize-check docs docs-serve docs-check \
         devnet devnet-up devnet-wait down status rcash-install rcash-keys \
         rcash-bootstrap rgen-install rgen-keys keys install setup \
@@ -71,6 +72,16 @@ check-suites:
 check-toplevel-bindings:
 	$(PY) tools/check_toplevel_bindings.py
 
+check-match-style:
+	$(PY) tools/check_match_style.py --self-test
+	$(PY) tools/check_match_style.py --check
+
+check-match-style-report:
+	$(PY) tools/check_match_style.py --report
+
+check-call-arity:
+	$(PY) tools/check_call_arity.py
+
 check-bundle-wildcards:
 	$(PY) tools/check_bundle_wildcards.py
 
@@ -82,7 +93,7 @@ check-docs:
 
 spec-check: build-check measure-check check-arch check-captures check-select \
             check-placeholders check-money check-suites check-toplevel-bindings \
-            check-bundle-wildcards
+            check-bundle-wildcards check-call-arity check-match-style
 
 parse-check:
 	$(PY) harness/install.py --dry-run

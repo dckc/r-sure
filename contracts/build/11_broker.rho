@@ -212,7 +212,10 @@ contract authIsOwner(dId, @ownerId, ret) = {
                   .set("nonce", b.get("nonce") + 1)) |
                 ret!((true, s2.get("id"), uri))
               }
-              existing => { ret!((false, "duplicate owner", existing)) }
+              existing => {
+                brokerBookState!(b) |
+                ret!((false, "duplicate owner", existing))
+              }
             }
           }
         }

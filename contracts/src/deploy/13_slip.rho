@@ -11,7 +11,11 @@ new
   rootCh, c, ack,
   slipResolve, nowHeight, slipMake, slipShareSum, slipHasShare, slipLeadSecond,
   slipOpenLines, slipExpireQuotes, mapKeys, slipReqOk, authOwner, slipStatus,
-  slipSubscribe, slipFundDeposit, slipBindPolicy, slipRefund, authIsOwner
+  slipSubscribe, slipFundDeposit, slipBindPolicy, slipRefund, authIsOwner,
+  slipRefundPayments, slipRefundFacet, slipRefundMove,
+  slipFundIssuer, slipFundAmount,
+  slipBindTerms, slipBindLines, slipBindCreate, slipBindDistribute,
+  slipOpenBroker, slipOpenTerms, slipOpenPayments, slipOpenPurse, slipOpenHeight
 in {
   // @@INLINE:lib/Auth.rho@@
 
@@ -154,16 +158,7 @@ in {
                   new eCh in {
                     Syndicate!("expireQuote", s.get("grantId"), *eCh) |
                     for (@e <- eCh) {
-                      match e {
-                        (true, _) => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
-                        (false, "not expired") => {
-                          slipExpireQuotes!(keys, i + 1, shares, *ret)
-                        }
-                        (false, "closed") => {
-                          slipExpireQuotes!(keys, i + 1, shares, *ret)
-                        }
-                        _ => { slipExpireQuotes!(keys, i + 1, shares, *ret) }
-                      }
+                      slipExpireQuotes!(keys, i + 1, shares, *ret)
                     }
                   }
                 }
@@ -191,43 +186,55 @@ in {
     if (s.get("funded") < 1) {
       ret!((true, Nil))
     } else {
-      new pCh in {
-        slipResolve!("component:payments", *pCh) |
-        for (@p <- pCh) {
-          match p {
-            (true, Payments) => {
-              new fCh in {
-                @Payments!("depositFacet", s.get("insured"), s.get("assetId"), *fCh) |
-                for (@f <- fCh) {
-                  match f {
-                    (true, facet) => {
-                      new wCh in {
-                        @purse!("withdraw", (brand, s.get("funded")), *wCh) |
-                        for (@w <- wCh) {
-                          match w {
-                            (true, payment) => {
-                              new dCh in {
-                                @facet!("deposit", payment, *dCh) |
-                                for (@d <- dCh) {
-                                  match d {
-                                    (true, _) => { ret!((true, Nil)) }
-                                    _ => { 1/0 }
-                                  }
-                                }
-                              }
-                            }
-                            _ => { 1/0 }
-                          }
-                        }
-                      }
-                    }
-                    _ => { ret!(f) }
-                  }
+      slipRefundPayments!(s, purse, brand, *ret)
+    }
+  } |
+
+  contract slipRefundPayments(@s, @purse, @brand, ret) = {
+    new pCh in {
+      slipResolve!("component:payments", *pCh) |
+      for (@p <- pCh) {
+        match p {
+          (true, Payments) => {
+            slipRefundFacet!(s, Payments, purse, brand, *ret)
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract slipRefundFacet(@s, @Payments, @purse, @brand, ret) = {
+    new fCh in {
+      @Payments!("depositFacet", s.get("insured"), s.get("assetId"), *fCh) |
+      for (@f <- fCh) {
+        match f {
+          (true, facet) => {
+            slipRefundMove!(purse, brand, s.get("funded"), facet, *ret)
+          }
+          _ => { ret!(f) }
+        }
+      }
+    }
+  } |
+
+  contract slipRefundMove(@purse, @brand, @amount, @facet, ret) = {
+    new wCh in {
+      @purse!("withdraw", (brand, amount), *wCh) |
+      for (@w <- wCh) {
+        match w {
+          (true, payment) => {
+            new dCh in {
+              @facet!("deposit", payment, *dCh) |
+              for (@d <- dCh) {
+                match d {
+                  (true, _) => { ret!((true, Nil)) }
+                  _ => { 1/0 }
                 }
               }
             }
-            _ => { ret!((false, "payments unavailable")) }
           }
+          _ => { 1/0 }
         }
       }
     }
@@ -313,41 +320,17 @@ in {
     }
   } |
 
-  contract slipFundDeposit(@s, @payment, @purse, ret) = {
-    new iCh2 in {
-      slipResolve!("component:payments", *iCh2) |
-      for (@p <- iCh2) {
+  contract slipFundIssuer(@assetId, ret) = {
+    new iCh in {
+      slipResolve!("component:payments", *iCh) |
+      for (@p <- iCh) {
         match p {
           (true, Payments) => {
             new issCh in {
-              @Payments!("issuer", s.get("assetId"), *issCh) |
+              @Payments!("issuer", assetId, *issCh) |
               for (@i <- issCh) {
                 match i {
-                  (true, brand2, issuer2) => {
-                    new aCh2 in {
-                      @issuer2!("getAmountOf", payment, *aCh2) |
-                      for (@a <- aCh2) {
-                        match a {
-                          (true, amount) => {
-                            if (amount != s.get("premiumTotal")) {
-                              ret!((false, "amount"))
-                            } else {
-                              new dCh in {
-                                @purse!("deposit", payment, *dCh) |
-                                for (@d <- dCh) {
-                                  match d {
-                                    (true, _) => { ret!((true, amount)) }
-                                    _ => { 1/0 }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          _ => { ret!(a) }
-                        }
-                      }
-                    }
-                  }
+                  (true, _, issuer) => { ret!((true, issuer)) }
                   _ => { ret!(i) }
                 }
               }
@@ -359,8 +342,71 @@ in {
     }
   } |
 
+  contract slipFundAmount(@issuer, @payment, ret) = {
+    new aCh in {
+      @issuer!("getAmountOf", payment, *aCh) |
+      for (@a <- aCh) {
+        match a {
+          (true, amount) => { ret!((true, amount)) }
+          _ => { ret!(a) }
+        }
+      }
+    }
+  } |
+
+  contract slipFundDeposit(@s, @payment, @purse, ret) = {
+    new iCh2 in {
+      slipFundIssuer!(s.get("assetId"), *iCh2) |
+      for (@i <- iCh2) {
+        match i {
+          (true, issuer) => {
+            new aCh2 in {
+              slipFundAmount!(issuer, payment, *aCh2) |
+              for (@a <- aCh2) {
+                match a {
+                  (true, amount) => {
+                    if (amount != s.get("premiumTotal")) {
+                      ret!((false, "amount"))
+                    } else {
+                      new dCh in {
+                        @purse!("deposit", payment, *dCh) |
+                        for (@d <- dCh) {
+                          match d {
+                            (true, _) => { ret!((true, amount)) }
+                            _ => { 1/0 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  _ => { ret!(a) }
+                }
+              }
+            }
+          }
+          _ => { ret!(i) }
+        }
+      }
+    }
+  } |
+
   contract slipBindPolicy(@s, @keys, @policyId, slipToken, policyToken, claimToken,
                           @purse, @brand, ret) = {
+    new tCh in {
+      slipBindTerms!(s, *tCh) |
+      for (@t <- tCh) {
+        match t {
+          (true, Nil) => {
+            slipBindLines!(s, keys, policyId, *slipToken, *policyToken, *claimToken,
+                           purse, brand, *ret)
+          }
+          _ => { ret!(t) }
+        }
+      }
+    }
+  } |
+
+  contract slipBindTerms(@s, ret) = {
     new tCh in {
       slipResolve!("component:terms", *tCh) |
       for (@t <- tCh) {
@@ -370,70 +416,11 @@ in {
               @CoverTerms!("hash", s.get("terms"), *hCh) |
               for (@h <- hCh) {
                 match h {
-                  (true, termsHash2) => {
-                    if (termsHash2 != s.get("termsHash")) {
+                  (true, termsHash) => {
+                    if (termsHash != s.get("termsHash")) {
                       ret!((false, "terms"))
                     } else {
-                      new linesCh in {
-                        slipOpenLines!(keys, 0, s.get("shares"), policyId,
-                                       s.get("id"), *slipToken, *policyToken,
-                                       [], *linesCh) |
-                        for (@linesR <- linesCh) {
-                          match linesR {
-                            (true, lines) => {
-                              new piCh in {
-                                slipResolve!("component:policy-factory", *piCh) |
-                                for (@pi <- piCh) {
-                                  match pi {
-                                    (true, PolicyFactory) => {
-                                      new pCh in {
-                                        @PolicyFactory!("create",
-                                          {"policyId": policyId,
-                                           "slipId": s.get("id"),
-                                           "slipUri": s.get("uri"),
-                                           "riskId": s.get("riskId"),
-                                           "insured": s.get("insured"),
-                                           "broker": s.get("broker"),
-                                           "brokerOwner": s.get("brokerOwner"),
-                                           "class": s.get("class"),
-                                           "assetId": s.get("assetId"),
-                                           "terms": s.get("terms"),
-                                           "termsHash": s.get("termsHash"),
-                                           "premiumTotal": s.get("premiumTotal"),
-                                           "lines": lines},
-                                          purse, brand, *policyToken, *claimToken, *pCh) |
-                                        for (@pr <- pCh) {
-                                          match pr {
-                                            (true, policyUri) => {
-                                              new polCh in {
-                                                rl!(policyUri, *polCh) |
-                                                for (Policy <- polCh) {
-                                                  new distCh in {
-                                                    Policy!("distribute", *policyToken, *distCh) |
-                                                    for (@d <- distCh) {
-                                                      match d {
-                                                        (true, _) => { ret!((true, policyUri)) }
-                                                        _ => { ret!((false, "distribute")) }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                            _ => { ret!(pr) }
-                                          }
-                                        }
-                                      }
-                                    }
-                                    _ => { ret!((false, "policy factory")) }
-                                  }
-                                }
-                              }
-                            }
-                            _ => { ret!(linesR) }
-                          }
-                        }
-                      }
+                      ret!((true, Nil))
                     }
                   }
                   _ => { ret!(h) }
@@ -442,6 +429,188 @@ in {
             }
           }
           _ => { ret!((false, "terms unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract slipBindLines(@s, @keys, @policyId, slipToken, policyToken, claimToken,
+                         @purse, @brand, ret) = {
+    new linesCh in {
+      slipOpenLines!(keys, 0, s.get("shares"), policyId, s.get("id"),
+                     *slipToken, *policyToken, [], *linesCh) |
+      for (@linesR <- linesCh) {
+        match linesR {
+          (true, lines) => {
+            slipBindCreate!(s, lines, policyId, *slipToken, *policyToken,
+                            *claimToken, purse, brand, *ret)
+          }
+          _ => { ret!(linesR) }
+        }
+      }
+    }
+  } |
+
+  contract slipBindCreate(@s, @lines, @policyId, slipToken, policyToken, claimToken,
+                          @purse, @brand, ret) = {
+    new piCh in {
+      slipResolve!("component:policy-factory", *piCh) |
+      for (@pi <- piCh) {
+        match pi {
+          (true, PolicyFactory) => {
+            new pCh in {
+              @PolicyFactory!("create",
+                {"policyId": policyId,
+                 "slipId": s.get("id"),
+                 "slipUri": s.get("uri"),
+                 "riskId": s.get("riskId"),
+                 "insured": s.get("insured"),
+                 "broker": s.get("broker"),
+                 "brokerOwner": s.get("brokerOwner"),
+                 "class": s.get("class"),
+                 "assetId": s.get("assetId"),
+                 "terms": s.get("terms"),
+                 "termsHash": s.get("termsHash"),
+                 "premiumTotal": s.get("premiumTotal"),
+                 "lines": lines},
+                purse, brand, *policyToken, *claimToken, *pCh) |
+              for (@pr <- pCh) {
+                match pr {
+                  (true, policyUri) => {
+                    slipBindDistribute!(policyUri, *policyToken, *ret)
+                  }
+                  _ => { ret!(pr) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "policy factory")) }
+        }
+      }
+    }
+  } |
+
+  contract slipBindDistribute(@policyUri, policyToken, ret) = {
+    new polCh in {
+      rl!(policyUri, *polCh) |
+      for (Policy <- polCh) {
+        new distCh in {
+          Policy!("distribute", *policyToken, *distCh) |
+          for (@d <- distCh) {
+            match d {
+              (true, _) => { ret!((true, policyUri)) }
+              _ => { ret!((false, "distribute")) }
+            }
+          }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenBroker(@req, @BrokerBook, @ownerId, ret) = {
+    new boCh in {
+      @BrokerBook!("brokerOf", ownerId, *boCh) |
+      for (@bo <- boCh) {
+        match bo {
+          (true, brokerId, _) => { slipOpenTerms!(req, ownerId, brokerId, *ret) }
+          _ => { ret!((false, "broker not registered")) }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenTerms(@req, @ownerId, @brokerId, ret) = {
+    new termCh in {
+      slipResolve!("component:terms", *termCh) |
+      for (@t <- termCh) {
+        match t {
+          (true, CoverTerms) => {
+            new vCh in {
+              @CoverTerms!("validate", req.get("terms"), *vCh) |
+              for (@v <- vCh) {
+                match v {
+                  (true, Nil) => {
+                    new hCh in {
+                      @CoverTerms!("hash", req.get("terms"), *hCh) |
+                      for (@h <- hCh) {
+                        match h {
+                          (true, termsHash) => {
+                            slipOpenPayments!(req, termsHash, ownerId, brokerId, *ret)
+                          }
+                          _ => { ret!(h) }
+                        }
+                      }
+                    }
+                  }
+                  _ => { ret!(v) }
+                }
+              }
+            }
+          }
+          _ => { ret!((false, "terms unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenPayments(@req, @termsHash, @ownerId, @brokerId, ret) = {
+    new pCh in {
+      slipResolve!("component:payments", *pCh) |
+      for (@p <- pCh) {
+        match p {
+          (true, Payments) => {
+            slipOpenPurse!(req, termsHash, ownerId, brokerId, Payments, *ret)
+          }
+          _ => { ret!((false, "payments unavailable")) }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenPurse(@req, @termsHash, @ownerId, @brokerId, @Payments, ret) = {
+    new iCh in {
+      @Payments!("issuer", req.get("terms").get("assetId"), *iCh) |
+      for (@i <- iCh) {
+        match i {
+          (true, brand, issuer) => {
+            new puCh in {
+              @issuer!("makeEmptyPurse", *puCh) |
+              for (@pu <- puCh) {
+                match pu {
+                  (true, purse) => {
+                    slipOpenHeight!(req, termsHash, ownerId, brokerId, brand, purse,
+                                    *ret)
+                  }
+                  _ => { ret!(pu) }
+                }
+              }
+            }
+          }
+          _ => { ret!(i) }
+        }
+      }
+    }
+  } |
+
+  contract slipOpenHeight(@req, @termsHash, @ownerId, @brokerId, @brand, @purse, ret) = {
+    new sidCh in {
+      nowHeight!(*sidCh) |
+      for (@h2 <- sidCh) {
+        match h2 {
+          (true, now) => {
+            match "slp:" ++ brokerId ++ ":" ++ now.toString() {
+              sid => {
+                new slipToken, policyToken, claimToken in {
+                  slipMake!(ownerId, brokerId, sid,
+                            req.set("termsHash", termsHash)
+                               .set("class", req.get("class")),
+                            purse, brand, *slipToken, *policyToken,
+                            *claimToken, *ret)
+                }
+              }
+            }
+          }
+          _ => { ret!(h2) }
         }
       }
     }
@@ -742,87 +911,7 @@ in {
       for (@bb <- bCh; @ok <- okCh; @o <- oCh) {
         match (bb, ok, o) {
           ((true, BrokerBook), (true, Nil), (true, ownerId)) => {
-            new boCh in {
-              @BrokerBook!("brokerOf", ownerId, *boCh) |
-              for (@bo <- boCh) {
-                match bo {
-                  (true, brokerId, brokerUri) => {
-                    new termCh in {
-                      slipResolve!("component:terms", *termCh) |
-                      for (@t <- termCh) {
-                        match t {
-                          (true, CoverTerms) => {
-                            new vCh in {
-                              @CoverTerms!("validate", req.get("terms"), *vCh) |
-                              for (@v <- vCh) {
-                                match v {
-                                  (true, Nil) => {
-                                    new hCh in {
-                                      @CoverTerms!("hash", req.get("terms"), *hCh) |
-                                      for (@h <- hCh) {
-                                        match h {
-                                          (true, termsHash) => {
-                                            new pCh in {
-                                              slipResolve!("component:payments", *pCh) |
-                                              for (@p <- pCh) {
-                                                match p {
-                                                  (true, Payments) => {
-                                                    new iCh in {
-                                                      @Payments!("issuer",
-                                                        req.get("terms").get("assetId"), *iCh) |
-                                                      for (@(true, brand, issuer) <- iCh) {
-                                                        new puCh in {
-                                                          @issuer!("makeEmptyPurse", *puCh) |
-                                                          for (@(true, purse) <- puCh) {
-                                                            new slipToken, policyToken, claimToken, sidCh in {
-                                                              nowHeight!(*sidCh) |
-                                                              for (@h2 <- sidCh) {
-                                                                match h2 {
-                                                                  (true, now) => {
-                                                                    match "slp:" ++ brokerId ++ ":" ++ now.toString() {
-                                                                      sid => {
-                                                                        slipMake!(ownerId, brokerId, sid,
-                                                                          req.set("termsHash", termsHash)
-                                                                             .set("class", req.get("class")),
-                                                                          purse, brand,
-                                                                          *slipToken, *policyToken,
-                                                                          *claimToken, *ret)
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                  _ => { ret!(h2) }
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                  _ => { ret!((false, "payments unavailable")) }
-                                                }
-                                              }
-                                            }
-                                          }
-                                          _ => { ret!(h) }
-                                        }
-                                      }
-                                    }
-                                  }
-                                  _ => { ret!(v) }
-                                }
-                              }
-                            }
-                          }
-                          _ => { ret!((false, "terms unavailable")) }
-                        }
-                      }
-                    }
-                  }
-                  _ => { ret!((false, "broker not registered")) }
-                }
-              }
-            }
+            slipOpenBroker!(req, BrokerBook, ownerId, *ret)
           }
           _ => { ret!((false, "broker unavailable")) }
         }

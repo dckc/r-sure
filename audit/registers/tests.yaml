@@ -208,3 +208,18 @@ tests:
   focus: 'Variance is risk: SureMath varianceRate/varianceGap/loadedPremium/varianceStats,
     the engineering and insurer estimates, the signed gap, the minimum premium, the
     acknowledgement on accept, and the attestation-binding and premium-floor refusals.'
+- id: T-041
+  name: match_style
+  file: tools/check_match_style.py
+  status: implemented
+  focus: 'Static gate for M-001 depth, M-002 same-enum ladders, M-003 mutating catch-all,
+    M-004 repost-and-reply, M-005 identical/duplicate/dead arms, M-006 wildcard-then-if,
+    M-007 parse drift and M-008 empty arms, with 14 self-test fixture groups. The gate is
+    the regression; there is no behavioural run row.'
+- id: T-042
+  name: call_arity
+  file: tools/check_call_arity.py
+  status: implemented
+  focus: 'Static gate that every call to a locally defined contract passes the declared
+    arity. A mismatched send does not reduce and stalls silently; the local reducer caught
+    one such helper extraction. The gate reads both contracts/src and contracts/build.'

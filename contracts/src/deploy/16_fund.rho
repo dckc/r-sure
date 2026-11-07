@@ -247,7 +247,7 @@ in {
                 match i {
                   (true, issuer) => {
                     new aCh in {
-                      fundContributeAmount!(issuer, payment, *aCh) |
+                      fundContributeAmount!(issuer, payment, purse, *aCh) |
                       for (@a <- aCh) {
                         match a {
                           (true, amount) => {

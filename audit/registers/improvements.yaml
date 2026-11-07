@@ -437,3 +437,95 @@ improvements:
   rollback: restore the previous harness; set RSURE_FORCE_PROPOSE=1 only on a node
     that advertises manual propose
   status: implemented
+- id: R-026
+  priority: P2
+  findings:
+  - F-026
+  hazards: []
+  change: Extract staged top-level helpers so every non-let match and tag-dispatch if stays
+    at depth 3 or less, with one consume and one repost owner per path.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-041
+  - T-003
+  - T-007
+  - T-011
+  rollout_stage: devnet
+  rollback: redeploy the previous Root and terms
+  status: implemented
+- id: R-027
+  priority: P1
+  findings:
+  - F-027
+  hazards:
+  - HZ-037
+  change: Every mutating match ends in a total arm that reposts the held cell and replies
+    or aborts; total arms that delegate pass the cell and reply channel to a helper that is
+    itself checked. Duplicate-owner, component-unavailable and malformed-reply refusals now
+    repost before replying.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-003
+  - T-005
+  - T-007
+  - T-011
+  - T-012
+  - T-041
+  rollout_stage: devnet
+  rollback: redeploy the previous Root and terms
+  status: implemented
+- id: R-028
+  priority: P3
+  findings:
+  - F-028
+  hazards: []
+  change: Merge identical arms into one recursion, replace the wildcard-then-presence-test
+    shape with Nil/value arms, and move the duplicated settlement block into one helper used
+    by both the covered and uncovered branches.
+  type: contract
+  breaking: false
+  migration: fresh devnet install
+  compatibility_window: v1 only
+  tests:
+  - T-041
+  - T-011
+  rollout_stage: devnet
+  rollback: redeploy the previous Root and terms
+  status: implemented
+- id: R-029
+  priority: P2
+  findings: []
+  hazards: []
+  change: Add tools/rholang_match.py and tools/check_match_style.py, wire check-match-style
+    into spec-check, and document the rules and the do-not-force-match boundary.
+  type: tooling
+  breaking: false
+  migration: none
+  compatibility_window: tooling only
+  tests:
+  - T-041
+  rollout_stage: devnet
+  rollback: remove the target from spec-check
+  status: implemented
+- id: R-030
+  priority: P2
+  findings: []
+  hazards: []
+  change: Add tools/check_call_arity.py and wire it into spec-check so a contract call whose
+    argument count differs from the declared parameter list fails statically instead of
+    stalling at run time.
+  type: tooling
+  breaking: false
+  migration: none
+  compatibility_window: tooling only
+  tests:
+  - T-042
+  rollout_stage: devnet
+  rollback: remove the target from spec-check
+  status: implemented

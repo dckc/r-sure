@@ -1,0 +1,67 @@
+contracts/src/deploy/03_terms.rho:126: M-001: dispatch depth 4 > 3
+contracts/src/deploy/03_terms.rho:126: M-005: identical bodies across distinct arms
+contracts/src/deploy/03_terms.rho:152: M-005: identical bodies across distinct arms
+contracts/src/deploy/05_rgen.rho:226: M-005: identical bodies across distinct arms
+contracts/src/deploy/05_rgen.rho:235: M-001: dispatch depth 4 > 3
+contracts/src/deploy/05_rgen.rho:248: M-001: dispatch depth 4 > 3
+contracts/src/deploy/05_rgen.rho:251: M-001: dispatch depth 5 > 3
+contracts/src/deploy/05_rgen.rho:254: M-001: dispatch depth 6 > 3
+contracts/src/deploy/05_rgen.rho:342: M-001: dispatch depth 4 > 3
+contracts/src/deploy/10_syndicate.rho:317: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/10_syndicate.rho:323: M-001: dispatch depth 4 > 3
+contracts/src/deploy/10_syndicate.rho:323: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/10_syndicate.rho:340: M-001: dispatch depth 5 > 3
+contracts/src/deploy/10_syndicate.rho:346: M-001: dispatch depth 6 > 3
+contracts/src/deploy/10_syndicate.rho:592: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/10_syndicate.rho:598: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/10_syndicate.rho:611: M-001: dispatch depth 4 > 3
+contracts/src/deploy/10_syndicate.rho:617: M-001: dispatch depth 5 > 3
+contracts/src/deploy/10_syndicate.rho:913: M-001: dispatch depth 4 > 3
+contracts/src/deploy/10_syndicate.rho:943: M-001: dispatch depth 5 > 3
+contracts/src/deploy/10_syndicate.rho:945: M-001: dispatch depth 6 > 3
+contracts/src/deploy/10_syndicate.rho:1051: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/11_broker.rho:183: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/13_slip.rho:157: M-005: identical bodies across distinct arms
+contracts/src/deploy/13_slip.rho:212: M-001: dispatch depth 4 > 3
+contracts/src/deploy/13_slip.rho:338: M-001: dispatch depth 4 > 3
+contracts/src/deploy/13_slip.rho:387: M-001: dispatch depth 4 > 3
+contracts/src/deploy/13_slip.rho:406: M-001: dispatch depth 5 > 3
+contracts/src/deploy/13_slip.rho:414: M-001: dispatch depth 6 > 3
+contracts/src/deploy/13_slip.rho:758: M-001: dispatch depth 4 > 3
+contracts/src/deploy/13_slip.rho:763: M-001: dispatch depth 5 > 3
+contracts/src/deploy/13_slip.rho:768: M-001: dispatch depth 6 > 3
+contracts/src/deploy/13_slip.rho:780: M-001: dispatch depth 7 > 3
+contracts/src/deploy/15_distribution.rho:228: M-001: dispatch depth 4 > 3
+contracts/src/deploy/15_distribution.rho:362: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/16_fund.rho:167: M-001: dispatch depth 4 > 3
+contracts/src/deploy/16_fund.rho:170: M-001: dispatch depth 5 > 3
+contracts/src/deploy/16_fund.rho:239: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/16_fund.rho:245: M-001: dispatch depth 4 > 3
+contracts/src/deploy/16_fund.rho:245: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/16_fund.rho:258: M-001: dispatch depth 5 > 3
+contracts/src/deploy/16_fund.rho:263: M-001: dispatch depth 6 > 3
+contracts/src/deploy/17_policy.rho:241: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:247: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:251: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:256: M-001: dispatch depth 4 > 3
+contracts/src/deploy/17_policy.rho:256: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:267: M-001: dispatch depth 5 > 3
+contracts/src/deploy/17_policy.rho:267: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:275: M-001: dispatch depth 6 > 3
+contracts/src/deploy/17_policy.rho:283: M-001: dispatch depth 7 > 3
+contracts/src/deploy/17_policy.rho:403: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:413: M-001: dispatch depth 4 > 3
+contracts/src/deploy/17_policy.rho:413: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:418: M-001: dispatch depth 5 > 3
+contracts/src/deploy/17_policy.rho:418: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:430: M-001: dispatch depth 6 > 3
+contracts/src/deploy/17_policy.rho:430: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:436: M-001: dispatch depth 7 > 3
+contracts/src/deploy/17_policy.rho:470: M-001: dispatch depth 6 > 3
+contracts/src/deploy/17_policy.rho:470: M-004: total arm must repost the state cell and reply
+contracts/src/deploy/17_policy.rho:476: M-001: dispatch depth 7 > 3
+contracts/src/deploy/40_payments.rho:188: M-001: dispatch depth 4 > 3
+contracts/src/deploy/40_payments.rho:201: M-001: dispatch depth 5 > 3
+check-match-style: 24 files, 397 match sites (109 let, 288 dispatch), 64 violation(s), 0 suppression(s)
+  depth histogram: {'0': 73, '1': 163, '2': 81, '3': 30, '4': 24, '5': 12, '6': 9, '7': 5}
+  per file: contracts/src/deploy/00_root.rho=22, contracts/src/deploy/01_kernel.rho=4, contracts/src/deploy/02_admin.rho=11, contracts/src/deploy/03_terms.rho=9, contracts/src/deploy/04_math.rho=22, contracts/src/deploy/05_rgen.rho=27, contracts/src/deploy/10_syndicate.rho=51, contracts/src/deploy/11_broker.rho=9, contracts/src/deploy/12_risk.rho=33, contracts/src/deploy/13_slip.rho=50, contracts/src/deploy/14_line.rho=6, contracts/src/deploy/15_distribution.rho=27, contracts/src/deploy/16_fund.rho=25, contracts/src/deploy/17_policy.rho=37, contracts/src/deploy/18_claim.rho=26, contracts/src/deploy/19_books.rho=9, contracts/src/deploy/40_payments.rho=16, contracts/src/lib/AdminGuard.rho=1, contracts/src/lib/AdminSet.rho=1, contracts/src/lib/AdminsText.rho=1, contracts/src/lib/Auth.rho=1, contracts/src/lib/Guard.rho=6, contracts/src/lib/Money.rho=2, contracts/src/lib/Resolve.rho=1

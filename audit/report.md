@@ -1,6 +1,6 @@
 # Audit report
 
-> **Status:** Internal desk, tabletop, install-RCA and behavioural review, 2026-11-06.
+> **Status:** Internal desk, tabletop, install-RCA, match-style and behavioural review, 2026-11-07.
 > **Not an independent audit.** The 17-term install is E2 green after the fixes recorded in
 > `rca.yaml#RCA-001`. The campaign records 38 runs, 410 assertions and 0 assertion failures;
 > 37 of 40 registered suites pass and three process gates are `not_run`. Install evidence is
@@ -27,13 +27,13 @@ and processed. Three caveats bound that claim:
 | Interfaces in the composition matrix | 46 |
 | HAZOP nodes | 19 |
 | Public arms registered | 168 |
-| Hazards | 36 |
-| Findings | 25 |
+| Hazards | 37 |
+| Findings | 28 |
 | P0 findings | 5 (5 fixed; F-002/F-022/F-023/F-024 E2 install) |
-| P1 findings | 13 (13 fixed, 0 open) |
-| P2/P3 findings | 7 (4 fixed, 3 accepted) |
-| Improvements | 25 |
-| Tests registered | 40 (37 passing, 3 `not_run`) |
+| P1 findings | 14 (14 fixed, 0 open) |
+| P2/P3 findings | 9 (6 fixed, 3 accepted) |
+| Improvements | 29 |
+| Tests registered | 41 (37 passing, 3 `not_run`, 1 implemented) |
 | Lean theorems registered | 285 (register and source agree; no unregistered theorem) |
 | Claims | 26 covered, 1 partial, 1 tool; 15 critical primitives covered |
 
@@ -77,10 +77,13 @@ and processed. Three caveats bound that claim:
 | F-020 payable can exceed aggregate | fixed | `SureMath.payable` is the documented minimum and `Policy.settleClaim` propagates refusals without losing state; INV-9 is covered. |
 | F-021 settled claim can be re-agreed | fixed | `agree`/`addEvidence`/`classify`/`assess`/`dispute`/`applyDecision` reject terminal status; INV-10 is covered. |
 | F-025 harness manual propose masks proposer errors | fixed | The harness now calls manual propose only when configured or `RSURE_FORCE_PROPOSE=1`; the node advertises autopropose. |
+| F-027 mutating match refusal loses the state cell | fixed | Nineteen refusal arms replied after consuming the cell without reposting; every refusal now reposts. HZ-037 and RCA-002 record it. |
 
 ## P2/P3
 
-F-013 termsHash is revalidated at bind (fixed); F-014 claim-to-policy binding is accepted as
+F-013 termsHash is revalidated at bind (fixed); F-026 non-let dispatch depth above 3 is
+flattened to a maximum of 3 (fixed); F-028 identical, duplicate and dead arms are merged
+(fixed); F-014 claim-to-policy binding is accepted as
 the policy-token/claims-map boundary; F-015 cross-cell writers and overloaded arms are
 declared and checked (fixed); F-016 `distState` catalogue name corrected (fixed); F-017
 tri-test presence is accepted with the NAIC off-chain quality note; F-018 external reply
