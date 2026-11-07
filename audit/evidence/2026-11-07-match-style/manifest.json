@@ -8,7 +8,7 @@
     "audit": "internal",
     "production": false,
     "dynamic": "static gate only",
-    "note": "E1 is the static scanner on source. The local reducer passed after the arity fix; the devnet campaign was interrupted by shared-devnet resets and is not a claim of this evidence set."
+    "note": "E1 is the static scanner on source. The 2026-11-07 campaign on the refactored tree passes 38/38 run suites with 410 assertions and 3/3 Playwright journeys; the local reducer also passes."
   },
   "artifacts": [
     {
@@ -67,16 +67,14 @@
     "before_inventory": "recorded (397 sites, 64 violations on b4e671d; before-report.txt)",
     "call_arity": "pass (41 files, 0 mismatches; make check-call-arity)",
     "local_reducer": "pass (17 terms, 25 vectors, journey, refusals, variance; after the helper arity fix)",
-    "behavioural_suites": "partial (ten suites passed on the refactored tree before the shared devnet was reset; the fund helper arity defect the run exposed is fixed and the local reducer passes)"
+    "behavioural_suites": "pass (38/38 run suites, 410 assertions, 0 failures; web-e2e 3/3)"
   },
-  "reasons": {
-    "behavioural_suites": "The 40403 devnet was recreated by another session mid-campaign (13:32, 15:09 and 15:23), so later suites reported not_run. The run exposed a helper-call arity defect in the fund refactor; it is fixed, gated by tools/check_call_arity.py, and the local reducer passes on the fixed tree."
-  },
+  "reasons": {},
   "limitations": [
     "Internal audit, not an independent review; no production-safety claim.",
     "The scanner is a brace/token heuristic; make parse-check remains the syntax gate.",
     "M-004 accepts a total arm that forwards the cell and reply to a helper defined in the same file; the helper is checked separately.",
-    "The behavioural campaign is incomplete because the shared devnet was reset; the local reducer is the dynamic evidence for this set.",
-    "The before inventory uses the final checker on commit b4e671d, not the first scanner revision, so the M-004 count is higher than the first run reported."
+    "The before inventory uses the final checker on commit b4e671d, not the first scanner revision, so the M-004 count is higher than the first run reported.",
+    "The campaign ran against a shared devnet; concurrent peer deploys were present during earlier attempts, though the final run is green."
   ]
 }

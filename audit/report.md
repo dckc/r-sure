@@ -2,9 +2,11 @@
 
 > **Status:** Internal desk, tabletop, install-RCA, match-style and behavioural review, 2026-11-07.
 > **Not an independent audit.** The 17-term install is E2 green after the fixes recorded in
-> `rca.yaml#RCA-001`. The campaign records 38 runs, 410 assertions and 0 assertion failures;
-> 37 of 40 registered suites pass and three process gates are `not_run`. Install evidence is
-> not behavioural coverage. No primitive is audited or production-safe.
+> `rca.yaml#RCA-001`. The 2026-11-07 campaign records 38 run rows (37 behavioural suites plus the
+> fixture self-check), 410 assertions and 0 assertion failures; every row passes, and the
+> three Playwright journeys pass. Four
+> registered rows are process/tool gates (`not_run` or implemented static gates), not
+> behavioural suites. No primitive is audited or production-safe.
 
 ## Verdict
 
@@ -127,13 +129,13 @@ gap.
 - `make spec-check` runs the arity and match-style gates; both pass with zero findings.
 - `make local-reducer` passes all 17 terms, 25 vectors, the journey, the refusal vectors and
   the variance checks on the refactored tree.
-- `deployments/suite-results.json` records the last full campaign (38 runs, 410 assertions,
-  no assertion failure). That campaign predates the match refactor. A partial campaign on
-  the refactored tree passed root, payments, syndicate, capital, broker, risk, variance,
-  slip, subscription and binding before the shared devnet was reset; it also exposed a
-  helper-call arity defect in the fund refactor, now fixed and covered by
-  `make check-call-arity`. The full campaign must be rerun before the new terms are called
-  behavioural-verified; `make local-reducer` passes on the fixed tree.
+- `deployments/suite-results.json` records the 2026-11-07 campaign on the refactored tree:
+  37/37 behavioural suites plus the fixture self-check pass, 410 assertions, 0
+  failures; `make web-e2e` passes 3/3 journeys.
+  The campaign exposed a helper-call arity defect during development; it is fixed and gated
+  by `make check-call-arity`. The expiry fixture now uses the placement start for the risk
+  period, so a slow shared devnet cannot push `start >= end`. `make local-reducer` also
+  passes on the fixed tree.
 
 ## Next steps
 

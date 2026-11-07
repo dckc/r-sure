@@ -310,7 +310,6 @@ class Placement:
     def submit_risk(self) -> str:
         self._ensure_signer(self.insured)
         book = self.component("component:risk-book")
-        now = actors.block_height()
         req = {
             "class": self.class_,
             "assetRef": {"kind": "site", "hash": f"asset:{self.name}",
@@ -328,7 +327,10 @@ class Placement:
                 "consequenceBasis": "declared-value",
                 "consequenceRef": f"consequence:{self.name}",
             },
-            "periodStart": now,
+            # Use the placement's start, not the submit-time height: broker and syndicate
+            # setup can take longer than a short test period under load, and RiskBook
+            # refuses start >= end. The period begins when the placement began.
+            "periodStart": self.start,
             "periodEnd": self.end,
             "declaredValue": self.aggregate,
             "requestedLimit": self.per_claim,
