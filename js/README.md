@@ -1,6 +1,27 @@
 # r-sure, as exos
 
-r-sure's open insurance market (syndicates, placing slips, policies, claims, and a central fund), ported from Rholang to durable objects in a [toybox](https://github.com/dckc/vattr97/tree/toybox-kernel/packages/toybox) zone. Where r-sure checks who signed a deploy, each party here holds a facet: a syndicate's manager holds its `manager` facet, the insured holds the slip's `insured` facet, and only the policy holds its lines' `policy` facets.
+r-sure's open insurance market (syndicates, placing slips, policies, claims, and a central fund), ported from Rholang to exos in [toybox](https://github.com/dckc/vattr97/tree/toybox-kernel/packages/toybox) zones on [workerd](https://github.com/cloudflare/workerd). Where r-sure checks who signed a deploy, each party here holds a facet: a syndicate's manager holds its `manager` facet, the insured holds the slip's `insured` facet, and only the policy holds its lines' `policy` facets.
+
+## Scope
+
+The canonical r-sure implementation is the Rholang in [contracts](../contracts) for the rholo
+node. This `js/` tree is a sibling, non-canonical port for the toybox/Endo/Agoric ecosystem:
+a separate implementation that shares r-sure's semantics and test vectors, not the rholo
+implementation. It does not run on rholo and is outside rholo's verification, audit, status
+and coverage claims.
+
+The rails differ. This port uses Agoric's
+[`@agoric/ertp`](https://github.com/Agoric/agoric-sdk/tree/master/packages/ERTP); r-sure on
+rholo uses rholo's native `rho:rchain:ertp` through
+[r-cash](https://github.com/rhovision-org/r-cash). This port does not use
+[OCapN](https://ocapn.org); an OCapN/Agoric bridge would be a separate interop path, not the
+same thing.
+
+Objects here are exos in toybox zones on workerd; `durable` means toybox's durable zone
+storage, not a Cloudflare Durable Object and not Endo's durable objects generally.
+
+CI for this tree is [`.github/workflows/js.yml`](../.github/workflows/js.yml), advisory and
+separate from the rholo gates.
 
 ## Getting started
 
