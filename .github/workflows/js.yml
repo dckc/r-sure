@@ -4,10 +4,8 @@ name: js sibling port (advisory)
 # and must not become a required check: the path filters mean it legitimately
 # does not run on unrelated changes.
 #
-# Fork PR limitation: for pull_request events from a fork, GitHub runs the
-# workflow file from the base branch, not one that exists only on the PR head.
-# This file therefore first runs after it lands on main. Do not use
-# pull_request_target to work around that.
+# It runs on pull requests that touch js/, including PRs from forks, with a
+# read-only token and no secrets. It does not need pull_request_target.
 
 on:
   push:
